@@ -1,0 +1,79 @@
++-----------------+
+    |   DataModule    |
+    +-----------------+
+    | - train_path    |
+    | - val_path      |
+    | - y_val_path    |
+    +-----------------+
+    | + load()        |
+    +-----------------+
+
+           |
+           | (Provides Data)
+           |
+           V
+
+    +-----------------------+
+    |      Experiment       |
+    +-----------------------+
+    | - preprocessor        |
+    | - threshold_selector  |
+    | - evaluator           |
+    | - logger              |
+    +-----------------------+
+    | + run()               |
+    | + run_tuning()        |
+    +-----------------------+
+            |
+            | (Uses to Prepare Data)
+            V
+    +-----------------------+       +-------------------+
+    | PreprocessingPipeline |<------|     Transform     |
+    +-----------------------+       +-------------------+
+    | - steps               |       | + fit()           |
+    +-----------------------+       | + transform()     |
+    | + fit_transform_split()|      | + get_artifact()  |
+    | + get_artifacts()     |       +---------+---------+
+    +-----------------------+                 |
+                                             / \ (Inherits)
+                                            /   \
+                              +-------------+   +--------------+
+                              | Scaler      |   | Feature      |
+                              | Transform   |   | Selector     |
+                              +-------------+   +--------------+
+
+
+            | (Coordinates)
+            |
+            V
+
+    +------------------------+
+    |  AnomalyModelWrapper   | (The unified contract)
+    +------------------------+
+    | - architecture         |
+    | - trainer              |
+    +------------------------+
+    | + fit(X_train, X_val)  |
+    | + get_scores(X)        |
+    +----+-----------+-------+
+         |           |
+         | (Wraps)   | (Uses to Train)
+         V           V
+
++----------------+   +-----------------------+
+|  Architecture  |   |      BaseTrainer      |
+| (PyTorch/SKL)  |   +-----------------------+
++----------------+   | - model               |
+| + forward()    |   | - cfg (PhaseConfig)   |
+| + fit()        |   +-----------------------+
+| + predict()    |   | + train()             |
++----------------+   | - compile_model()     |
+                     +-------+---------------+
+                             |
+                            / \ (Inherits Strategies)
+                           /   \
+             +------------+     +-------------+
+             | Standard   |     | Transfer    |
+             | Trainer    |     | Learning    |
+             |            |     | Trainer     |
+             +------------+     +-------------+

@@ -191,6 +191,8 @@ def build_preprocessor(cfg):
 
 
 class AnomalyModel(ABC):
+
+
     @abstractmethod
     def fit(self, X_train, X_val=None): 
         pass
@@ -320,8 +322,10 @@ class AETrainer():
 class AutoencoderModel(AnomalyModel):
     
     def __init__(self, model_cfg:AEConfig):
+    	self.model_cfg = model_cfg
         self.model = AE(model_cfg)
         self.trainer = AETrainer() # Only NNs see the Trainer, later pass training_cfg
+
 
     def fit(self, X_train_prep, X_val_prep=None):
         self.trainer.train(self.model, X_train_prep, X_val_prep)
@@ -353,8 +357,13 @@ class Experiment:
 
 
         # for dynamic inut dim
-        # Determine input_dim dynamically from the preprocessed data
-    	self.model.initialize(input_dim=X_train_p.shape[1])
+        # 2. Build the model (High-level orchestration)
+        # We pass the type and the params. The Factory handles the 'input_dim' logic.
+        self.model = ModelFactory.create(
+            model_type=self.cfg.model_type,
+            model_config=self.cfg.model_params,
+            runtime_params={"input_dim": X_train_p.shape[1]}
+        )
 
 
         self.model.fit(X_train_p, X_val_p)
@@ -387,6 +396,61 @@ class MLflowLogger:
 
 # https://gemini.google.com/app/36bc81e5d0ffd6c7
 
+
+
+
+
+
+
+#----------to choose the appropiate model--------------#
+class ModelFactory:
+    @staticmethod
+    def create(model_type: str, model_config: dict, runtime_params: dict):
+        """
+        The only place that knows how to 'construct' models.
+        """
+        if model_type == "autoencoder":
+            # Inject input_dim into config before creating
+            model_config.input_dim = runtime_params["input_dim"]
+            return AutoencoderModel(model_config)
+            
+        if model_type == "iso_forest":
+            return IsolationForestModel(model_config)
+            
+        raise ValueError(f"Unknown model: {model_type}")
+
+
+
+"""
+with traiin str.
+"""
+
+class ModelFactory:
+    @staticmethod
+    def create(cfg, runtime_params):
+        input_dim = runtime_params["input_dim"]
+        
+        if cfg.name == "autoencoder":
+            # 1. Build Architecture
+            architecture = AE(input_dim=input_dim, layers=cfg.layers)
+            
+            # 2. Handle Transfer Learning logic
+            if cfg.get("pretrained_path"):
+                architecture.load_state_dict(torch.load(cfg.pretrained_path))
+                if cfg.freeze_encoder:
+                    # Logic to freeze layers
+                    pass
+            
+            # 3. Choose Trainer
+            trainer = DeepLearningTrainer(epochs=cfg.epochs, lr=cfg.lr)
+            
+            # 4. Return the Wrapper
+            return AutoencoderModel(architecture, trainer)
+
+        if cfg.name == "iso_forest":
+            architecture = IsolationForest(**cfg.params)
+            trainer = SklearnTrainer()
+            return IsolationForestModel(architecture, trainer)
 
 
 
