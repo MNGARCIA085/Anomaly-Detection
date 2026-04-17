@@ -307,7 +307,7 @@ class AETrainer():
 		# ---- Train (only normal data) ----
 		X_t = torch.tensor(X_train, dtype=torch.float32)
 
-		for epoch in range(50):
+		for epoch in range(50): # pass it later to training config!!!!!
 		    optimizer.zero_grad()
 		    recon = model(X_t)
 		    loss = criterion(recon, X_t)
@@ -321,10 +321,15 @@ class AETrainer():
 # wrapper
 class AutoencoderModel(AnomalyModel):
     
-    def __init__(self, model_cfg:AEConfig):
+    def __init__(self, model_cfg:AEConfig, trainer):
     	self.model_cfg = model_cfg
         self.model = AE(model_cfg)
-        self.trainer = AETrainer() # Only NNs see the Trainer, later pass training_cfg
+        
+
+        self.trainer = trainer # injected 
+
+        #self.trainer = AETrainer() # Only NNs see the Trainer, later pass training_cfg
+                # later inject it
 
 
     def fit(self, X_train_prep, X_val_prep=None):

@@ -3,7 +3,7 @@
 class PreprocessingPipeline:
 
     def __init__(self, steps):
-        self.steps = steps
+        self.steps = steps # scaler, feat. sel..... "i saved them"
 
     def fit(self, X):
         for step in self.steps: # step can be scaler transform, feature selector....

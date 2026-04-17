@@ -1,0 +1,13 @@
+{
+  "step_0_ScalerTransform": "StandardScaler()",
+  "step_1_FeatureSelector": {
+    "indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+}

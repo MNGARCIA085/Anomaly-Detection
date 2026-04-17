@@ -29,6 +29,39 @@ from anomaly_detection.data.data import DataModule
 
 
 
+import pickle
+
+def load_pickle(path):
+    with open(path, "rb") as f:
+        return pickle.load(f)
+
+
+
+def save_pickle(obj, path):
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
+
+
+
+
+
+import mlflow
+import pickle
+import os
+
+# load form a mlflow run id
+def load_pipeline_from_run(run_id, artifact_path="pipeline.pkl"):
+    # downloads artifact locally and returns the local path
+    local_path = mlflow.artifacts.download_artifacts(
+        run_id=run_id,
+        artifact_path=artifact_path
+    )
+
+    with open(local_path, "rb") as f:
+        return pickle.load(f)
+
+
+
 
 
 
@@ -64,6 +97,55 @@ if __name__=="__main__":
 	#
 	a = prep.get_artifacts()
 	print(a)
+
+
+
+	# test logging
+
+
+	from anomaly_detection.infra.conf import init_mlflow
+
+
+	init_mlflow('Anomaly_Detection')
+
+
+	import pickle
+	import mlflow
+
+	with open("pipeline.pkl", "wb") as f:
+	    pickle.dump(prep, f)
+
+
+	"""
+	mlflow.log_artifact("pipeline.pkl")
+	mlflow.log_dict(prep.get_artifacts(), "artifacts.json")  # for inspection
+	"""
+
+	#
+	run_id = "23fbbb8d7fce4b6cbe4de1f35215ea67"
+
+	pipeline = load_pipeline_from_run(run_id)
+	print(pipeline)
+
+	d = pipeline.get_artifacts()
+
+	print(d)
+
+	s = d['step_0_ScalerTransform']
+	print(s)
+	print(s.mean_)
+
+	#X_new = pipeline.transform(X_new)
+
+
+	"""
+	To make inference
+		pipeline = load_pickle("pipeline.pkl")
+		X_new = pipeline.transform(X_new)
+	"""
+
+	pipeline = load_pickle("pipeline.pkl")
+
 
 
 

@@ -1,0 +1,43 @@
+project_root/
+│
+├── configs/                # YAML/Hydra files (Hyperparams, paths, etc.)
+│   ├── model/              # ae.yaml, iso_forest.yaml
+│   ├── trainer/            # standard.yaml, transfer.yaml
+│   └── main.yaml           # Global orchestration config
+│
+├── src/
+│   ├── __init__.py
+│   ├── main.py             # Entry point (Orchestrator)
+│   │
+│   ├── core/               # The "Unchanging" logic
+│   │   ├── base.py         # ABCs (AnomalyModel, BaseTrainer, Transform)
+│   │   ├── pipeline.py     # PreprocessingPipeline class
+│   │   ├── evaluator.py    # Evaluator & ThresholdSelector
+│   │   └── factory.py      # ModelFactory & TrainerFactory
+│   │
+│   ├── data/               # Data handling
+│   │   └── datamodule.py   # DataModule class
+│   │
+│   ├── preprocessing/      # Reusable transforms
+│   │   ├── scalers.py      # ScalerTransform
+│   │   └── features.py     # FeatureSelector
+│   │
+│   ├── models/             # Different files for different model types
+│   │   ├── __init__.py     # Registry of models for the Factory
+│   │   ├── classic.py      # IsoForest, 1-Class SVM (Sklearn wrappers)
+│   │   ├── neural_nets/    # Complex architectures
+│   │   │   ├── architectures.py # Pure PyTorch/TF (AE, GNN)
+│   │   │   └── wrappers.py      # AutoencoderModel(AnomalyModel)
+│   │
+│   ├── training/           # Training strategies
+│   │   ├── standard.py     # StandardTrainer
+│   │   ├── transfer.py     # TransferLearningTrainer
+│   │   └── callbacks.py    # Custom callback logic
+│   │
+│   └── utils/              # Logging and helpers
+│       ├── logger.py       # MLflowLogger
+│       └── tuning.py       # OptunaTuner / RayTune logic
+│
+├── tests/                  # Unit tests for core and models
+├── requirements.txt
+└── .gitignore
