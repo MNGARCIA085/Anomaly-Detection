@@ -1,0 +1,23 @@
+
+defaults:
+  - _self_
+  - model_type: ae
+  - preprocessing: preprocessing
+  - models: ae
+  - training: ae
+  #- override hydra/launcher: joblib
+
+random_state: 42
+experiment_name: anomaly_detection
+
+tracking:
+  enabled: true
+  #uri: "sqlite:///mlflow.db"
+
+
+
+
+
+#hydra:
+#  launcher:
+#    n_jobs: 2

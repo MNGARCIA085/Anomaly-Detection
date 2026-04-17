@@ -1,0 +1,5 @@
+defaults:
+  - /models: ae
+  - /training: ae
+
+name: ae
