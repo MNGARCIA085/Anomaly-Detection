@@ -17,52 +17,59 @@ class ModelFactory:
 
 
 
-from anomaly_detection.models.isoforest import IsolationForestModel
+from anomaly_detection.models.isoforest import IsolationForestModel, build_forest
+
+
+from anomaly_detection.models.ae import AE, AETrainer, AutoencoderModel
+
+
 
 
 
 class ModelFactory:
     @staticmethod
     def create(model_type, model_cfg, runtime_params):
-        input_dim = runtime_params["input_dim"]
         
-        if model_type == "autoencoder":
-            pass
 
-            """
-            # 1. Build Architecture
-            architecture = AE(input_dim=input_dim, layers=cfg.layers)
+        #input_dim = runtime_params["input_dim"] # error if i dont pass it, put guards
+        input_dim = runtime_params.get("input_dim", 11)
+
+
+        
+        if model_type == "ae":
+
+            #input_dim = 8
+            model_cfg['input_dim'] = input_dim # see later if this is clean!!!; maybe a merge is better
+            #print(model_cfg)
+
+            # add input_dim to config!!! OR update default value
+
+            # build model
+            model = AE(model_cfg)
+
+            # choose trainer
+            trainer = AETrainer() # quick test, adapt later, pass config, see TL
             
-            # 2. Handle Transfer Learning logic
-            if cfg.get("pretrained_path"):
-                architecture.load_state_dict(torch.load(cfg.pretrained_path))
-                if cfg.freeze_encoder:
-                    # Logic to freeze layers
-                    pass
-            
-            # 3. Choose Trainer
-            trainer = DeepLearningTrainer(epochs=cfg.epochs, lr=cfg.lr)
-            
-            # 4. Return the Wrapper
-            return AutoencoderModel(architecture, trainer)
-            """
+            # return the warpper
+            return AutoencoderModel(model, trainer)
+
 
         if model_type == "isoforest":
-            #architecture = IsolationForest(**cfg.params)
-            #trainer = SklearnTrainer()
+            model = build_forest(model_cfg) # or **cfg.params
+            print(model)
             trainer = None
-            return IsolationForestModel(model_cfg, trainer)
+            return IsolationForestModel(model, trainer) # change!!!; pass inst. model
 
 
 
 
-
+# create a builder
 
 
 
 """
 Correct ownership:
-Factory owns the decision
+Factory owns the decision (but also creates the model)
 Wrapper owns the usage
 Experiment doesn’t care
 """

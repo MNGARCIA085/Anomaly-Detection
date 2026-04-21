@@ -23,9 +23,8 @@ def build_forest(cfg: IsoForestConfig):
 # wrapper
 class IsolationForestModel(AnomalyModel):
 
-    def __init__(self, model_cfg, trainer):
-        self.model_cfg = model_cfg
-        self.model = build_forest(model_cfg)
+    def __init__(self, model, trainer):
+        self.model = model
         self.trainer = trainer
 
     def fit(self, X_train, X_val): # manage X_val properly!!!!!!!

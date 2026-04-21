@@ -2,7 +2,7 @@
 from anomaly_detection.models.factory import ModelFactory
 
 
-class Experiment:
+class Experimentv0:
     def __init__(self, preprocessor, threshold_selector, evaluator, logger=None):
         self.preprocessor = preprocessor
         self.threshold_selector = threshold_selector
@@ -38,15 +38,16 @@ class Experiment:
 
 
 
-"""
+
 class Experiment:
 
-    def __init__(self, preprocessor, threshold_selector, evaluator, model_type, model_cfg):
-    	self.model_type = model_type
-    	self.model_cfg = model_cfg
+    def __init__(self, preprocessor, threshold_selector, evaluator, model_type, model_cfg, logger=None):
+        self.model_type = model_type
+        self.model_cfg = model_cfg
         self.preprocessor = preprocessor
         self.threshold_selector = threshold_selector
         self.evaluator = evaluator
+        self.logger = logger
 
     def run(self, X_train, X_val, y_val):
 
@@ -59,7 +60,7 @@ class Experiment:
         model_factory = ModelFactory()
         self.model = model_factory.create( # later also pass training config (and include in there the staretgy)!!!!
             model_type=self.model_type,
-            model_config=self.model_cfg,
+            model_cfg=self.model_cfg,
             runtime_params={"input_dim": X_train_p.shape[1]}
         )
         # prev code is a wrapper, returns isntnacniated model + trainer
@@ -82,4 +83,3 @@ class Experiment:
 
         return metrics, threshold
 
-"""

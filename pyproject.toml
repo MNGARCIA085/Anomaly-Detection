@@ -12,7 +12,6 @@ dependencies = [
   "mlflow",
   "pandas",
   "numpy",
-  #"tensorflow",
   "scikit-learn",
 ]
 
