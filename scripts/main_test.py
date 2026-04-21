@@ -33,6 +33,7 @@ from omegaconf import DictConfig
 from anomaly_detection.preprocessing.transforms.scaling import ScalerTransform
 
 
+#from anomaly_detection.models.factory import model_builder
 
 
 
@@ -49,38 +50,23 @@ def main(cfg):
     prep = PreprocessingPipeline([ScalerTransform(StandardScaler)])
     evaluator = Evaluator()
     selector = ThresholdSelector()
+
+
+    # how to build this specific model, given runtime info
+    model_builder = lambda runtime_params: ModelFactory.create(cfg.model_type.name, 
+                cfg.model_type.models, runtime_params)
+
     
     # Initialize the experiment runner
-    exp = Experiment(prep, selector, evaluator, cfg.model_type.name, cfg.model_type.models) #, logger=MLflowLogger())
+    exp = Experiment(prep, selector, evaluator) #, logger=MLflowLogger())
 
-    # --- 3. CONFIGURATION (In reality, this comes from Hydra/YAML) ---
-    # Example for a Transfer Learning AE
+
+    # Example for a Transfer Learning AE; i can pŕpbably handle TL via config.
     
-
-
-    # --- 4. EXECUTION ---
-    """
-    # Use the Factory to build the ready-to-use wrapper
-    model_wrapper = ModelFactory.create(
-        model_type="ae",
-        model_cfg=cfg.model_type.models,
-        runtime_params={"input_dim": X_train.shape[1]}, # later after prep i shpuild do this!!!
-                                # i need to do this in teh exp
-                                # bc the shape should be with X_val
-        #train_cfg=train_cfg
-    )
-    """
-
-
-
-    # cleanest approach : https://chatgpt.com/c/69e2c1ad-3e74-83e9-97b2-c0f0786ca927
 
     # Run the experiment
     print("Starting Experiment...")
-    #final_metrics, final_threshold = exp.run(model_wrapper, X_train, X_val, y_val)
-    final_metrics, final_threshold = exp.run(X_train, X_val, y_val)
-
-
+    final_metrics, final_threshold = exp.run(model_builder, X_train, X_val, y_val)
     print(f"Final F1 Score: {final_metrics['f1']:.4f}")
 
 

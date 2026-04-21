@@ -1,0 +1,19 @@
+random_state: 42
+experiment_name: anomaly_detection
+tracking:
+  enabled: true
+model_type:
+  models:
+    n_estimators: 100
+    contamination: 0.1
+    random_state: 42
+  training: {}
+  name: isoforest
+preprocessing:
+  image_dir: images-small
+  train_path: train-small.csv
+  valid_path: valid-small.csv
+  test_path: test.csv
+models:
+  input_dim: 11
+training: {}

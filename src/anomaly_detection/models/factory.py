@@ -25,7 +25,7 @@ from anomaly_detection.models.ae import AE, AETrainer, AutoencoderModel
 
 
 
-
+# right now it does everything (model+traibner) maybe change that later
 class ModelFactory:
     @staticmethod
     def create(model_type, model_cfg, runtime_params):
@@ -56,7 +56,6 @@ class ModelFactory:
 
         if model_type == "isoforest":
             model = build_forest(model_cfg) # or **cfg.params
-            print(model)
             trainer = None
             return IsolationForestModel(model, trainer) # change!!!; pass inst. model
 
