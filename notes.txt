@@ -9,3 +9,66 @@ torchaudio
 
 
 https://gemini.google.com/app/5cf4029e8aca3015
+
+----
+
+src/
+├── models/
+│   ├── base.py              # The abstract AnomalyModel class
+│   ├── ae/                  # EVERYTHING for Autoencoders
+│   │   ├── __init__.py      # Exports the 'build_ae_wrapper'
+│   │   ├── architecture.py  # The nn.Module (AE class)
+│   │   ├── configs.py       # AEConfig, AETrainingConfig
+│   │   ├── tuner.py         # sample_ae_model_cfg functions
+│   │   └── wrapper.py       # AutoencoderModel(AnomalyModel) & build_ae_wrapper
+│   ├── iso_forest/          # EVERYTHING for Isolation Forest
+│   │   ├── wrapper.py
+│   │   └── tuner.py
+│   └── factory.py           # The "Switchboard" to pick a model
+
+
+
+
+--
+registry
+
+# src/models/factory.py
+from src.models.ae.wrapper import build_ae_wrapper
+from src.models.vae.wrapper import build_vae_wrapper
+
+MODEL_REGISTRY = {
+    "ae": build_ae_wrapper,
+    "vae": build_vae_wrapper
+}
+
+def get_model(name, **kwargs):
+    return MODEL_REGISTRY[name](**kwargs)
+
+
+
+https://gemini.google.com/app/4c9dcf1c1d4d89d6
+
+
+--
+
+
+src/
+├── models/
+│   ├── base.py              # Base classes: AnomalyModel and BaseTuner (ABC)
+│   ├── factory.py           # The MODEL_REGISTRY and get_model() logic
+│   │
+│   ├── ae/                  # AUTOENCODER FAMILY
+│   │   ├── architecture.py  # The PyTorch nn.Module
+│   │   ├── configs.py       # Dataclasses (AEConfig, AETrainingConfig)
+│   │   ├── tuner.py         # The AETuner(BaseTuner) class
+│   │   ├── trainer.py       # The AETrainer logic
+│   │   └── wrapper.py       # AutoencoderModel(AnomalyModel) & build_ae_wrapper
+│   │
+│   ├── iso_forest/          # ISOLATION FOREST FAMILY
+│   │   ├── tuner.py         # The IsoForestTuner (suggests n_estimators, etc.)
+│   │   └── wrapper.py       # IsoForestModel(AnomalyModel) & build_iso_wrapper
+│   │
+│   └── vae/                 # VAE FAMILY (Same pattern)
+│       ├── architecture.py
+│       ├── tuner.py
+│       └── wrapper.py

@@ -21,6 +21,11 @@ class Experiment:
         # 3. Wrapper (model + trainer)
         model_wrapper = model_builder(runtime_params) 
 
+
+        print('dsfdsf dsfdsjfpodsjofdsjopfjdspofjpofdsjpo')
+        print(model_wrapper)
+
+
         # 4. Train
         model_wrapper.fit(X_train_p, X_val_p)
 
