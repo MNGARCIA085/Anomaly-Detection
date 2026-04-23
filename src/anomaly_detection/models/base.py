@@ -24,6 +24,7 @@ class BaseTuner(ABC):
     def sample_model_config(self, trial, base_cfg, runtime_params): 
         pass
     
+    # see if isoforest.. really needs this!!!
     @abstractmethod
     def sample_training_config(self, trial, base_cfg): 
         pass

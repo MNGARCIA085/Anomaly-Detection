@@ -10,7 +10,7 @@ class AETrainer():
         self.epochs = cfg.epochs
         self.batch_size = cfg.batch_size
 
-    # later -> add dataloaders...; callbacks
+    # later -> add dataloaders...; callbacks.....
 
 
     # for now very simpel, later, also rain with x_val

@@ -35,3 +35,8 @@ def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None):
     model = build_model(model_cfg, runtime_params)
     trainer = AETrainer(training_cfg)
     return AutoencoderModel(model, trainer)
+
+
+# to think: https://chatgpt.com/c/69eaa917-7050-83e9-a65f-ec92e2e25fc8
+
+

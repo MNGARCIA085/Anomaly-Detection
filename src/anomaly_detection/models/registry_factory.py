@@ -12,7 +12,8 @@
 from anomaly_detection.models.ae.wrapper import build_wrapper as build_ae_wrapper
 from anomaly_detection.models.ae.schemas import AEConfig, AETrainingConfig
 
-
+from anomaly_detection.models.isoforest.wrapper import build_wrapper as build_iforest_wrapper
+from anomaly_detection.models.isoforest.schemas import IsoForestConfig
 
 
 class ModelFactory:
@@ -34,9 +35,13 @@ class ModelFactory:
                 trial
             )
 
-        elif name == "iforest":
+        elif name == "isoforest":
 
-            model_cfg = IsoForestConfig(**cfg.models.iforest)
+            #print(cfg.model_type.models)
+
+            model_cfg = IsoForestConfig(**cfg.model_type.models)
+
+            #print('cfg', model_cfg)
 
             return build_iforest_wrapper(
                 model_cfg,

@@ -7,7 +7,7 @@ from anomaly_detection.models.ae.schemas import AEConfig, AETrainingConfig
 
 class AETuner(BaseTuner):
 
-    # for tng, with oiptuna; returns model config!!!
+    # for tng, with optuna; returns model config!!!
     def sample_model_config(self, trial, base_cfg, runtime_params): # see later conf.
         
         input_dim = runtime_params["input_dim"]

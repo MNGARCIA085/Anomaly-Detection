@@ -62,7 +62,7 @@ def main(cfg):
 
 
 
-    
+    """
     print("Running single experiment...")
 
     wrapper_builder = build_wrapper_builder(trial=None)
@@ -76,7 +76,7 @@ def main(cfg):
 
     print(f"F1: {metrics['f1']:.4f}")
     return
-    
+    """
 
 
     # =========================================================
