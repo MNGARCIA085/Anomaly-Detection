@@ -1,0 +1,37 @@
+import torch
+from anomaly_detection.models.base import AnomalyModel
+from anomaly_detection.models.ae.tuner import AETuner
+from anomaly_detection.models.ae.architecture import build_model
+from anomaly_detection.models.ae.trainer import AETrainer
+
+
+# wrapper class
+class AutoencoderModel(AnomalyModel):
+    
+    def __init__(self, model, trainer):
+        self.model = model
+        self.trainer = trainer # injected, Only NNs see the Trainer
+
+
+    def fit(self, X_train_prep, X_val_prep=None):
+        self.trainer.train(self.model, X_train_prep, X_val_prep)
+
+
+    def get_scores(self, X):
+        X_t = torch.tensor(X, dtype=torch.float32)
+        recon = self.model(X_t).detach()
+        error = ((X_t - recon) ** 2).mean(dim=1).numpy()
+        return error
+
+
+
+# builder
+def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None):
+    if trial is not None:
+        tuner = AETuner()
+        model_cfg = tuner.sample_model_config(trial, model_cfg, runtime_params)
+        training_cfg = tuner.sample_training_config(trial, training_cfg)
+
+    model = build_model(model_cfg, runtime_params)
+    trainer = AETrainer(training_cfg)
+    return AutoencoderModel(model, trainer)

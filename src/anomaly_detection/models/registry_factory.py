@@ -2,7 +2,15 @@
 
 
 #from .aev1 import build_ae_wrapper, AEConfig, AETrainingConfig # later to AEModelConfig
-from .aev2 import build_ae_wrapper, AEConfig, AETrainingConfig
+
+
+
+# ok too
+#from .aev2 import build_ae_wrapper, AEConfig, AETrainingConfig
+
+
+from anomaly_detection.models.ae.wrapper import build_wrapper as build_ae_wrapper
+from anomaly_detection.models.ae.schemas import AEConfig, AETrainingConfig
 
 
 
@@ -18,6 +26,7 @@ class ModelFactory:
             model_cfg = AEConfig(**cfg.model_type.models) #**cfg.models.autoencoder
             training_cfg = AETrainingConfig(**cfg.model_type.training)
 
+            
             return build_ae_wrapper(
                 model_cfg,
                 training_cfg,

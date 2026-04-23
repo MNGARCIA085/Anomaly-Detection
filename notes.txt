@@ -52,6 +52,8 @@ https://gemini.google.com/app/4c9dcf1c1d4d89d6
 --
 
 
+confiog -> schemas
+
 src/
 ├── models/
 │   ├── base.py              # Base classes: AnomalyModel and BaseTuner (ABC)

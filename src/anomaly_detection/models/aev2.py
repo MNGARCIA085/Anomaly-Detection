@@ -58,27 +58,18 @@ class AE(nn.Module):
 
 
 
-# wrapper
-class AutoencoderModel(AnomalyModel):
-    
-    def __init__(self, model, trainer):
-        self.model = model
-        self.trainer = trainer # injected, Only NNs see the Trainer
-
-
-    def fit(self, X_train_prep, X_val_prep=None):
-        self.trainer.train(self.model, X_train_prep, X_val_prep)
-
-
-    def get_scores(self, X):
-        X_t = torch.tensor(X, dtype=torch.float32)
-        recon = self.model(X_t).detach()
-        error = ((X_t - recon) ** 2).mean(dim=1).numpy()
-        return error
 
 
 
 ##########
+
+
+"""
+build_ae_model
+sample_ae_model_cfg
+sample_ae_training_cfg
+build_ae_wrapper
+"""
 
 
 

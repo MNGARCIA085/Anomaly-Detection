@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 
+# Wrapper
 class AnomalyModel(ABC):
 
     @abstractmethod
@@ -14,4 +15,16 @@ class AnomalyModel(ABC):
 
 
 
+# annotate what every method should do
+
+
+# Tuner
+class BaseTuner(ABC):
+    @abstractmethod
+    def sample_model_config(self, trial, base_cfg, runtime_params): 
+        pass
+    
+    @abstractmethod
+    def sample_training_config(self, trial, base_cfg): 
+        pass
 
