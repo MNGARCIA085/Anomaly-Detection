@@ -1,7 +1,11 @@
 from anomaly_detection.models.base import AnomalyModel
 from anomaly_detection.models.isoforest.tuner import IsoForestTuner
-
 from anomaly_detection.models.isoforest.architecture import build_model
+from anomaly_detection.models.schemas import IntParam, FloatParam
+from .schemas import IsoForestTuningConfig
+
+
+
 
 # Model wrapper
 class IsolationForestModel(AnomalyModel):
@@ -18,28 +22,21 @@ class IsolationForestModel(AnomalyModel):
 
 
 
-# builder
-def build_wrapper(model_cfg, runtime_params, trial=None): # training_config?
+
+
+
+# builder (new file????)
+def build_wrapper(model_cfg, runtime_params, trial=None, cfg=None): # training_config?
+    
     if trial is not None:
         tuner = IsoForestTuner()
-        model_cfg = tuner.sample_model_config(trial, model_cfg, runtime_params)
-
-    print('cfg', model_cfg)
+        model_tuning_cfg = IsoForestTuningConfig(
+            n_estimators=IntParam("n_estimators", 50, 300),
+            contamination=FloatParam("contamination", 0.001, 0.1, log=True)
+        )
+        model_cfg = tuner.sample_model_config(trial, model_tuning_cfg, runtime_params)
 
     model = build_model(model_cfg) # runtime_params?
     return IsolationForestModel(model)
 
 
-
-"""
-# builder
-def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None):
-    if trial is not None:
-        tuner = AETuner()
-        model_cfg = tuner.sample_model_config(trial, model_cfg, runtime_params)
-        training_cfg = tuner.sample_training_config(trial, training_cfg)
-
-    model = build_model(model_cfg, runtime_params)
-    trainer = AETrainer(training_cfg)
-    return AutoencoderModel(model, trainer)
-"""

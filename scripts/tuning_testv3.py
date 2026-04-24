@@ -68,7 +68,7 @@ def main(cfg):
 
 
 
-    
+    """
     print("Running single experiment...")
 
     #wrapper_builder = build_wrapper_builder(trial=None)
@@ -84,6 +84,7 @@ def main(cfg):
 
     print(f"F1: {metrics['f1']:.4f}")
     return
+    """
     
 
 
@@ -141,7 +142,7 @@ def main(cfg):
         exp=exp
     )
     
-    study = tuner.run_study(X_train, X_val, y_val, n_trials=10)
+    study = tuner.run_study(X_train, X_val, y_val, n_trials=5)
     print(f"Best Score: {study.best_value}")
 
     print("\nBest trial:")

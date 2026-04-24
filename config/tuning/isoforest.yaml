@@ -1,0 +1,12 @@
+model_space:
+  n_estimators:
+    name: n_estimators
+    low: 100
+    high: 200
+
+  contamination:
+    name: contamination
+    low: 0.02
+    high: 0.05
+
+

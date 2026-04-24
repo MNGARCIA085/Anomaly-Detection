@@ -1,0 +1,79 @@
+random_state: 42
+experiment_name: anomaly_detection
+tracking:
+  enabled: true
+model_type:
+  models:
+    input_dim: 11
+    encoder_dims:
+    - 8
+    - 4
+    decoder_dims:
+    - 8
+  training:
+    lr: 0.001
+    batch_size: 32
+    epochs: 5
+  tuning:
+    model:
+      n_layers:
+        name: n_layers
+        low: 1
+        high: 3
+      encoder_dim:
+        name: enc_dim
+        low: 16
+        high: 128
+    training:
+      lr:
+        name: lr
+        low: 0.0001
+        high: 0.01
+        log: true
+      batch_size:
+        name: batch_size
+        choices:
+        - 32
+        - 64
+        - 128
+      epochs: 10
+  name: ae
+preprocessing:
+  image_dir: images-small
+  train_path: train-small.csv
+  valid_path: valid-small.csv
+  test_path: test.csv
+models:
+  input_dim: 11
+  encoder_dims:
+  - 8
+  - 4
+  decoder_dims:
+  - 8
+training:
+  lr: 0.001
+  batch_size: 32
+  epochs: 5
+tuning:
+  model:
+    n_layers:
+      name: n_layers
+      low: 1
+      high: 3
+    encoder_dim:
+      name: enc_dim
+      low: 16
+      high: 128
+  training:
+    lr:
+      name: lr
+      low: 0.0001
+      high: 0.01
+      log: true
+    batch_size:
+      name: batch_size
+      choices:
+      - 32
+      - 64
+      - 128
+    epochs: 10

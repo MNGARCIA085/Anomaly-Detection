@@ -3,6 +3,10 @@ from anomaly_detection.models.base import AnomalyModel
 from anomaly_detection.models.ae.tuner import AETuner
 from anomaly_detection.models.ae.architecture import build_model
 from anomaly_detection.models.ae.trainer import AETrainer
+from anomaly_detection.models.schemas import IntParam, FloatParam, CategoricalParam
+from .schemas import AETuningConfig, AETrainingTuningConfig
+
+
 
 
 # wrapper class
@@ -25,12 +29,31 @@ class AutoencoderModel(AnomalyModel):
 
 
 
+
 # builder
-def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None):
+def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, cfg=None):
     if trial is not None:
+
+        # is diff. from model config bc in tuning i suggest params
+        model_tuning_cfg = AETuningConfig(
+            n_layers=IntParam(**cfg.model_type.tuning.model_space.n_layers), # if i pass tun_conf -> tconf.n_layers
+            encoder_dim=IntParam(**cfg.model_type.tuning.model_space.encoder_dim),
+        )
+
+        training_tuning_cfg = AETrainingTuningConfig(
+            lr=FloatParam(**cfg.model_type.tuning.training_space.lr),
+            batch_size=CategoricalParam(**cfg.model_type.tuning.training_space.batch_size),
+            epochs=cfg.model_type.tuning.training_space.epochs
+        )
+
+        
         tuner = AETuner()
-        model_cfg = tuner.sample_model_config(trial, model_cfg, runtime_params)
-        training_cfg = tuner.sample_training_config(trial, training_cfg)
+        
+
+        model_cfg = tuner.sample_model_config(trial, model_tuning_cfg, runtime_params)
+        training_cfg = tuner.sample_training_config(trial, training_tuning_cfg)
+
+
 
     model = build_model(model_cfg, runtime_params)
     trainer = AETrainer(training_cfg)

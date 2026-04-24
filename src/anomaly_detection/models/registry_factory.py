@@ -18,27 +18,27 @@ from anomaly_detection.models.isoforest.schemas import IsoForestConfig
 
 
 
-
+# later -> sepaarte completely from hydra conF!!!!!!!!!
 
 
 
 class ModelFactory:
 
     @staticmethod
-    def create(name, cfg, runtime_params, trial=None):
+    def create(name, cfg, runtime_params, trial=None): # cfg -> molde+training+tuning
 
         if name == "ae":
 
         	# confs from hydra, abstract later!!!
             model_cfg = AEConfig(**cfg.model_type.models) #**cfg.models.autoencoder
             training_cfg = AETrainingConfig(**cfg.model_type.training)
-
             
             return build_ae_wrapper(
                 model_cfg,
                 training_cfg,
                 runtime_params, # it must include input_dim
-                trial
+                trial,
+                cfg
             )
 
         elif name == "isoforest":
@@ -52,13 +52,21 @@ class ModelFactory:
             return build_iforest_wrapper(
                 model_cfg,
                 runtime_params,
-                trial
+                trial, 
+                cfg
             )
 
 
 
 
 
+
+
+
+
+
+
+#????????? do i use it????
 def model_builder_closure(model_name, cfg, runtime_params, trial=None):
     return ModelFactory.create(
         name=model_name,

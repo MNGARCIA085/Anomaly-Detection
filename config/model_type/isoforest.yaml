@@ -1,5 +1,6 @@
 defaults:
   - /models: isoforest
   - /training: isoforest
+  - /tuning: isoforest
 
 name: isoforest
