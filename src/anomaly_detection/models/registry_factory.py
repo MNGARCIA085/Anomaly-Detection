@@ -16,6 +16,12 @@ from anomaly_detection.models.isoforest.wrapper import build_wrapper as build_if
 from anomaly_detection.models.isoforest.schemas import IsoForestConfig
 
 
+
+
+
+
+
+
 class ModelFactory:
 
     @staticmethod
@@ -48,6 +54,41 @@ class ModelFactory:
                 runtime_params,
                 trial
             )
+
+
+
+
+
+def model_builder_closure(model_name, cfg, runtime_params, trial=None):
+    return ModelFactory.create(
+        name=model_name,
+        cfg=cfg,
+        runtime_params=runtime_params,
+        trial=trial # Optuna trial injected here
+    )
+
+
+
+
+"""
+class AnomalyModelBuilder:
+    def __init__(self, model_name, cfg, trial=None):
+        self.model_name = model_name
+        self.cfg = cfg
+        self.trial = trial
+
+    def __call__(self, runtime_params):
+        #This is what Experiment.run() calls.
+        return ModelFactory.create(
+            name=self.model_name,
+            cfg=self.cfg,
+            runtime_params=runtime_params,
+            trial=self.trial
+        )
+"""
+
+
+
 
 
 

@@ -30,6 +30,10 @@ Y_VAL_PATH = BASE_DIR / "data" / "servers" / "y_val_part2.npy"
 
 
 
+from anomaly_detection.experiments.run_tuning import AnomalyModelBuilder
+
+
+
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg):
@@ -46,6 +50,8 @@ def main(cfg):
     exp = Experiment(prep, selector, evaluator)
 
     # --- 3. BUILDER FACTORY (important change) ---
+    
+    """
     def build_wrapper_builder(trial=None):
 
         def wrapper_builder(runtime_params):
@@ -58,14 +64,16 @@ def main(cfg):
             )
 
         return wrapper_builder
-
-
-
-
     """
+
+
+
+    
     print("Running single experiment...")
 
-    wrapper_builder = build_wrapper_builder(trial=None)
+    #wrapper_builder = build_wrapper_builder(trial=None)
+
+    wrapper_builder = AnomalyModelBuilder(cfg.model_type.name, cfg) # trail=None (no tuning)
 
     metrics, threshold = exp.run(
         wrapper_builder,
@@ -76,7 +84,7 @@ def main(cfg):
 
     print(f"F1: {metrics['f1']:.4f}")
     return
-    """
+    
 
 
     # =========================================================
@@ -105,6 +113,9 @@ def main(cfg):
     # =========================================================
     print("Starting Optuna tuning...")
 
+
+
+    """
     def objective(trial):
 
         wrapper_builder = build_wrapper_builder(trial)
@@ -120,6 +131,18 @@ def main(cfg):
 
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=4) # laater form config!!!!
+    """
+
+    from anomaly_detection.experiments.run_tuning import AnomalyTuner
+
+    tuner = AnomalyTuner(
+        model_name=cfg.model_type.name, 
+        cfg=cfg, 
+        exp=exp
+    )
+    
+    study = tuner.run_study(X_train, X_val, y_val, n_trials=10)
+    print(f"Best Score: {study.best_value}")
 
     print("\nBest trial:")
     print(study.best_trial.params)
