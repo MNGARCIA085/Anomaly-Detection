@@ -30,21 +30,24 @@ class AutoencoderModel(AnomalyModel):
 
 
 
-# builder
+# builder (separate later)
 def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, cfg=None):
     if trial is not None:
+        # maybe converrt outside!!!!!!!!!!! (thra receives alreadju a Tunign conf!!!)
 
-        # is diff. from model config bc in tuning i suggest params
+        # let cfg whuich is in realidty tunign config be compose for aes
+
         model_tuning_cfg = AETuningConfig(
-            n_layers=IntParam(**cfg.model_type.tuning.model_space.n_layers), # if i pass tun_conf -> tconf.n_layers
-            encoder_dim=IntParam(**cfg.model_type.tuning.model_space.encoder_dim),
+            n_layers=IntParam(**cfg.model_space.n_layers), # if i pass tun_conf -> tconf.n_layers
+            encoder_dim=IntParam(**cfg.model_space.encoder_dim),
         )
 
         training_tuning_cfg = AETrainingTuningConfig(
-            lr=FloatParam(**cfg.model_type.tuning.training_space.lr),
-            batch_size=CategoricalParam(**cfg.model_type.tuning.training_space.batch_size),
-            epochs=cfg.model_type.tuning.training_space.epochs
+            lr=FloatParam(**cfg.training_space.lr),
+            batch_size=CategoricalParam(**cfg.training_space.batch_size),
+            epochs=10 #**cfg.training_space.epochs
         )
+
 
         
         tuner = AETuner()

@@ -25,20 +25,27 @@ from anomaly_detection.models.isoforest.schemas import IsoForestConfig
 class ModelFactory:
 
     @staticmethod
-    def create(name, cfg, runtime_params, trial=None): # cfg -> molde+training+tuning
+    def create(name, model_cfg, runtime_params, training_cfg=None, trial=None, tuning_cfg=None):
 
+        # before -> cfg eas everything
         if name == "ae":
+            # if trila here for now maybe
 
         	# confs from hydra, abstract later!!!
+            """
             model_cfg = AEConfig(**cfg.model_type.models) #**cfg.models.autoencoder
             training_cfg = AETrainingConfig(**cfg.model_type.training)
+            """
+
+            #model_cfg = AEConfig(**cfg.model_type.models) #**cfg.models.autoencoder
+            #training_cfg = AETrainingConfig(**cfg.model_type.training)
             
             return build_ae_wrapper(
                 model_cfg,
                 training_cfg,
                 runtime_params, # it must include input_dim
                 trial,
-                cfg
+                tuning_cfg
             )
 
         elif name == "isoforest":

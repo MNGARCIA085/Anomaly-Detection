@@ -138,8 +138,10 @@ def main(cfg):
 
     tuner = AnomalyTuner(
         model_name=cfg.model_type.name, 
-        cfg=cfg, 
-        exp=exp
+        exp=exp,
+        model_cfg=cfg.model_type.models, 
+        training_cfg=cfg.model_type.training,
+        tuning_cfg=cfg.model_type.tuning
     )
     
     study = tuner.run_study(X_train, X_val, y_val, n_trials=5)
@@ -152,3 +154,5 @@ def main(cfg):
 
 if __name__ == "__main__":
     main()
+
+# python -m scripts.tuning_testv3
