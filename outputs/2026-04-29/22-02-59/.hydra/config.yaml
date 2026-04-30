@@ -1,0 +1,60 @@
+random_state: 42
+experiment_name: anomaly_detection
+tracking:
+  enabled: true
+model_type:
+  models:
+    n_estimators: 100
+    contamination: 0.1
+    random_state: 42
+  training: {}
+  tuning:
+    model_space:
+      n_estimators:
+        name: n_estimators
+        low: 100
+        high: 200
+      contamination:
+        name: contamination
+        low: 0.02
+        high: 0.05
+  name: isoforest
+preprocessing:
+  image_dir: images-small
+  train_path: train-small.csv
+  valid_path: valid-small.csv
+  test_path: test.csv
+models:
+  input_dim: 11
+  encoder_dims:
+  - 8
+  - 4
+  decoder_dims:
+  - 8
+training:
+  lr: 0.001
+  batch_size: 32
+  epochs: 5
+tuning:
+  model_space:
+    n_layers:
+      name: n_layers
+      low: 1
+      high: 3
+    encoder_dim:
+      name: enc_dim
+      low: 16
+      high: 128
+  training_space:
+    lr:
+      name: lr
+      low: 0.0001
+      high: 0.01
+      log: true
+    batch_size:
+      name: batch_size
+      choices:
+      - 32
+      - 64
+      - 128
+    epochs: 10

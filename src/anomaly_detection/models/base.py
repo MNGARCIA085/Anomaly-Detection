@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 
+# later -> move ti a core fodler!!!
+
+
 # Wrapper
 class AnomalyModel(ABC):
 
@@ -14,10 +17,6 @@ class AnomalyModel(ABC):
         pass
 
 
-
-# annotate what every method should do
-
-
 # Tuner
 class BaseTuner(ABC):
     @abstractmethod
@@ -29,3 +28,20 @@ class BaseTuner(ABC):
     def sample_training_config(self, trial, training_tuning_cfg): 
         pass
 
+
+
+"""
+core/
+  wrapper.py      ← AnomalyModel
+  tuner.py        ← BaseTuner
+  builder.py      ← AnomalyModelBuilder
+  experiment.py
+
+models/
+  ae/
+    builder.py
+    tuner.py      ← AETuner
+    model.py
+    trainer.py
+    config.py
+"""

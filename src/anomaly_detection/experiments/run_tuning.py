@@ -35,7 +35,7 @@ class AnomalyTuner:
         self.exp = exp
         self.tuning_cfg = tuning_cfg
 
-    def run_study(self, build_fn, X_train, X_val, y_val, n_trials=20):
+    def run_study(self, build_fn, X_train, X_val, y_val, n_trials=5):
         study = optuna.create_study(direction="maximize")
         
         def objective(trial):
