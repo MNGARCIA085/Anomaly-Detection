@@ -28,8 +28,8 @@ class AutoencoderModel(AnomalyModel):
 def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, cfg=None):
     if trial is not None:
         tuner = AETuner()
-        model_cfg = tuner.sample_model_config(trial, cfg['model_space'], runtime_params)
-        training_cfg = tuner.sample_training_config(trial, cfg['training_space'])
+        model_cfg = tuner.sample_model_config(trial, cfg.model_space, runtime_params)
+        training_cfg = tuner.sample_training_config(trial, cfg.training_space)
 
     model = build_model(model_cfg, runtime_params)
     trainer = AETrainer(training_cfg)

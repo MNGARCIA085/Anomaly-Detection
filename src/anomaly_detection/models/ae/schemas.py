@@ -19,7 +19,7 @@ class AETrainingConfig:
 
 
 @dataclass
-class AETuningConfig:
+class AEModelTuningConfig:
     n_layers: IntParam
     encoder_dim: IntParam
 
@@ -29,3 +29,9 @@ class AETrainingTuningConfig:
     lr: FloatParam
     batch_size: CategoricalParam
     epochs: int  # fixed, not tuned (for now)
+
+
+@dataclass
+class AETuningConfig:
+    model_space: AEModelTuningConfig
+    training_space: AETrainingTuningConfig

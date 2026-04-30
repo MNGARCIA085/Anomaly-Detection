@@ -67,35 +67,24 @@ def main(cfg):
         training_cfg=cfg.model_type.training
     )
 
+    #from anomaly_detection.models.ae.config import build_ae_tuning_config
+
+    from anomaly_detection.models.registry import TUNING_CONFIG_REGISTRY
+    build_cfg_fn = TUNING_CONFIG_REGISTRY[cfg.model_type.name]
+
+    tuning_cfg = build_cfg_fn(cfg.model_type.tuning)
+    tuner = AnomalyTuner(exp, tuning_cfg)
+    tuner.run_study(build_fn, X_train, X_val, y_val, 10)
 
 
-    from anomaly_detection.models.ae.schemas import AETuningConfig, AETrainingTuningConfig
-    from anomaly_detection.models.schemas import IntParam, FloatParam, CategoricalParam
-    
-    # build appr. tuning config
-    def build_ae_tuning_config(cfg):
-        model_tuning_cfg = AETuningConfig(
-            n_layers=IntParam(**cfg.model_space.n_layers),
-            encoder_dim=IntParam(**cfg.model_space.encoder_dim),
-        )
-
-        training_tuning_cfg = AETrainingTuningConfig(
-            lr=FloatParam(**cfg.training_space.lr),
-            batch_size=CategoricalParam(**cfg.training_space.batch_size),
-            epochs=10 #cfg.training_space.epochs
-        )
-
-        return {
-            "model_space": model_tuning_cfg,
-            "training_space": training_tuning_cfg
-        } # later not a dict but a real conf compose coinf
-
+    """
     # then use a registry for this; tuning_config_registry
     tuning_cfg = build_ae_tuning_config(cfg.model_type.tuning)
 
     #tuner = AnomalyTuner(exp, cfg.model_type.tuning)
     tuner = AnomalyTuner(exp, tuning_cfg)
     tuner.run_study(build_fn, X_train, X_val, y_val, 10)
+    """
 
 
 
