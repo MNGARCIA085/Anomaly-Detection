@@ -134,6 +134,14 @@ def main(cfg):
     study.optimize(objective, n_trials=4) # laater form config!!!!
     """
 
+
+    # convert to the correct dataclass, use a registry to know the fucntion maybe
+    # right now here for quick tests
+    # later only with modle type it should choose well
+
+
+
+
     from anomaly_detection.experiments.run_tuning import AnomalyTuner
 
     tuner = AnomalyTuner(
