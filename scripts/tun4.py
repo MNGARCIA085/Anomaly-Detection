@@ -67,6 +67,25 @@ def main(cfg):
         training_cfg=cfg.model_type.training
     )
 
+
+    # simple
+    print(cfg)
+    wrapper_builder = AnomalyModelBuilder(cfg.model_type.name, 
+                        cfg.model_type.models, cfg.model_type.training) # trail=None (no tuning)
+
+    metrics, threshold = exp.run(
+        wrapper_builder,
+        X_train,
+        X_val,
+        y_val
+    )
+
+    print(metrics)
+
+    return
+
+
+
     #from anomaly_detection.models.ae.config import build_ae_tuning_config
 
     from anomaly_detection.models.registry import TUNING_CONFIG_REGISTRY
