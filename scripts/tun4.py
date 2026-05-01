@@ -68,10 +68,17 @@ def main(cfg):
     )
 
 
-    # simple
-    print(cfg)
+
+
+    # single training!!!!
+    print(cfg.training)
+    from anomaly_detection.models.ae.config import build_ae_training_config
+
+    training_cfg = build_ae_training_config(cfg)
+
+
     wrapper_builder = AnomalyModelBuilder(cfg.model_type.name, 
-                        cfg.model_type.models, cfg.model_type.training) # trail=None (no tuning)
+                        cfg.model_type.models, training_cfg) # trail=None (no tuning)
 
     metrics, threshold = exp.run(
         wrapper_builder,
@@ -82,8 +89,11 @@ def main(cfg):
 
     print(metrics)
 
-    return
+    
 
+
+
+    #--------TUNING
 
 
     #from anomaly_detection.models.ae.config import build_ae_tuning_config
@@ -92,6 +102,9 @@ def main(cfg):
     build_cfg_fn = TUNING_CONFIG_REGISTRY[cfg.model_type.name]
 
     tuning_cfg = build_cfg_fn(cfg.model_type.tuning)
+
+
+    
     tuner = AnomalyTuner(exp, tuning_cfg)
     tuner.run_study(build_fn, X_train, X_val, y_val, 10)
 

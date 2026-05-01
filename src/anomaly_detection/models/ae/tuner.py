@@ -46,7 +46,11 @@ class AETuner(BaseTuner):
                 tuning_cfg.batch_size.name,
                 tuning_cfg.batch_size.choices
             ),
-            epochs=tuning_cfg.epochs
+            epochs=tuning_cfg.epochs,
+
+            # callbvakcs tests
+
+
         )
 
 
