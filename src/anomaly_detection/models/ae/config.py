@@ -40,7 +40,7 @@ def build_ae_training_config(cfg):
     return AETrainingConfig(
         lr=1e-3,  #(**cfg.training.lr),
         batch_size=32, # (**cfg.training.batch_size),
-        epochs=120, #cfg.training_space.epochs
+        epochs=10, #cfg.training_space.epochs
         # hardcoded for now!!!!
         callbacks=[PrintLossCallback(), EarlyStopping(patience=2)]
         #callbacks=[]

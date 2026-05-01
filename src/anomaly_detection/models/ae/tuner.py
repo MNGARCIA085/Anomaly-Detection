@@ -4,7 +4,7 @@ from anomaly_detection.models.base import BaseTuner
 from anomaly_detection.models.ae.schemas import AEConfig, AETrainingConfig, AETrainingTuningConfig, AETuningConfig
 
 
-
+from anomaly_detection.models.ae.trainer import PrintLossCallback, EarlyStopping
 
 class AETuner(BaseTuner):
 
@@ -49,6 +49,7 @@ class AETuner(BaseTuner):
             epochs=tuning_cfg.epochs,
 
             # callbvakcs tests
+            callbacks=[PrintLossCallback(), EarlyStopping(patience=3)]
 
 
         )
