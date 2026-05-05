@@ -24,13 +24,23 @@ class AETrainingConfig:
     num_workers: int = 0
 
 
+
+"""
 @dataclass
 class TrainState:
     epoch: int = 0
     loss: float = 0.0
     model: Any = None
     stop_training: bool = False
+"""
 
+@dataclass
+class TrainState:
+    epoch: int = 0
+    train_loss: float = 0.0
+    val_loss: float = None
+    model: Any = None
+    stop_training: bool = False
 
 
 
