@@ -1,5 +1,5 @@
 import torch
-from anomaly_detection.models.base import AnomalyModel
+from anomaly_detection.core.wrapper import AnomalyModel
 from anomaly_detection.models.ae.tuner import AETuner
 from anomaly_detection.models.ae.architecture import build_model
 from anomaly_detection.models.ae.trainer import AETrainer
@@ -12,10 +12,8 @@ class AutoencoderModel(AnomalyModel):
         self.model = model
         self.trainer = trainer # injected, Only NNs see the Trainer
 
-
     def fit(self, X_train_prep, X_val_prep=None):
         self.trainer.train(self.model, X_train_prep, X_val_prep)
-
 
     def get_scores(self, X):
         X_t = torch.tensor(X, dtype=torch.float32)
@@ -24,7 +22,9 @@ class AutoencoderModel(AnomalyModel):
         return error
 
 
-# builder (separate later maybe)
+
+
+# builder (separate later maybe): does it build more than the wrapper????
 def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, cfg=None):
     if trial is not None:
         tuner = AETuner()

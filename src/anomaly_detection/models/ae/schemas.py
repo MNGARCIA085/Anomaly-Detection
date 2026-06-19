@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List, Any
-from anomaly_detection.models.schemas import IntParam, FloatParam, CategoricalParam
+from anomaly_detection.core.schemas import IntParam, FloatParam, CategoricalParam
 
 
 # dataclass for Model

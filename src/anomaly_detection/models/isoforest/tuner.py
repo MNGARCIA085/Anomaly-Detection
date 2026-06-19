@@ -1,6 +1,6 @@
 
 
-from anomaly_detection.models.base import BaseTuner
+from anomaly_detection.core.tuner import BaseTuner
 from anomaly_detection.models.isoforest.schemas import IsoForestConfig, IsoForestTuningConfig
 
 
