@@ -6,7 +6,7 @@ from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from sklearn.preprocessing import StandardScaler
 from anomaly_detection.experiments.experiments import Experiment
 
-from anomaly_detection.models.factory import ModelFactory
+#from anomaly_detection.models.factory import ModelFactory
 
 from anomaly_detection.data.data import DataModule
 from pathlib import Path

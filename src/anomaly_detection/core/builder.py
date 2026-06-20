@@ -30,7 +30,7 @@ class AnomalyModelBuilder:
         }
 
     def __call__(self, runtime_params):
-
+        """This is what Experiment.run() calls."""
         return self.builder(
             runtime_params=runtime_params,
             **self.fixed_params,
@@ -40,7 +40,7 @@ class AnomalyModelBuilder:
 
 
 
-
+"""
 from anomaly_detection.models.factory import ModelFactory
 class AnomalyModelBuilderv0:
     def __init__(self, model_name, model_cfg=None, training_cfg=None, trial=None, tuning_cfg=None):
@@ -52,7 +52,7 @@ class AnomalyModelBuilderv0:
         
 
     def __call__(self, runtime_params):
-        """This is what Experiment.run() calls."""
+        #
         return ModelFactory.create(
             name=self.model_name,
             model_cfg=self.model_cfg,
@@ -61,3 +61,26 @@ class AnomalyModelBuilderv0:
             trial=self.trial,
             tuning_cfg=self.tuning_cfg
         )
+
+class ModelFactory:
+
+    @staticmethod
+    def create(name, model_cfg, runtime_params, training_cfg=None, trial=None, tuning_cfg=None):
+        if name == "ae":
+            # manages std training and also tuning            
+            return build_ae_wrapper(
+                model_cfg,
+                training_cfg,
+                runtime_params, # it must include input_dim
+                trial,
+                tuning_cfg
+            )
+
+        elif name == "isoforest":
+            return build_iforest_wrapper(
+                model_cfg,
+                runtime_params,
+                trial, 
+                tuning_cfg
+            )
+"""
