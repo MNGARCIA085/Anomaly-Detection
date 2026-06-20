@@ -24,9 +24,9 @@ class IsolationForestModel(AnomalyModel):
 
 
 
-
+# pass later to schema:https://gemini.google.com/app/20b9f9d20930b3cd
 # builder (new file????)
-def build_wrapper(model_cfg, runtime_params, training_cfg, trial=None, tuning_cfg=None): # training_config?
+def build_wrapper(model_cfg, runtime_params, training_cfg=None, trial=None, tuning_cfg=None): # training_config?
     
     if trial is not None:
         tuner = IsoForestTuner()
