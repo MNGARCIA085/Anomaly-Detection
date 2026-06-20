@@ -27,7 +27,14 @@ TUNING_CONFIG_REGISTRY = {
 
 
 
+#-------
+from anomaly_detection.models.ae.wrapper import build_wrapper as build_ae_wrapper
+from anomaly_detection.models.isoforest.wrapper import build_wrapper as build_isoforest_wrapper
 
+MODEL_BUILDER = {
+    "ae": build_ae_wrapper,
+    "isoforest": build_isoforest_wrapper,
+}
 
 
 

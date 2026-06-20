@@ -26,10 +26,11 @@ class IsolationForestModel(AnomalyModel):
 
 
 # builder (new file????)
-def build_wrapper(model_cfg, runtime_params, trial=None, cfg=None): # training_config?
+def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, tuning_cfg=None): # training_config?
     
     if trial is not None:
         tuner = IsoForestTuner()
+        # improve later!!!!!!
         model_tuning_cfg = IsoForestTuningConfig(
             n_estimators=IntParam("n_estimators", 50, 300),
             contamination=FloatParam("contamination", 0.001, 0.1, log=True)
