@@ -26,7 +26,7 @@ class IsolationForestModel(AnomalyModel):
 
 
 # builder (new file????)
-def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, tuning_cfg=None): # training_config?
+def build_wrapper(model_cfg, runtime_params, training_cfg, trial=None, tuning_cfg=None): # training_config?
     
     if trial is not None:
         tuner = IsoForestTuner()

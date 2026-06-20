@@ -25,7 +25,7 @@ class AutoencoderModel(AnomalyModel):
 
 
 # builder (separate later maybe): does it build more than the wrapper????
-def build_wrapper(model_cfg, training_cfg, runtime_params, trial=None, tuning_cfg=None):
+def build_wrapper(model_cfg, runtime_params, training_cfg, trial=None, tuning_cfg=None):
     if trial is not None:
         tuner = AETuner()
         model_cfg = tuner.sample_model_config(trial, tuning_cfg.model_space, runtime_params)
