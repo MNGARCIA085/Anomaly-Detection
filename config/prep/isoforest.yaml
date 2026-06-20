@@ -1,0 +1,8 @@
+scale: true
+scaler: robust
+
+feature_selection:
+  enabled: false
+
+contamination_filter:
+  enabled: false

@@ -27,6 +27,43 @@ class PreprocessingPipeline:
         return artifacts
 
 
+# https://chatgpt.com/c/6a36d2e3-86c0-83ea-a21f-b53759a625a8
+
+
+
+# move later to models
+
+
+from sklearn.preprocessing import StandardScaler
+
+
+class AEPreprocessingBuilder:
+
+    def build(self, cfg):
+        steps = []
+
+        if cfg.scale:
+            steps.append(StandardScaler())
+
+        #if cfg.feature_selection:
+        #    steps.append(AEFeatureSelector())
+
+        return PreprocessingPipeline(steps)
+
+
+class IsoForestPreprocessingBuilder:
+
+    def build(self, cfg):
+        steps = []
+
+        if cfg.scale:
+            pass
+            #steps.append(RobustScaler())
+
+        # maybe no feature selection
+
+        return PreprocessingPipeline(steps)
+
 
 
 """

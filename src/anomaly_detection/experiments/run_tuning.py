@@ -23,6 +23,7 @@ class AnomalyTuner:
 
 
 #
+# build_fn is mostly an adapter that exists to inject trial and tuning_cfg.
 def make_tuning_builder(model_name, model_cfg, training_cfg):
         def build_fn(trial, tuning_cfg):
             return AnomalyModelBuilder(

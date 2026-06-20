@@ -1,0 +1,8 @@
+scale: true
+scaler: standard
+
+feature_selection:
+  enabled: false
+
+normalize:
+  enabled: true

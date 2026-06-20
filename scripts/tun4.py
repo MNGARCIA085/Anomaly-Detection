@@ -3,7 +3,7 @@ import optuna
 
 from anomaly_detection.evaluation.evaluator import Evaluator, ThresholdSelector
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
-from sklearn.preprocessing import StandardScaler
+
 from anomaly_detection.experiments.experiments import Experiment
 
 #from anomaly_detection.models.factory import ModelFactory
@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 from omegaconf import DictConfig
 from anomaly_detection.preprocessing.transforms.scaling import ScalerTransform
-
+from sklearn.preprocessing import StandardScaler
 
 
 
@@ -44,7 +44,18 @@ def main(cfg):
     X_train, X_val, y_val = data.load()
 
     # --- 2. COMPONENTS ---
-    prep = PreprocessingPipeline([ScalerTransform(StandardScaler)]) # what if some model dont need scaling..
+    #prep = PreprocessingPipeline([ScalerTransform(StandardScaler)]) # what if some model dont need scaling..
+    
+    
+    from anomaly_detection.preprocessing.pipeline import AEPreprocessingBuilder
+
+    # use registry later
+    builder = AEPreprocessingBuilder()
+    pipeline = builder.build(cfg.model_type.prep)
+    prep = pipeline
+
+
+    
     evaluator = Evaluator()
     selector = ThresholdSelector()
 
@@ -89,6 +100,8 @@ def main(cfg):
         model_cfg=cfg.model_type.models,
         training_cfg=cfg.model_type.training
     )
+
+
 
     build_cfg_fn = TUNING_CONFIG_REGISTRY[cfg.model_type.name] # build tuning config
     tuning_cfg = build_cfg_fn(cfg.model_type.tuning)    

@@ -2,5 +2,6 @@ defaults:
   - /models: ae
   - /training: ae
   - /tuning: ae
+  - /prep: ae
 
 name: ae
