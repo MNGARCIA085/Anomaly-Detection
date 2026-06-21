@@ -11,7 +11,7 @@ class AnomalyTuner:
         study = optuna.create_study(direction="maximize")
         
         def objective(trial):
-            builder = build_fn(trial, self.tuning_cfg)
+            builder = build_fn(trial, self.tuning_cfg) # anModelBuilder, retorna modelo+trainer
             metrics, _ = self.exp.run(builder, X_train, X_val, y_val)
             return metrics["f1"]
 
