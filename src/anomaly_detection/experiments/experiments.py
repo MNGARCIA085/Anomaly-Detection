@@ -18,8 +18,12 @@ class Experiment:
             "input_dim": X_train_p.shape[1]
         }
 
+
         # 3. Wrapper (model + trainer)
         model_wrapper = model_builder(runtime_params) 
+
+        #model_wrapper = model_builder(runtime_params)
+        print(model_wrapper.get_params())  # No more AttributeError!
 
         # 4. Train
         model_wrapper.fit(X_train_p, X_val_p)
@@ -30,12 +34,6 @@ class Experiment:
 
         # 6. Evaluate
         metrics = self.evaluator.evaluate(y_val, scores_val, threshold)
-
-
-        #
-        aux = self.preprocessor.get_artifacts()
-        print(aux)
-
         
         # 🔥 log artifacts
         if self.logger:

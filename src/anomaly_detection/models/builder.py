@@ -23,9 +23,33 @@ class AnomalyModelBuilder:
             "tuning_cfg": tuning_cfg,
         }
 
-    def __call__(self, runtime_params):
+    def __callv0__(self, runtime_params):
         """This is what Experiment.run() calls."""
         return self.builder(
             runtime_params=runtime_params,
             **self.fixed_params,
         )
+
+
+    def __call__(self, runtime_params):
+        """This is what Experiment.run() calls."""
+        # 1. Instantiate the model wrapper
+        model_wrapper = self.builder(
+            runtime_params=runtime_params,
+            **self.fixed_params,
+        )
+
+        # 2. Combine and attach the params directly to the model wrapper object
+        all_params = {
+            "model_name": self.builder.__name__,  # or pass model_name to self
+            "runtime_params": runtime_params,
+            **self.fixed_params,
+        }
+
+        # Dynamically add a method or attribute to the returned wrapper
+        model_wrapper.get_params = lambda: all_params
+
+        return model_wrapper
+
+
+
