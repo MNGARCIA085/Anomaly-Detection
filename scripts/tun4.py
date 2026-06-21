@@ -20,8 +20,10 @@ from sklearn.preprocessing import StandardScaler
 
 
 
-from anomaly_detection.experiments.run_tuning import AnomalyTuner, make_tuning_builder
-from anomaly_detection.core.builder import AnomalyModelBuilder
+from anomaly_detection.tuning.engine import AnomalyTuner
+from anomaly_detection.tuning.adapters import make_tuning_builder
+
+from anomaly_detection.models.builder import AnomalyModelBuilder
 from anomaly_detection.models.ae.config import build_ae_training_config
 from anomaly_detection.models.registry import TUNING_CONFIG_REGISTRY
 
@@ -49,10 +51,18 @@ def main(cfg):
     
     from anomaly_detection.preprocessing.pipeline import AEPreprocessingBuilder
 
-    # use registry later
-    builder = AEPreprocessingBuilder()
+    PREP_REGISTRY = {
+        "ae": AEPreprocessingBuilder(),
+        "isoforest": AEPreprocessingBuilder(),
+    }
+
+    # use registry later; conf in dataclasses
+    #builder = AEPreprocessingBuilder()
+    builder = PREP_REGISTRY[cfg.model_type.name] # builder_cls
     pipeline = builder.build(cfg.model_type.prep)
     prep = pipeline
+
+
 
 
     

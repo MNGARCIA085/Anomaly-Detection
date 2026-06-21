@@ -19,12 +19,46 @@ class PreprocessingPipeline:
         self.fit(X_train) # fit and transform!
         return self.transform(X_train), self.transform(X_val)
 
-    def get_artifacts(self):
+    def get_artifacts0(self):
         artifacts = {}
         for i, step in enumerate(self.steps):
             if hasattr(step, "get_artifacts"):
                 artifacts[f"step_{i}_{step.__class__.__name__}"] = step.get_artifacts()
         return artifacts
+
+    def get_artifacts(self):
+        artifacts = {}
+        for i, step in enumerate(self.steps):
+            step_name = f"step_{i}_{step.__class__.__name__}"
+            
+            # 1. If it's a custom step that has the explicit method
+            if hasattr(step, "get_artifacts"):
+                artifacts[step_name] = step.get_artifacts()
+            
+            # 2. Fallback for scikit-learn estimators (extract fitted attributes)
+            else:
+                # Gathers attributes like mean_, scale_, var_ 
+                learned_params = {k: v for k, v in vars(step).items() if k.endswith("_") and not k.startswith("__")}
+                if learned_params:
+                    artifacts[step_name] = learned_params
+                    
+        return artifacts
+
+
+    """
+    maybe better
+    def fit_transform_split(self, X_train, X_val):
+        # fit_transform the training data in one pass
+        X_train_transformed = self.fit_transform(X_train) 
+        # only transform the validation data
+        X_val_transformed = self.transform(X_val) 
+        return X_train_transformed, X_val_transformed
+
+    def fit_transform(self, X):
+        for step in self.steps:
+            X = step.fit_transform(X)
+        return X
+    """
 
 
 # https://chatgpt.com/c/6a36d2e3-86c0-83ea-a21f-b53759a625a8

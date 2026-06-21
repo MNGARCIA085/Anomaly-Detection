@@ -1,5 +1,5 @@
 from anomaly_detection.models.isoforest.schemas import IsoForestConfig,IsoForestTuningConfig
-from anomaly_detection.core.schemas import IntParam, FloatParam, CategoricalParam
+from anomaly_detection.models.schemas import IntParam, FloatParam, CategoricalParam
 
 
 

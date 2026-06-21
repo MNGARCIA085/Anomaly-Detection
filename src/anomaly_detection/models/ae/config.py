@@ -1,5 +1,5 @@
 from anomaly_detection.models.ae.schemas import AETrainingConfig, AEModelTuningConfig, AETrainingTuningConfig, AETuningConfig
-from anomaly_detection.core.schemas import IntParam, FloatParam, CategoricalParam
+from anomaly_detection.models.schemas import IntParam, FloatParam, CategoricalParam
 from anomaly_detection.models.ae.trainer import PrintLossCallback, EarlyStopping
 
 

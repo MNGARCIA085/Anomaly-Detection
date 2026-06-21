@@ -1,5 +1,5 @@
 import torch
-from anomaly_detection.core.wrapper import AnomalyModel
+from anomaly_detection.models.base_model import AnomalyModel
 from anomaly_detection.models.ae.tuner import AETuner
 from anomaly_detection.models.ae.architecture import build_model
 from anomaly_detection.models.ae.trainer import AETrainer

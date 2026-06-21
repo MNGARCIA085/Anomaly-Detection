@@ -1,10 +1,10 @@
 
 
-from anomaly_detection.core.tuner import BaseTuner
+from anomaly_detection.tuning.base_tuner import BaseTuner
 from anomaly_detection.models.ae.schemas import AEConfig, AETrainingConfig, AETrainingTuningConfig, AETuningConfig
-
-
 from anomaly_detection.models.ae.trainer import PrintLossCallback, EarlyStopping
+
+
 
 class AETuner(BaseTuner):
 

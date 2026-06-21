@@ -1,7 +1,7 @@
-from anomaly_detection.core.wrapper import AnomalyModel
+from anomaly_detection.models.base_model import AnomalyModel
 from anomaly_detection.models.isoforest.tuner import IsoForestTuner
 from anomaly_detection.models.isoforest.architecture import build_model
-from anomaly_detection.core.schemas import IntParam, FloatParam
+from anomaly_detection.models.schemas import IntParam, FloatParam
 from .schemas import IsoForestTuningConfig
 
 

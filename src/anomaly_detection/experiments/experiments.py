@@ -31,6 +31,11 @@ class Experiment:
         # 6. Evaluate
         metrics = self.evaluator.evaluate(y_val, scores_val, threshold)
 
+
+        #
+        aux = self.preprocessor.get_artifacts()
+        print(aux)
+
         
         # 🔥 log artifacts
         if self.logger:
