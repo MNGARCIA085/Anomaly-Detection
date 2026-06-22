@@ -1,10 +1,10 @@
 
 # later import all
-from anomaly_detection.new.ae import AEEntry
-from anomaly_detection.new.iso import IsoEntry
+from anomaly_detection.new_2.ae import AEEntry
+from anomaly_detection.new_2.iso import IsoEntry
 
 
-from anomaly_detection.new.registry import MODEL_REGISTRY
+from anomaly_detection.new_2.registry import MODEL_REGISTRY
 
 
 class Experiment:
@@ -46,6 +46,12 @@ class Experiment:
             X_train_p.shape[1]
         )
 
+
+        print('vamos')
+
+
+        print(cfg)
+
         wrapper = (
             entry.build(
                 cfg,
@@ -53,7 +59,9 @@ class Experiment:
             )
         )
 
-        wrapper.fit(
+        print(wrapper)
+
+        wrapper.fit( # fit
             X_train_p,
             X_val_p
         )
