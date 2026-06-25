@@ -11,7 +11,7 @@ from sklearn.ensemble import IsolationForest
 
 
 
-from anomaly_detection.new.preprocessing import PreprocessingPipeline
+from anomaly_detection.new_2.preprocessing import PreprocessingPipeline # new
 
 
 class IsoWrapper:
@@ -36,7 +36,7 @@ class IsoWrapper:
 #-------------entry
 
 
-from anomaly_detection.new.registry import register
+from anomaly_detection.new_2.registry import register
 
 @register("iso")
 class IsoEntry:

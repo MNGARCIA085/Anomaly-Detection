@@ -34,13 +34,20 @@ def main(cfg):
     # 8. TRAIN ONLY
     # =========================================================
 
+
+
+    from anomaly_detection.new_2.evaluator import Evaluator
+
+
     def train_once(
         model_type,
         cfg,
         X_train,
-        X_val
+        X_val,
+        y_val, # new!!!
     ):
 
+        """
         exp = Experiment(
             model_type
         )
@@ -50,6 +57,22 @@ def main(cfg):
             X_train,
             X_val
         )
+        """
+
+        exp = Experiment(
+            model_type="ae",
+            evaluator=Evaluator()
+        )
+
+        return exp.run(
+            cfg,
+            X_train,
+            X_val,
+            y_val
+        )
+
+
+
 
 
     # 9. TEST
@@ -98,10 +121,38 @@ def main(cfg):
             "ae",
             cfg,
             X_train,
-            X_val
+            X_val,
+            y_val
         )
     )
 
+
+    #-----------new tune
+
+    tuner = Tuner(
+        "iso", # model_type
+        evaluator=Evaluator()
+    )
+
+    study = tuner.run(
+        X_train,
+        X_val,
+        y_val,
+        n_trials=2
+    )
+
+    print(
+        study.best_value
+    )
+
+    print(
+        study.best_params
+    )
+
+
+
+
+    return
 
     # ---------- TUNE ----------
 
