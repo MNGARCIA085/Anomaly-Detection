@@ -38,11 +38,13 @@ class IsoWrapper:
 
 from anomaly_detection.new_2.registry import register
 
-@register("iso")
+@register("isoforest") # iso
 class IsoEntry:
 
     @staticmethod
-    def sample(trial):
+    def sample(trial, tun_cfg):
+
+        print(tun_cfg)
 
         return {
 
@@ -57,14 +59,14 @@ class IsoEntry:
 
                 "n_estimators": trial.suggest_int(
                     "n_estimators",
-                    50,
-                    300
+                    tun_cfg.model_space.n_estimators.low,
+                    tun_cfg.model_space.n_estimators.high
                 ),
 
                 "contamination": trial.suggest_float(
                     "contamination",
-                    0.01,
-                    0.2
+                    tun_cfg.model_space.contamination.low,
+                    tun_cfg.model_space.contamination.high
                 )
             }
         }

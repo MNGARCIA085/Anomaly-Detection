@@ -96,8 +96,11 @@ def main(cfg):
 
     # ---------- TRAIN ----------
 
+    model_type = cfg.model_type.name
+    print(model_type)
 
-    
+
+    """
     cfg_train = {
 
         "prep": {
@@ -118,16 +121,22 @@ def main(cfg):
         }
     }
 
+
+
+
+   
+
+
     print(
         train_once(
-            "ae",
+            model_type, # ae, iso
             cfg_train,
             X_train,
             X_val,
             y_val
         )
     )
-    
+    """
 
 
     #-----------new tune
@@ -138,7 +147,7 @@ def main(cfg):
 
 
     tuner = Tuner(
-        "ae", # model_type; ae
+        model_type, # model_type; ae
         Evaluator(), #evaluator=Evaluator(),
         tun_cfg
     )
