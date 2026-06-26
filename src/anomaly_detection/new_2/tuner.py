@@ -18,7 +18,9 @@ class Tuner:
     def __init__(
         self,
         model_type,
-        evaluator
+        evaluator,
+        # config
+        tun_cfg,
     ):
 
         self.model_type = (
@@ -31,6 +33,11 @@ class Tuner:
                 evaluator
             )
         )
+
+
+        # new
+        self.tun_cfg = tun_cfg
+
 
     def run(
         self,
@@ -46,6 +53,9 @@ class Tuner:
             ]
         )
 
+        print(entry)
+        print(type(entry))
+
         direction = (
             "maximize"
             if y_val is not None
@@ -56,11 +66,21 @@ class Tuner:
             trial
         ):
 
+
+            import inspect
+
+            print(entry.sample)
+            print(inspect.signature(entry.sample))
+
             cfg = (
                 entry.sample(
-                    trial
+                    trial,
+                    self.tun_cfg, # new!!!!
                 )
             )
+
+
+
 
             result = (
                 self.exp.run(

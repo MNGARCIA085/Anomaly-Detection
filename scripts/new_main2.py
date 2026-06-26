@@ -96,7 +96,9 @@ def main(cfg):
 
     # ---------- TRAIN ----------
 
-    cfg = {
+
+    
+    cfg_train = {
 
         "prep": {
             "scaler": "standard",
@@ -119,19 +121,26 @@ def main(cfg):
     print(
         train_once(
             "ae",
-            cfg,
+            cfg_train,
             X_train,
             X_val,
             y_val
         )
     )
+    
 
 
     #-----------new tune
 
+    tun_cfg = cfg.model_type.tuning
+
+    print(tun_cfg)
+
+
     tuner = Tuner(
-        "iso", # model_type
-        evaluator=Evaluator()
+        "ae", # model_type; ae
+        Evaluator(), #evaluator=Evaluator(),
+        tun_cfg
     )
 
     study = tuner.run(
@@ -154,24 +163,7 @@ def main(cfg):
 
     return
 
-    # ---------- TUNE ----------
 
-    study = (
-        Tuner("ae") # ae, iso
-        .run(
-            X_train,
-            X_val,
-            n_trials=3
-        )
-    )
-
-    print(
-        study.best_value
-    )
-
-    print(
-        study.best_params
-    )
 
 
 

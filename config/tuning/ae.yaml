@@ -1,24 +1,37 @@
 model_space:
-  n_layers:
-    name: n_layers
-    low: 1
-    high: 3
+  encoder_dims:
+    - name: enc1
+      type: int
+      low: 16
+      high: 64
 
-  encoder_dim:
-    name: enc_dim
-    low: 16
-    high: 128
+    - name: enc2
+      type: int
+      low: 4
+      high: 32
+
+  decoder_dims:
+    - name: dec1
+      type: int
+      low: 16
+      high: 64
 
 
 training_space:
   lr:
     name: lr
+    type: float
     low: 1e-4
     high: 1e-2
     log: true
 
+  epochs:
+    name: epochs
+    type: int
+    low: 5
+    high: 20
+
   batch_size:
     name: batch_size
-    choices: [32, 64, 128]
-
-  epochs: 10
+    type: categorical
+    choices: [32, 64]

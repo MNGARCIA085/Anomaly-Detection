@@ -293,10 +293,16 @@ class AEWrapper:
 
 
 
-# entry
-@register("ae")
-class AEEntry:
-    """
+
+
+
+
+
+
+
+
+
+"""
     Model entry responsible for assembling all Autoencoder-specific components.
 
     Acts as the integration point between the experiment framework and the AE
@@ -327,8 +333,21 @@ class AEEntry:
         build(cfg, input_dim) -> ModelWrapper
     """
 
+
+
+
+
+
+# entry
+@register("ae")
+class AEEntry:
+    
+
+    # sample only for tuning!!!!!!
     @staticmethod
-    def sample(trial):
+    def sample(trial, tun_cfg):
+
+        print(tun_cfg)
 
         return {
 
@@ -350,6 +369,9 @@ class AEEntry:
                 ),
             },
 
+
+
+
             "model": {
 
                 "encoder_dims": [
@@ -362,26 +384,33 @@ class AEEntry:
                 ]
             },
 
+
             "training": {
 
                 "lr": trial.suggest_float(
                     "lr",
-                    1e-4,
-                    1e-2,
+                    tun_cfg.training_space.lr.low,
+                    tun_cfg.training_space.lr.high,
                     log=True
                 ),
 
                 "epochs": trial.suggest_int(
                     "epochs",
-                    5,
-                    20
+                    tun_cfg.training_space.epochs.low,
+                    tun_cfg.training_space.epochs.high
                 ),
 
                 "batch_size": trial.suggest_categorical(
                     "batch_size",
-                    [32, 64]
+                    tun_cfg.training_space.batch_size.choices
                 )
             }
+
+
+
+           
+
+
         }
 
     @staticmethod
@@ -415,7 +444,7 @@ class AEEntry:
 
         model_cfg = AEConfig(
             input_dim=input_dim,
-            encoder_dims=cfg["model"]["encoder_dims"],
+            encoder_dims=cfg["model"]["encoder_dims"], # uso lo que paso en config!!!
             decoder_dims=cfg["model"]["decoder_dims"],
         )
 

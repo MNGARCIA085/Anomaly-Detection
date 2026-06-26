@@ -13,6 +13,8 @@ from .evaluator import Evaluator
 
 
 
+
+
 #----------
 class Experiment:
 
@@ -35,6 +37,9 @@ class Experiment:
         entry = MODEL_REGISTRY[
             self.model_type
         ]
+
+
+        print(entry)
 
         preprocessor = (
             entry.build_preprocessor(cfg)
