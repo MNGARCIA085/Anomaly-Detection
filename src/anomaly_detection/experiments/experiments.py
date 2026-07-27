@@ -1,48 +1,84 @@
+from anomaly_detection.models.nnets.ae.entry import AEEntry
+from anomaly_detection.models.classic.isoforest.entry import IsoEntry
+from anomaly_detection.models.registry import MODEL_REGISTRY
+
+from anomaly_detection.evaluation.evaluator import Evaluator
 
 
 
 
 
+
+#----------
 class Experiment:
 
-    def __init__(self, preprocessor, threshold_selector, evaluator, logger=None):
-        self.preprocessor = preprocessor
-        self.threshold_selector = threshold_selector
+    def __init__(
+        self,
+        model_type,
+        evaluator
+    ):
+        self.model_type = model_type
         self.evaluator = evaluator
-        self.logger = logger
 
-    def run(self, model_builder, X_train, X_val, y_val):
-
-        # 1. Preprocessing
-        X_train_p, X_val_p = self.preprocessor.fit_transform_split(X_train, X_val)
-
-         # 2. Runtime params
-        runtime_params = {
-            "input_dim": X_train_p.shape[1]
-        }
+    def run(
+        self,
+        cfg,
+        X_train,
+        X_val,
+        y_val=None
+    ):
 
 
-        # 3. Wrapper (model + trainer)
-        model_wrapper = model_builder(runtime_params) 
+        entry = MODEL_REGISTRY[
+            self.model_type
+        ]
 
-        #model_wrapper = model_builder(runtime_params)
-        print(model_wrapper.get_params())  # No more AttributeError!
+        preprocessor = (
+            entry.build_preprocessor(cfg)
+        )
 
-        # 4. Train
-        model_wrapper.fit(X_train_p, X_val_p)
+        X_train_p = (
+            preprocessor.fit_transform(
+                X_train
+            )
+        )
 
-        # 5. Score + threshold
-        scores_val = model_wrapper.get_scores(X_val_p)
-        threshold = self.threshold_selector.from_pr_curve(y_val, scores_val)
+        X_val_p = (
+            preprocessor.transform(
+                X_val
+            )
+        )
 
-        # 6. Evaluate
-        metrics = self.evaluator.evaluate(y_val, scores_val, threshold)
-        
-        # 🔥 log artifacts
-        if self.logger:
-            artifacts = self.preprocessor.get_artifacts()
-            self.logger.log_artifacts(artifacts)
-        
+        input_dim = (
+            X_train_p.shape[1]
+        )
 
-        return metrics, threshold
+        wrapper = (
+            entry.build(
+                cfg,
+                input_dim
+            )
+        )
+
+        wrapper.fit(
+            X_train_p,
+            X_val_p
+        )
+
+        scores = (
+            wrapper.get_scores(
+                X_val_p
+            )
+        )
+
+
+        evaluation = (
+            self.evaluator.evaluate(
+                scores=scores,
+                y_true=y_val,
+                X=X_val_p
+            )
+        )
+
+        return evaluation
 

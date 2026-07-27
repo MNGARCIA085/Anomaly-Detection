@@ -1,45 +1,10 @@
-#all registries
+MODEL_REGISTRY = {}
 
 
-from anomaly_detection.models.ae.config import build_ae_training_config, build_ae_tuning_config
-from anomaly_detection.models.isoforest.config import build_iso_training_config, build_iso_tuning_config
+def register(name):
 
-"""
-MODEL_REGISTRY = {
-    "ae": AEBuilder,
-    "isoforest": IFBuilder,
-}
-"""
+    def deco(cls):
+        MODEL_REGISTRY[name] = cls
+        return cls
 
-
-TRAINER_REGISTRY = {
-    #"ae_standard": AETrainer,
-    "ae": build_ae_training_config,
-    "isoforest": build_iso_training_config
-}
-
-
-TUNING_CONFIG_REGISTRY = {
-    "ae": build_ae_tuning_config,
-    "isoforest": build_iso_tuning_config,
-}
-
-
-
-
-#-------
-from anomaly_detection.models.ae.wrapper import build_wrapper as build_ae_wrapper
-from anomaly_detection.models.isoforest.wrapper import build_wrapper as build_isoforest_wrapper
-
-MODEL_BUILDER = {
-    "ae": build_ae_wrapper,
-    "isoforest": build_isoforest_wrapper,
-}
-
-
-
-
-
-
-
-
+    return deco
