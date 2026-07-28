@@ -1,10 +1,10 @@
 
 
-from .trainer import BaseTrainer
+from .trainer import NNTrainer
 
 
 TRAINER_REGISTRY = {
-    "base": BaseTrainer,
+    "default": NNTrainer,
     #"vae": VAETrainer,
     #"transfer": TransferTrainer
 }

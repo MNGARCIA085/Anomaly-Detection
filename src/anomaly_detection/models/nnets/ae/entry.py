@@ -1,6 +1,6 @@
 from anomaly_detection.models.registry import register
 from .schemas import AEConfig
-from anomaly_detection.models.nnets.training.schemas import TrainingConfig
+from anomaly_detection.training.schemas import TrainingConfig
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
@@ -12,13 +12,10 @@ from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from .model import AE, AEWrapper
 
 
-from anomaly_detection.models.nnets.training.callbacks import EarlyStopping,PrintLossCallback
+from anomaly_detection.training.callbacks import EarlyStopping,PrintLossCallback
 
 
-#from anomaly_detection.models.nnets.training.trainer import BaseTrainer
-
-
-from anomaly_detection.models.nnets.training.registry import TRAINER_REGISTRY
+from anomaly_detection.training.registry import TRAINER_REGISTRY
 
 
 
@@ -85,7 +82,7 @@ class AEEntry:
                 ),
 
 
-                "type": "base" # hardcoded for now
+                "type": "default" # hardcoded for now
             }
 
         }

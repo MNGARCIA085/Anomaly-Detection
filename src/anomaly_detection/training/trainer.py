@@ -9,8 +9,10 @@ from .schemas import TrainState, TrainingConfig
 
 
 
+
+
 # later -> optim... as DI -> it seems to work well
-class BaseTrainer:
+class NNTrainer:
 
     def __init__(self, cfg: TrainingConfig):
         self.cfg = cfg
