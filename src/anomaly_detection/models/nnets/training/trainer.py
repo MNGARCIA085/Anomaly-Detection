@@ -3,44 +3,8 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 
-
-
-
-from dataclasses import dataclass
-from typing import Any
-
-
-from torch.utils.data import Dataset
-
-
-
-
-
-from anomaly_detection.models.nnets.ae.schemas import AETrainingConfig
-
-
-
-
-@dataclass
-class TrainState:
-    epoch: int = 0
-    train_loss: float = 0.0
-    val_loss: float = None
-    model: Any = None
-    stop_training: bool = False
-
-
-
-
-class AEDataset(Dataset):
-    def __init__(self, X):
-        self.X = torch.tensor(X, dtype=torch.float32)
-
-    def __len__(self):
-        return len(self.X)
-
-    def __getitem__(self, idx):
-        return self.X[idx]
+from .dataset import AnomalyDataset
+from .schemas import TrainState, TrainingConfig
 
 
 
@@ -48,7 +12,7 @@ class AEDataset(Dataset):
 # later -> optim... as DI -> it seems to work well
 class BaseTrainer:
 
-    def __init__(self, cfg: AETrainingConfig):
+    def __init__(self, cfg: TrainingConfig):
         self.cfg = cfg
         self.callbacks = cfg.callbacks or []
 
@@ -65,7 +29,7 @@ class BaseTrainer:
 
         # ---- DataLoaders ----
         train_loader = DataLoader(
-            AEDataset(X_train),
+            AnomalyDataset(X_train),
             batch_size=self.cfg.batch_size,
             shuffle=self.cfg.shuffle,
             num_workers=self.cfg.num_workers
@@ -74,7 +38,7 @@ class BaseTrainer:
         val_loader = None
         if X_val is not None:
             val_loader = DataLoader(
-                AEDataset(X_val),
+                AnomalyDataset(X_val),
                 batch_size=self.cfg.batch_size,
                 shuffle=False,
                 num_workers=self.cfg.num_workers

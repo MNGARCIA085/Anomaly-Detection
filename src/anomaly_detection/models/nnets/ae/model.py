@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 
 # architecture
-from .schemas import AEConfig, AETrainingConfig
+from .schemas import AEConfig
 
 
 

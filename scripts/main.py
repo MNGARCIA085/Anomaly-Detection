@@ -129,10 +129,12 @@ def main(cfg):
         "training": {
             "lr": 1e-3,
             "epochs": 10,
-            "batch_size": 32
+            "batch_size": 32,
+            "type": "base",
         }
     }
 
+    # later -> get itfrom hydra!!!!!
 
 
 

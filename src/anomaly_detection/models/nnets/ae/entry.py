@@ -1,6 +1,6 @@
 from anomaly_detection.models.registry import register
-from .schemas import AEConfig, AETrainingConfig
-
+from .schemas import AEConfig
+from anomaly_detection.models.nnets.training.schemas import TrainingConfig
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
@@ -15,9 +15,11 @@ from .model import AE, AEWrapper
 from anomaly_detection.models.nnets.training.callbacks import EarlyStopping,PrintLossCallback
 
 
+#from anomaly_detection.models.nnets.training.trainer import BaseTrainer
 
 
-from anomaly_detection.models.nnets.training.trainer import BaseTrainer
+from anomaly_detection.models.nnets.training.registry import TRAINER_REGISTRY
+
 
 
 
@@ -80,7 +82,10 @@ class AEEntry:
                 "batch_size": trial.suggest_categorical(
                     "batch_size",
                     tun_cfg.training_space.batch_size.choices
-                )
+                ),
+
+
+                "type": "base" # hardcoded for now
             }
 
         }
@@ -123,7 +128,7 @@ class AEEntry:
         model = AE(model_cfg)
 
 
-        trainer_cfg = AETrainingConfig(
+        trainer_cfg = TrainingConfig(
                 lr=cfg["training"]["lr"],
                 epochs=cfg["training"]["epochs"],
                 batch_size=cfg["training"]["batch_size"],
@@ -133,13 +138,10 @@ class AEEntry:
                 ]
             )
 
-
         
+        trainer_cls = TRAINER_REGISTRY[cfg["training"]["type"]]
+        trainer = trainer_cls(trainer_cfg)
 
-
-        trainer = BaseTrainer(trainer_cfg)
-
-        print(trainer)
 
         return AEWrapper(
             model,
