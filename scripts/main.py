@@ -35,7 +35,11 @@ def main(cfg):
     data = DataModule(TRAIN_PATH, VAL_PATH, Y_VAL_PATH)
     X_train, X_val, y_val = data.load()
 
-    #------------ NEW TEST---------------
+    
+
+    model_type = cfg.model_type.name
+    print(model_type)
+
 
     # =========================================================
     # 8. TRAIN ONLY
@@ -43,120 +47,50 @@ def main(cfg):
 
 
 
-    
-
-
     def train_once(
         model_type,
-        cfg,
+        prep_cfg,
+        model_cfg,
+        train_cfg,
         X_train,
         X_val,
-        y_val, # new!!!
+        y_val,
     ):
 
-        """
-        exp = Experiment(
-            model_type
-        )
-
-        return exp.run(
-            cfg,
-            X_train,
-            X_val
-        )
-        """
 
         exp = Experiment(
-            model_type="ae",
+            model_type=model_type,
             evaluator=Evaluator()
         )
 
-        print(exp)
 
         return exp.run(
-            cfg,
+            prep_cfg,
+            model_cfg,
+            train_cfg,
             X_train,
             X_val,
             y_val
         )
-
-
-
-
-
-
-
-
-    # 9. TEST
-    # =========================================================
-
-    np.random.seed(0)
-
-
-    """
-    X_train = np.random.randn(
-        200,
-        20
-    )
-
-    X_val = np.random.randn(
-        50,
-        20
-    )
-    """
-
-
-    # ---------- TRAIN ----------
-
-    model_type = cfg.model_type.name
-    print(model_type)
-
-
-    
-    cfg_train = {
-
-        "prep": {
-            "scaler": "standard",
-            "use_pca": True,
-            "pca_dim": 8
-        },
-
-         "model": {
-            "encoder_dims": [32, 16],
-            "decoder_dims": [32],
-        },
-
-        "training": {
-            "lr": 1e-3,
-            "epochs": 10,
-            "batch_size": 32,
-            "type": "default",
-        }
-    }
-
-    # later -> get itfrom hydra!!!!!
-
-
-
-   
 
 
     print(
         train_once(
             model_type, # ae, iso
-            cfg_train,
+            cfg.model_type.prep,
+            cfg.model_type.models,
+            cfg.model_type.training,
             X_train,
             X_val,
             y_val
         )
     )
-    
 
 
-    
 
 
-    #-----------new tune
+
+    #===========TUNING===============
 
     tun_cfg = cfg.model_type.tuning
 

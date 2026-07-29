@@ -22,7 +22,9 @@ class Experiment:
 
     def run(
         self,
-        cfg,
+        prep_cfg,
+        cfg_model,
+        cfg_training,
         X_train,
         X_val,
         y_val=None
@@ -34,7 +36,7 @@ class Experiment:
         ]
 
         preprocessor = (
-            entry.build_preprocessor(cfg)
+            entry.build_preprocessor(prep_cfg)
         )
 
         X_train_p = (
@@ -55,7 +57,8 @@ class Experiment:
 
         wrapper = (
             entry.build(
-                cfg,
+                cfg_model,
+                cfg_training,
                 input_dim
             )
         )

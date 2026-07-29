@@ -1,6 +1,10 @@
 scale: true
 scaler: standard
 
+
+use_pca: false
+pca_dim: 10
+
 feature_selection:
   enabled: false
 

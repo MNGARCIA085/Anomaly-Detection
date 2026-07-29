@@ -53,8 +53,7 @@ class Tuner:
             ]
         )
 
-        print(entry)
-        print(type(entry))
+
 
         direction = (
             "maximize"
@@ -67,24 +66,20 @@ class Tuner:
         ):
 
 
-            import inspect
-
-            print(entry.sample)
-            print(inspect.signature(entry.sample))
-
             cfg = (
                 entry.sample(
                     trial,
-                    self.tun_cfg, # new!!!!
+                    self.tun_cfg,
                 )
             )
 
 
 
-
             result = (
                 self.exp.run(
-                    cfg,
+                    cfg['prep'],
+                    cfg['model'],
+                    cfg['training'],
                     X_train,
                     X_val,
                     y_val

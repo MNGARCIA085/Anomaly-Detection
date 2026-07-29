@@ -88,23 +88,25 @@ class AEEntry:
         }
 
     @staticmethod
-    def build_preprocessor(cfg):
+    def build_preprocessor(prep_cfg): # later -> prep_cfg:AEPrepConfig or like that
 
         steps = []
 
-        if cfg["prep"]["scaler"] == "standard":
+        if prep_cfg["scaler"] == "standard":
             steps.append(StandardScaler())
 
-        elif cfg["prep"]["scaler"] == "minmax":
+        elif prep_cfg["scaler"] == "minmax":
             steps.append(MinMaxScaler())
 
-        if cfg["prep"]["use_pca"]:
+        """
+        if prep_cfg["use_pca"]:
 
             steps.append(
                 PCA(
-                    n_components=cfg["prep"]["pca_dim"]
+                    n_components=prep_cfg["pca_dim"]
                 )
             )
+        """
 
         return PreprocessingPipeline(
             steps
@@ -112,23 +114,25 @@ class AEEntry:
 
     @staticmethod
     def build(
-        cfg,
+        cfg_model,
+        cfg_training,
         input_dim
     ):
 
+        # later maybe move it out
         model_cfg = AEConfig(
             input_dim=input_dim,
-            encoder_dims=cfg["model"]["encoder_dims"], # uso lo que paso en config!!!
-            decoder_dims=cfg["model"]["decoder_dims"],
+            encoder_dims=cfg_model["encoder_dims"],
+            decoder_dims=cfg_model["decoder_dims"],
         )
 
         model = AE(model_cfg)
 
 
         trainer_cfg = TrainingConfig(
-                lr=cfg["training"]["lr"],
-                epochs=cfg["training"]["epochs"],
-                batch_size=cfg["training"]["batch_size"],
+                lr=cfg_training["lr"],
+                epochs=cfg_training["epochs"],
+                batch_size=cfg_training["batch_size"],
                 callbacks=[
                     EarlyStopping(patience=3),
                     PrintLossCallback(),
@@ -136,7 +140,7 @@ class AEEntry:
             )
 
         
-        trainer_cls = TRAINER_REGISTRY[cfg["training"]["type"]]
+        trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]
         trainer = trainer_cls(trainer_cfg)
 
 
