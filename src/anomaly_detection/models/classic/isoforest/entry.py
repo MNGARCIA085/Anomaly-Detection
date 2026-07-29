@@ -20,7 +20,6 @@ class IsoEntry:
     @staticmethod
     def sample(trial, tun_cfg):
 
-        print(tun_cfg)
 
         return {
 
@@ -48,14 +47,14 @@ class IsoEntry:
         }
 
     @staticmethod
-    def build_preprocessor(cfg):
+    def build_preprocessor(prep_cfg):
 
         steps = []
 
-        if cfg["prep"]["scaler"] == "standard":
+        if prep_cfg["scaler"] == "standard":
             steps.append(StandardScaler())
 
-        elif cfg["prep"]["scaler"] == "minmax":
+        elif prep_cfg["scaler"] == "minmax":
             steps.append(MinMaxScaler())
 
         return PreprocessingPipeline(
@@ -64,14 +63,15 @@ class IsoEntry:
 
     @staticmethod
     def build(
-        cfg,
-        input_dim
+        model_cfg,
+        training_cfg=None,
+        input_dim=None,
     ):
 
         # my model, not need to define it custom like AE
         model = IsolationForest(
-            n_estimators=cfg["model"]["n_estimators"],
-            contamination=cfg["model"]["contamination"]
+            n_estimators=model_cfg["n_estimators"],
+            contamination=model_cfg["contamination"]
         )
 
         return IsoWrapper(

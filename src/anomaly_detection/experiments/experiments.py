@@ -7,9 +7,6 @@ from anomaly_detection.evaluation.evaluator import Evaluator
 
 
 
-
-
-#----------
 class Experiment:
 
     def __init__(

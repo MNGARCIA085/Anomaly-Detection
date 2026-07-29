@@ -74,12 +74,11 @@ class Tuner:
             )
 
 
-
             result = (
                 self.exp.run(
                     cfg['prep'],
                     cfg['model'],
-                    cfg['training'],
+                    cfg.get('training', None), # None for isoforests.....
                     X_train,
                     X_val,
                     y_val
