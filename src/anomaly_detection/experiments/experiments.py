@@ -19,21 +19,20 @@ class Experiment:
 
     def run(
         self,
-        prep_cfg,
-        cfg_model,
-        cfg_training,
+        cfg,
         X_train,
         X_val,
         y_val=None
     ):
 
 
+
         entry = MODEL_REGISTRY[
             self.model_type
-        ]
+        ]()
 
         preprocessor = (
-            entry.build_preprocessor(prep_cfg)
+            entry.build_preprocessor(cfg.get('prep'))
         )
 
         X_train_p = (
@@ -52,10 +51,11 @@ class Experiment:
             X_train_p.shape[1]
         )
 
+
         wrapper = (
             entry.build(
-                cfg_model,
-                cfg_training,
+                cfg.get('models'),
+                cfg.get('training', None), # None for isoforests......
                 input_dim
             )
         )

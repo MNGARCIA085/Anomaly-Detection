@@ -49,9 +49,7 @@ def main(cfg):
 
     def train_once(
         model_type,
-        prep_cfg,
-        model_cfg,
-        train_cfg,
+        cfg,
         X_train,
         X_val,
         y_val,
@@ -65,29 +63,32 @@ def main(cfg):
 
 
         return exp.run(
-            prep_cfg,
-            model_cfg,
-            train_cfg,
+            cfg,
             X_train,
             X_val,
             y_val
         )
 
 
+
+    """
     print(
         train_once(
             model_type, # ae, iso
-            cfg.model_type.prep,
-            cfg.model_type.models,
-            cfg.model_type.training,
+            cfg.model_type,
+            #cfg.model_type.prep,
+            #cfg.model_type.models,
+            #cfg.model_type.training,
             X_train,
             X_val,
             y_val
         )
     )
-
+    """
 
     
+
+
 
 
 

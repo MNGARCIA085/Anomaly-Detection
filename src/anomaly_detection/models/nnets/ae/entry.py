@@ -20,13 +20,16 @@ from anomaly_detection.training.registry import TRAINER_REGISTRY
 
 
 
+from ...base_entry import BaseModelEntry
+
+
+
 @register("ae")
-class AEEntry:
+class AEEntry(BaseModelEntry):
     
 
     # sample only for tuning
-    @staticmethod
-    def sample(trial, tun_cfg):
+    def sample(self, trial, tun_cfg):
 
         return {
 
@@ -49,7 +52,7 @@ class AEEntry:
             },
 
 
-            "model": {
+            "models": {
                 "encoder_dims": [
                     trial.suggest_int("enc1", 16, 64),
                     trial.suggest_int("enc2", 4, 32),
@@ -87,8 +90,8 @@ class AEEntry:
 
         }
 
-    @staticmethod
-    def build_preprocessor(prep_cfg): # later -> prep_cfg:AEPrepConfig or like that
+
+    def build_preprocessor(self, prep_cfg): # later -> prep_cfg:AEPrepConfig or like that
 
         steps = []
 
@@ -112,8 +115,10 @@ class AEEntry:
             steps
         )
 
-    @staticmethod
+
+
     def build(
+        self,
         cfg_model,
         cfg_training,
         input_dim

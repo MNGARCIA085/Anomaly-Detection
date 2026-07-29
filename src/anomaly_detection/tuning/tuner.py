@@ -19,7 +19,6 @@ class Tuner:
         self,
         model_type,
         evaluator,
-        # config
         tun_cfg,
     ):
 
@@ -51,7 +50,7 @@ class Tuner:
             MODEL_REGISTRY[
                 self.model_type
             ]
-        )
+        )()
 
 
 
@@ -76,9 +75,7 @@ class Tuner:
 
             result = (
                 self.exp.run(
-                    cfg['prep'],
-                    cfg['model'],
-                    cfg.get('training', None), # None for isoforests.....
+                    cfg,
                     X_train,
                     X_val,
                     y_val

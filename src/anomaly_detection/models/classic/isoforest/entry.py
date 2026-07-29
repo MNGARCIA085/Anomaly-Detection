@@ -12,13 +12,16 @@ from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from .model import IsoWrapper
 
 
+from ...base_entry import BaseModelEntry
 
 
-@register("isoforest") # iso
-class IsoEntry:
 
-    @staticmethod
-    def sample(trial, tun_cfg):
+
+@register("isoforest")
+class IsoEntry(BaseModelEntry):
+
+
+    def sample(self, trial, tun_cfg):
 
 
         return {
@@ -30,7 +33,7 @@ class IsoEntry:
                 )
             },
 
-            "model": {
+            "models": {
 
                 "n_estimators": trial.suggest_int(
                     "n_estimators",
@@ -46,8 +49,8 @@ class IsoEntry:
             }
         }
 
-    @staticmethod
-    def build_preprocessor(prep_cfg):
+
+    def build_preprocessor(self, prep_cfg):
 
         steps = []
 
@@ -61,12 +64,14 @@ class IsoEntry:
             steps
         )
 
-    @staticmethod
+
     def build(
+        self,
         model_cfg,
         training_cfg=None,
         input_dim=None,
     ):
+
 
         # my model, not need to define it custom like AE
         model = IsolationForest(

@@ -7,6 +7,9 @@ import torch.nn as nn
 from .schemas import AEConfig
 
 
+from ...base_model import AnomalyWrapper
+
+
 
 
 class AE(nn.Module):
@@ -43,8 +46,11 @@ class AE(nn.Module):
 
 
 
+
+
+
 # wrapper -> model + trainer
-class AEWrapper:
+class AEWrapper(AnomalyWrapper):
 
     def __init__(
         self,

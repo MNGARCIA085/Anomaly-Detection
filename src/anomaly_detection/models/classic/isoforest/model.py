@@ -1,11 +1,11 @@
+from ...base_model import AnomalyWrapper
 
 
-
-# dsp. que herede
-class IsoWrapper:
+class IsoWrapper(AnomalyWrapper):
 
     def __init__(self, model):
         self.model = model
+
 
     def fit(
         self,
@@ -15,8 +15,8 @@ class IsoWrapper:
         self.model.fit(X)
         return self
 
-    def get_scores(self, X):
 
+    def get_scores(self, X):
         return -self.model.decision_function(X)
 
 
