@@ -28,7 +28,7 @@ from ...base_entry import BaseModelEntry
 class AEEntry(BaseModelEntry):
     
 
-    # sample only for tuning
+    # sample only for tuning; maybe later more generic
     def sample(self, trial, tun_cfg):
 
         return {

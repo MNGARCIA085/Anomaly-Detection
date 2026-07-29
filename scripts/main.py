@@ -71,20 +71,17 @@ def main(cfg):
 
 
 
-    """
+    
     print(
         train_once(
             model_type, # ae, iso
             cfg.model_type,
-            #cfg.model_type.prep,
-            #cfg.model_type.models,
-            #cfg.model_type.training,
             X_train,
             X_val,
             y_val
         )
     )
-    """
+    
 
     
 

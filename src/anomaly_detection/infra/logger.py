@@ -1,5 +1,181 @@
 
 
+
+#-------logger.py
+from abc import ABC, abstractmethod
+
+
+class ExperimentLogger(ABC):
+
+    @abstractmethod
+    def start_run(self, run_name=None):
+        pass
+
+    @abstractmethod
+    def end_run(self):
+        pass
+
+    @abstractmethod
+    def log_params(self, params):
+        pass
+
+    @abstractmethod
+    def log_metrics(self, metrics):
+        pass
+
+    @abstractmethod
+    def log_artifact(self, path):
+        pass
+
+    @abstractmethod
+    def log_model(self, model, path):
+        pass
+
+
+
+#-------------mlflow logger
+import os
+from pathlib import Path
+import mlflow
+import joblib
+
+from .logger import ExperimentLogger
+
+
+class MLFlowLogger(ExperimentLogger):
+
+    def __init__(
+        self,
+        exp_name='an_detection',
+        tracking_db="mlflow.db",
+        artifact_dir="mlruns"
+    ):
+
+        self.root_dir = Path(__file__).resolve().parents[3]
+
+        self.tracking_db = (
+            self.root_dir / tracking_db
+        )
+
+        self.artifact_dir = (
+            self.root_dir / artifact_dir
+        )
+
+        self.exp_name = exp_name
+
+        self._init_mlflow()
+
+
+    def _init_mlflow(self):
+
+        mlflow.set_tracking_uri(
+            f"sqlite:///{self.tracking_db}"
+        )
+
+        os.makedirs(
+            self.artifact_dir,
+            exist_ok=True
+        )
+
+        mlflow.set_experiment(
+            self.exp_name
+        )
+
+
+    def start_run(
+        self,
+        run_name=None
+    ):
+
+        return mlflow.start_run(
+            run_name=run_name
+        )
+
+
+    def end_run(self):
+
+        mlflow.end_run()
+
+
+    def log_params(
+        self,
+        params
+    ):
+
+        mlflow.log_params(
+            params
+        )
+
+
+    def log_metrics(
+        self,
+        metrics
+    ):
+
+        mlflow.log_metrics(
+            metrics
+        )
+
+
+    def log_artifact(
+        self,
+        path
+    ):
+
+        mlflow.log_artifact(
+            str(path)
+        )
+
+
+    def log_model(
+        self,
+        model,
+        path
+    ):
+
+        model_path = (
+            self.root_dir / path
+        )
+
+        joblib.dump(
+            model,
+            model_path
+        )
+
+        mlflow.log_artifact(
+            str(model_path)
+        )
+
+
+
+
+
+# helper
+def flatten_dict(d, parent_key=""):
+    items = {}
+
+    for k, v in d.items():
+        key = f"{parent_key}.{k}" if parent_key else k
+
+        if isinstance(v, dict):
+            items.update(
+                flatten_dict(v, key)
+            )
+
+        elif isinstance(v, list):
+            items[key] = str(v)
+
+        else:
+            items[key] = v
+
+    return items
+
+
+
+
+
+
+"""
 import mlflow
 
 
@@ -41,6 +217,9 @@ class ExperimentLogger:
             mlflow.log_artifact("model.pkl")
 
             mlflow.set_tag("best_model", "true")
+
+"""
+
 
 
 
