@@ -91,3 +91,19 @@ class AEWrapper(AnomalyWrapper):
                 (X - recon) ** 2,
                 dim=1
             ).numpy()
+
+
+
+    # save model
+    def save(self, path):
+
+        torch.save(
+            self.model.state_dict(),
+            path
+        )
+
+
+    # training history
+    @property
+    def history(self):
+        return self.trainer.history

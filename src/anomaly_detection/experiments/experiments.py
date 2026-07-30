@@ -5,15 +5,6 @@ from anomaly_detection.models.registry import MODEL_REGISTRY
 from anomaly_detection.evaluation.evaluator import Evaluator
 
 
-
-
-
-
-
-
-
-
-
 from anomaly_detection.infra.logger import flatten_dict, MLFlowLogger
 
 
@@ -45,10 +36,19 @@ class Experiment:
             run_name=self.model_type
         ):
 
-            # log params from my config
+            
+
+            # log params from my config; maybe prefixes later
             self.logger.log_params(
-                flatten_dict(cfg)
+                flatten_dict(cfg.get('prep'))
             )
+            self.logger.log_params(
+                flatten_dict(cfg.get('models'))
+            )
+            self.logger.log_params(
+                flatten_dict(cfg.get('training', None))
+            )
+            #--------------------------
 
 
 
@@ -61,6 +61,24 @@ class Experiment:
                 entry.build_preprocessor(cfg.get('prep'))
             )
 
+
+            # log preprocessor
+            path = self.logger.artifact_path(
+                "preprocessor.pkl"
+            )
+            preprocessor.save(path)
+            self.logger.log_artifact(path)
+            #----------
+            """
+            # File
+            path = self.logger.artifact_path("preprocessor.pkl")
+            preprocessor.save(path)
+            self.logger.log_artifact(
+                path,
+                artifact_path="preprocessing"
+            )
+
+            """
 
 
 
@@ -91,13 +109,22 @@ class Experiment:
 
 
 
-            
-
-
+        
             wrapper.fit(
                 X_train_p,
                 X_val_p
             )
+
+
+            # history
+            history = wrapper.history
+
+            # log:
+            if wrapper.history.metrics:
+                #print(history)
+                self.logger.log_training_history(wrapper.history)
+
+
 
             scores = (
                 wrapper.get_scores(
@@ -112,7 +139,28 @@ class Experiment:
                     y_true=y_val,
                     X=X_val_p
                 )
-            )
+            ) # actually returns metrics
+
+
+            # log metrics
+            self.logger.log_metrics(evaluation)
+            #---------
+
+            print('evaluation')
+
+
+
+            # save only "good" models
+            if evaluation["auc"] > 0.9999:
+
+                path = self.logger.artifact_path("model")
+
+                wrapper.save(path)
+
+                self.logger.log_artifact(
+                    path,
+                    artifact_path="model"
+                )
 
         return evaluation
 

@@ -42,3 +42,41 @@ class TrainingConfig:
 
     callbacks: list[Any] = field(default_factory=list)
 """
+
+
+
+
+
+
+
+@dataclass
+class TrainingHistory:
+    """
+    Stores any metric recorded during training.
+
+    Example:
+        {
+            "train_loss": [0.95, 0.81, 0.72],
+            "val_loss":   [1.02, 0.88, 0.79],
+            "lr":          [0.001, 0.001, 0.0005]
+        }
+    """
+
+    metrics: dict[str, list[float]] = field(default_factory=dict)
+
+    def append(self, name: str, value: float):
+
+        self.metrics.setdefault(
+            name,
+            []
+        ).append(float(value))
+
+
+    def get(self, name: str):
+
+        return self.metrics.get(name, [])
+
+
+    def as_dict(self):
+
+        return self.metrics

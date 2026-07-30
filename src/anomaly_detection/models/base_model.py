@@ -17,4 +17,28 @@ class AnomalyWrapper(ABC):
         pass
 
 
+    # save the model
+    @abstractmethod
+    def save(self, path): 
+        pass
 
+
+    # property for history
+    @property
+    @abstractmethod
+    def history(self):
+        pass
+
+
+
+"""
+class IsoWrapper:
+
+    def __init__(...):
+        ...
+        self._history = TrainingHistory()
+
+    @property
+    def history(self):
+        return self._history
+"""

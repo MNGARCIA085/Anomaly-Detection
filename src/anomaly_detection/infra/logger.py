@@ -42,6 +42,26 @@ import joblib
 from .logger import ExperimentLogger
 
 
+
+import numpy as np 
+import numbers
+
+
+import joblib
+import tempfile
+
+
+
+from pathlib import Path
+
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+
 class MLFlowLogger(ExperimentLogger):
 
     def __init__(
@@ -107,6 +127,9 @@ class MLFlowLogger(ExperimentLogger):
         )
 
 
+
+
+    """
     def log_metrics(
         self,
         metrics
@@ -115,9 +138,26 @@ class MLFlowLogger(ExperimentLogger):
         mlflow.log_metrics(
             metrics
         )
+    """
 
 
-    def log_artifact(
+    def log_metrics(self, metrics):
+
+        clean_metrics = {}
+
+        for k, v in metrics.items():
+
+            if isinstance(v, np.generic):
+                v = v.item()
+
+            if isinstance(v, numbers.Number):
+                clean_metrics[k] = float(v)
+
+        mlflow.log_metrics(clean_metrics)
+
+
+
+    def log_artifactv0(
         self,
         path
     ):
@@ -125,6 +165,66 @@ class MLFlowLogger(ExperimentLogger):
         mlflow.log_artifact(
             str(path)
         )
+
+
+
+    def log_artifact(
+        self,
+        path,
+        artifact_path=None
+    ):
+
+        path = Path(path)
+
+        if path.is_dir():
+            mlflow.log_artifacts(
+                str(path),
+                artifact_path=artifact_path
+            )
+
+        else:
+            mlflow.log_artifact(
+                str(path),
+                artifact_path=artifact_path
+            )
+
+
+
+    def artifact_path(self, filename):
+
+        run_id = mlflow.active_run().info.run_id
+
+        path = (
+            self.root_dir
+            / "artifacts"
+            / run_id
+        )
+
+        path.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        return path / filename
+
+
+    def log_preprocessor(
+        self,
+        preprocessor
+    ):
+
+        path = self.artifact_path(
+            "preprocessor.pkl"
+        )
+
+        preprocessor.save(path)
+
+        mlflow.log_artifact(
+            str(path),
+            artifact_path="preprocessing"
+        )
+
+
 
 
     def log_model(
@@ -144,6 +244,100 @@ class MLFlowLogger(ExperimentLogger):
 
         mlflow.log_artifact(
             str(model_path)
+        )
+
+
+
+
+
+
+    def log_training_history(
+        self,
+        history
+    ):
+
+        if not history.metrics:
+            return
+
+        # ---------- CSV ----------
+        df = pd.DataFrame(history.as_dict())
+
+        csv_path = self.artifact_path(
+            "history.csv"
+        )
+
+        df.to_csv(
+            csv_path,
+            index=False
+        )
+
+        self.log_artifact(
+            csv_path,
+            artifact_path="training"
+        )
+
+
+        # ---------- One plot per metric ----------
+        for metric, values in history.as_dict().items():
+
+            plt.figure()
+
+            plt.plot(
+                range(1, len(values) + 1),
+                values
+            )
+
+            plt.xlabel("Epoch")
+            plt.ylabel(metric)
+            plt.title(metric)
+
+            fig_path = self.artifact_path(
+                f"{metric}.png"
+            )
+
+            plt.savefig(
+                fig_path,
+                bbox_inches="tight"
+            )
+
+            plt.close()
+
+            self.log_artifact(
+                fig_path,
+                artifact_path="training"
+            )
+
+
+        # ---------- Combined plot ----------
+        plt.figure()
+
+        for metric, values in history.as_dict().items():
+
+            plt.plot(
+                range(1, len(values) + 1),
+                values,
+                label=metric
+            )
+
+        plt.xlabel("Epoch")
+        plt.ylabel("Value")
+        plt.title("Training History")
+        plt.legend()
+
+        fig_path = self.artifact_path(
+            "history.png"
+        )
+
+        plt.savefig(
+            fig_path,
+            bbox_inches="tight"
+        )
+
+        plt.close()
+
+        self.log_artifact(
+            fig_path,
+            artifact_path="training"
         )
 
 

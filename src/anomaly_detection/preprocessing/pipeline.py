@@ -1,3 +1,6 @@
+import joblib
+
+
 class PreprocessingPipeline:
 
     def __init__(self, steps):
@@ -22,3 +25,12 @@ class PreprocessingPipeline:
 
     def fit_transform(self, X):
         return self.fit(X).transform(X)
+
+
+    # for later loggign
+    def save(self, path):
+
+        joblib.dump(
+            self,
+            path
+        )

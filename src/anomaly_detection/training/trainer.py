@@ -4,7 +4,7 @@ import torch
 import torch.optim as optim
 
 from .dataset import AnomalyDataset
-from .schemas import TrainState, TrainingConfig
+from .schemas import TrainState, TrainingConfig, TrainingHistory
 
 
 
@@ -18,6 +18,8 @@ class NNTrainer:
         self.cfg = cfg
         self.callbacks = cfg.callbacks or []
 
+        self.history = None
+
     def _call_callbacks(self, hook, state):
         for cb in self.callbacks:
             getattr(cb, hook, lambda x: None)(state)
@@ -25,6 +27,10 @@ class NNTrainer:
     def fit(self, model, X_train, X_val=None): # train
         device = self.cfg.device
         model.to(device)
+
+
+        history = TrainingHistory()
+
 
         optimizer = torch.optim.Adam(model.parameters(), lr=self.cfg.lr)
         criterion = nn.MSELoss()
@@ -92,6 +98,20 @@ class NNTrainer:
             if state.stop_training:
                 break
 
+            # history
+            history.append(
+                "train_loss",
+                epoch_loss
+            )
+
+            if val_loader is not None:
+                history.append(
+                    "val_loss",
+                    val_loss
+                )
+
         self._call_callbacks("on_train_end", state)
+
+        self.history = history
 
         return model
