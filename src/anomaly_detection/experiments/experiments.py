@@ -45,9 +45,11 @@ class Experiment:
             self.logger.log_params(
                 flatten_dict(cfg.get('models'))
             )
-            self.logger.log_params(
-                flatten_dict(cfg.get('training', None))
-            )
+
+            if cfg.get('training', None):
+                self.logger.log_params(
+                    flatten_dict(cfg.get('training'))
+                )
             #--------------------------
 
 
@@ -63,24 +65,18 @@ class Experiment:
 
 
             # log preprocessor
+            """
             path = self.logger.artifact_path(
                 "preprocessor.pkl"
             )
             preprocessor.save(path)
             self.logger.log_artifact(path)
+            """
             #----------
-            """
-            # File
-            path = self.logger.artifact_path("preprocessor.pkl")
-            preprocessor.save(path)
-            self.logger.log_artifact(
-                path,
-                artifact_path="preprocessing"
-            )
-
-            """
-
-
+            
+            
+            
+    
 
             X_train_p = (
                 preprocessor.fit_transform(
@@ -99,6 +95,17 @@ class Experiment:
             )
 
 
+
+            # prep -> save after fit!!!!
+            path = self.logger.artifact_path("preprocessor.pkl")
+            preprocessor.save(path)
+            self.logger.log_artifact(
+                path,
+                artifact_path="preprocessing"
+            )
+
+
+            # wrapper
             wrapper = (
                 entry.build(
                     cfg.get('models'),
@@ -151,7 +158,7 @@ class Experiment:
 
 
             # save only "good" models
-            if evaluation["auc"] > 0.9999:
+            if evaluation["auc"] > 0.9:
 
                 path = self.logger.artifact_path("model")
 
