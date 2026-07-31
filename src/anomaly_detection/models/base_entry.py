@@ -29,3 +29,7 @@ class BaseModelEntry(ABC):
         parameters: `training_cfg` and `input_dim`.
         """
         pass
+
+    @abstractmethod
+    def load(self, path):
+        pass

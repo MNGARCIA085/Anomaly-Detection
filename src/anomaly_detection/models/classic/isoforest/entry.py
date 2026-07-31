@@ -82,3 +82,10 @@ class IsoEntry(BaseModelEntry):
         return IsoWrapper(
             model
         )
+
+
+    # to make inference easier
+    # The entry is just delegating. It's a tiny method, but it keeps the pipeline generic.
+    def load(self, path):
+
+        return IsoWrapper.load(path)

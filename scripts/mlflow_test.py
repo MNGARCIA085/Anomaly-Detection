@@ -88,6 +88,27 @@ def main(run_id):
 
 
 
+    # quick test for AEs
+
+
+    """
+    entry = MODEL_REGISTRY[model_type]()
+
+    preprocessor = PreprocessingPipeline.load(preprocessor_path)
+
+    wrapper = entry.load(model_path)
+
+    X = preprocessor.transform(X)
+
+    scores = wrapper.get_scores(X)
+    """
+
+
+
 
 if __name__=="__main__":
     main("46766beb5da344e5a29b813e2f7884c6")
+
+
+
+# https://chatgpt.com/c/6a6a64a4-6a7c-83e9-8abe-b720fb6e5351 -> model recosntruct

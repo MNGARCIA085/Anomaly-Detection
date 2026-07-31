@@ -11,11 +11,17 @@ from ...base_model import AnomalyWrapper
 
 
 
+from pathlib import Path
+import joblib
+
+
+
 
 class AE(nn.Module):
 
     def __init__(self, cfg: AEConfig):
         super().__init__()
+        self.config = cfg
 
         # ----- Encoder -----
         encoder_layers = []
@@ -94,16 +100,174 @@ class AEWrapper(AnomalyWrapper):
 
 
 
-    # save model
-    def save(self, path):
-
-        torch.save(
-            self.model.state_dict(),
-            path
-        )
-
-
     # training history
     @property
     def history(self):
         return self.trainer.history
+
+
+    # save and load
+    def save(self, path):
+
+        save_torch_model(
+            self.model,
+            path
+        )
+
+    @classmethod
+    def load(cls, path):
+
+        model = load_torch_model(
+            AE,
+            path
+        )
+
+        return cls(
+            model=model,
+            trainer=None
+        )
+
+
+    # property for input dim
+    @property
+    def input_dim(self):
+        return self.model.config.input_dim
+
+
+    """
+    # save model
+    def save(self, path):
+
+        path = Path(path)
+        path.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        # Save model weights
+        torch.save(
+            self.model.state_dict(),
+            path / "weights.pt"
+        )
+
+        # Save everything needed to rebuild the architecture
+        joblib.dump(
+            self.model.config,
+            path / "config.pkl"
+        )
+
+    # load model
+    @classmethod
+    def load(cls, path):
+
+        path = Path(path)
+
+        # Load configuration
+        cfg = joblib.load(
+            path / "config.pkl"
+        )
+
+        # Rebuild model
+        model = AE(cfg)
+
+        # Load weights
+        model.load_state_dict(
+            torch.load(
+                path / "weights.pt",
+                map_location="cpu"
+            )
+        )
+
+        model.eval()
+
+        # No trainer needed for inference
+        return cls(
+            model=model,
+            trainer=None
+        )
+    """
+
+
+
+
+
+
+
+
+
+
+
+#---------move later
+# persistence/torch.py
+
+def save_torch_model(model, path):
+
+    path = Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+
+    torch.save(
+        model.state_dict(),
+        path / "weights.pt"
+    )
+
+    joblib.dump(
+        model.config,
+        path / "config.pkl"
+    )
+
+def load_torch_model(model_cls, path):
+
+    path = Path(path)
+
+    cfg = joblib.load(
+        path / "config.pkl"
+    )
+
+    model = model_cls(cfg)
+
+    model.load_state_dict(
+        torch.load(
+            path / "weights.pt",
+            map_location="cpu"
+        )
+    )
+
+    model.eval()
+
+    return model
+
+
+
+
+"""
+@classmethod
+def load(cls, path):
+
+    cfg = joblib.load(
+        path / "config.pkl"
+    )
+
+    model = AE(cfg)
+
+    model.load_state_dict(
+        torch.load(path / "weights.pt")
+    )
+
+    model.eval()
+
+    return cls(
+        model=model,
+        trainer=None
+    )
+"""
+
+
+
+
+
+
+# too many duplicate code in save/load
+# maybe add an abstraction
+# or simple functions and use them here
+# all torch models are saved and load probably in the same way 
+    

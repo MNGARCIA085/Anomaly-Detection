@@ -24,6 +24,11 @@ from ...base_entry import BaseModelEntry
 
 
 
+
+
+
+
+
 @register("ae")
 class AEEntry(BaseModelEntry):
     
@@ -153,6 +158,17 @@ class AEEntry(BaseModelEntry):
             model,
             trainer
         )
+
+
+    # load model (to simplify inference pipeline)
+    def load(self, path):
+
+        return AEWrapper.load(path)
+
+
+
+
+
 
 
 
