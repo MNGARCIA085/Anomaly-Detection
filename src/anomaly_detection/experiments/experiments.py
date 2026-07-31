@@ -1,11 +1,10 @@
-from anomaly_detection.models.nnets.ae.entry import AEEntry
-from anomaly_detection.models.classic.isoforest.entry import IsoEntry
+import anomaly_detection.models.register_models # to trigger registration
 from anomaly_detection.models.registry import MODEL_REGISTRY
 
 from anomaly_detection.evaluation.evaluator import Evaluator
 
-
-from anomaly_detection.infra.logger import flatten_dict, MLFlowLogger
+from anomaly_detection.infra.logger import flatten_dict
+from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
 
 
 
@@ -16,7 +15,7 @@ class Experiment:
         self,
         model_type,
         evaluator,
-        logger=MLFlowLogger(),
+        logger=MLFlowLogger(), # later ill make it optional
     ):
         self.model_type = model_type
         self.evaluator = evaluator
@@ -30,13 +29,13 @@ class Experiment:
         y_val=None
     ):
 
-
-
         with self.logger.start_run(
             run_name=self.model_type
         ):
 
-            
+            # tags
+            self.logger.log_tags(cfg.name)
+
 
             # log params from my config; maybe prefixes later
             self.logger.log_params(
@@ -52,9 +51,6 @@ class Experiment:
                 )
             #--------------------------
 
-
-
-
             entry = MODEL_REGISTRY[
                 self.model_type
             ]()
@@ -64,19 +60,6 @@ class Experiment:
             )
 
 
-            # log preprocessor
-            """
-            path = self.logger.artifact_path(
-                "preprocessor.pkl"
-            )
-            preprocessor.save(path)
-            self.logger.log_artifact(path)
-            """
-            #----------
-            
-            
-            
-    
 
             X_train_p = (
                 preprocessor.fit_transform(
@@ -115,8 +98,6 @@ class Experiment:
             )
 
 
-
-        
             wrapper.fit(
                 X_train_p,
                 X_val_p
@@ -128,7 +109,6 @@ class Experiment:
 
             # log:
             if wrapper.history.metrics:
-                #print(history)
                 self.logger.log_training_history(wrapper.history)
 
 
@@ -153,9 +133,6 @@ class Experiment:
             self.logger.log_metrics(evaluation)
             #---------
 
-            print('evaluation')
-
-
 
             # save only "good" models
             if evaluation["auc"] > 0.9:
@@ -172,100 +149,3 @@ class Experiment:
         return evaluation
 
 
-
-
-
-
-
-
-
-
-
-
-#--------------------------OK---------------------
-class Experimentv0:
-
-    def __init__(
-        self,
-        model_type,
-        evaluator
-    ):
-        self.model_type = model_type
-        self.evaluator = evaluator
-
-    def run(
-        self,
-        cfg,
-        X_train,
-        X_val,
-        y_val=None
-    ):
-
-
-
-        entry = MODEL_REGISTRY[
-            self.model_type
-        ]()
-
-        preprocessor = (
-            entry.build_preprocessor(cfg.get('prep'))
-        )
-
-
-
-
-        X_train_p = (
-            preprocessor.fit_transform(
-                X_train
-            )
-        )
-
-        X_val_p = (
-            preprocessor.transform(
-                X_val
-            )
-        )
-
-        input_dim = (
-            X_train_p.shape[1]
-        )
-
-
-        wrapper = (
-            entry.build(
-                cfg.get('models'),
-                cfg.get('training', None), # None for isoforests......
-                input_dim
-            )
-        )
-
-
-
-        # log params from my config
-
-
-        wrapper.fit(
-            X_train_p,
-            X_val_p
-        )
-
-        scores = (
-            wrapper.get_scores(
-                X_val_p
-            )
-        )
-
-
-        evaluation = (
-            self.evaluator.evaluate(
-                scores=scores,
-                y_true=y_val,
-                X=X_val_p
-            )
-        )
-
-        return evaluation
-
-
-
-# logging: https://chatgpt.com/c/6a6a64a4-6a7c-83e9-8abe-b720fb6e5351

@@ -8,17 +8,13 @@ from mlflow.tracking import MlflowClient
 from anomaly_detection.models.nnets.ae.model import AEWrapper
 
 
+import anomaly_detection.models.register_models 
+from anomaly_detection.models.registry import MODEL_REGISTRY
 
 
 
 
-
-
-
-
-#----------log model_type!!!!!!!!!!!!
-
-
+#----------log model_type-------------------#
 def main(run_id):
 
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
@@ -76,37 +72,16 @@ def main(run_id):
         if hasattr(step, "components_"):
             print("PCA components =", step.components_.shape)
 
+
     # -----------------------
     # Load model
     # -----------------------
+    model_type = run.data.tags['model_type']
 
-    """
-    model_type = run.data.params["model_type"]
-
-    entry = MODEL_REGISTRY[model_type]()
-
-    wrapper = entry.load(local_dir / "model")
-    """
-
-
-    # add later model type to logged params in mlflow
-
-    # for the registry to work, improve later
-    from anomaly_detection.models.nnets.ae.entry import AEEntry
-    from anomaly_detection.models.classic.isoforest.entry import IsoEntry
-    
-    # registry
-    from anomaly_detection.models.registry import MODEL_REGISTRY
-
-
-    entry = MODEL_REGISTRY['ae']() # hardcdoed for now; "ae"
+    entry = MODEL_REGISTRY[model_type]() # hardcdoed for now; "ae"
 
     wrapper = entry.load(local_dir / "model")
 
-
-    #wrapper = AEWrapper.load(
-    #    local_dir / "model"
-    #)
 
     print("\n=== MODEL ===")
     print(wrapper.model)
@@ -115,21 +90,7 @@ def main(run_id):
     # Quick inference test
     # -----------------------
 
-    """ AEs
-    X = np.random.randn(
-        5,
-        wrapper.model.config.input_dim # only for aes
-    )
-
-    X = prep.transform(X)
-
-    scores = wrapper.get_scores(X)
-    """
-
-
-
-
-    #
+    # fake data
     X = np.random.randn(
         5,
         wrapper.input_dim # only for aes
@@ -139,10 +100,6 @@ def main(run_id):
 
     scores = wrapper.get_scores(X)
 
-
-
-
-
     print("\n=== SCORES ===")
     print(scores)
 
@@ -150,5 +107,5 @@ def main(run_id):
 
 
 if __name__=="__main__":
-    main("6ca321accc624c679bf612bd1af43506")
-    #main("8c10dc66d8cb4153a4d2b9b738923acc") # iso
+    main("c4eb09f36af142d291d016938cb1cdee")
+    main("3ed8182870c24198a3a85a1a53229da2") # iso

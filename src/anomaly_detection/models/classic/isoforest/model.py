@@ -1,10 +1,9 @@
 from ...base_model import AnomalyWrapper
 
-
-import joblib
-
-
 from anomaly_detection.training.schemas import TrainingHistory
+
+from ...persistence.sklearn import save_sklearn_model, load_sklearn_model
+
 
 
 class IsoWrapper(AnomalyWrapper):
@@ -38,16 +37,8 @@ class IsoWrapper(AnomalyWrapper):
         return self.model.n_features_in_ # number of features stored by the fitted IsolationForest
 
 
-    #...
-    """
-    def save(self, path):
 
-        joblib.dump(
-            self.model,
-            path
-        )
-    """
-
+    # save & load
     def save(self, path):
 
         save_sklearn_model(
@@ -66,38 +57,5 @@ class IsoWrapper(AnomalyWrapper):
         return cls(
             model=model
         )
-
-    
-
-
-
-from pathlib import Path
-
-# --------move later;
-# persistence/sklearn
-def save_sklearn_model(model, path):
-
-    path = Path(path)
-    path.mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
-    joblib.dump(
-        model,
-        path / "model.pkl"
-    )
-
-
-def load_sklearn_model(path):
-
-    path = Path(path)
-
-    return joblib.load(
-        path / "model.pkl"
-    )
-
-
-
 
 

@@ -9,11 +9,7 @@ from omegaconf import DictConfig
 
 from anomaly_detection.experiments.experiments import Experiment
 
-
 from anomaly_detection.tuning.tuner import Tuner
-
-
-
 
 from anomaly_detection.evaluation.evaluator import Evaluator
 
@@ -86,7 +82,7 @@ def main(cfg):
     
 
 
-    #return
+    return
 
 
 
