@@ -223,7 +223,7 @@ mlflow.db
 checkpoints/
 saved_models/
 artifacts/
-
+artifacts
 
 
 # IDE

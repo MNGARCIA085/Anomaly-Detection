@@ -18,7 +18,7 @@ class MLFlowLogger(ExperimentLogger):
 
     def __init__(
         self,
-        exp_name='an_detection',
+        exp_name='Anomaly_Detection',
         tracking_db="mlflow.db",
         artifact_dir="mlruns"
     ):

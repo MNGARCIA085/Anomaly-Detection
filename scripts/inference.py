@@ -93,7 +93,7 @@ def main(run_id):
     # fake data
     X = np.random.randn(
         5,
-        wrapper.input_dim # only for aes
+        wrapper.input_dim
     )
 
     X = prep.transform(X)
@@ -107,5 +107,5 @@ def main(run_id):
 
 
 if __name__=="__main__":
-    main("c4eb09f36af142d291d016938cb1cdee")
-    main("3ed8182870c24198a3a85a1a53229da2") # iso
+    main("0e311cc9fc8f426a80b366a76de47f7a")
+    main("277f8f9cc1134e799458cf30d7ed2d55") # iso

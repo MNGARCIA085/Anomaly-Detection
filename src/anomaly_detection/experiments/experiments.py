@@ -3,7 +3,7 @@ from anomaly_detection.models.registry import MODEL_REGISTRY
 
 from anomaly_detection.evaluation.evaluator import Evaluator
 
-from anomaly_detection.infra.logger import flatten_dict
+from anomaly_detection.infra.utils import flatten_dict
 from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
 
 
