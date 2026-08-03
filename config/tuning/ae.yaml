@@ -19,12 +19,28 @@ model_space:
 
 training_space:
   optimizer:
-    lr:
-      name: optimizer.lr
-      type: float
-      low: 1e-4
-      high: 1e-2
-      log: true
+    name:
+      choices: [adam, sgd]
+
+    params:
+      lr:
+        name: optimizer.lr
+        type: float
+        low: 1e-4
+        high: 1e-2
+        log: true
+
+      betas:
+        type: categorical
+        choices:
+          - [0.9, 0.999]
+          - [0.5, 0.999]
+
+      momentum:
+        type: float
+        low: 0.0
+        high: 0.9
+
 
   epochs:
     name: epochs
@@ -36,3 +52,4 @@ training_space:
     name: batch_size
     type: categorical
     choices: [32, 64]
+

@@ -87,6 +87,42 @@ def create_loss(cfg):
 
 
 
+#--------later; dif optim have diff params
+"""
+optimizer_name = trial.suggest_categorical(
+    "optimizer.name",
+    ["adam", "sgd"]
+)
+
+
+
+if optimizer_name == "adam":
+    params = {
+        "lr": trial.suggest_float(
+            "adam.lr",
+            1e-4,
+            1e-2,
+            log=True
+        )
+    }
+
+elif optimizer_name == "sgd":
+    params = {
+        "lr": trial.suggest_float(
+            "sgd.lr",
+            1e-3,
+            1e-1,
+            log=True
+        ),
+        "momentum": trial.suggest_float(
+            "sgd.momentum",
+            0.0,
+            0.9
+        )
+    }
+"""
+
+
 
 
 #--------------------------------ENTRY----------------------#
@@ -135,15 +171,18 @@ class AEEntry(BaseModelEntry):
 
             "training": {
                 "optimizer": {
-                    "name": "adam",
+                    "name": trial.suggest_categorical(
+                        "optimizer.name",
+                        ["adam", "sgd"]
+                    ),
                     "params": {
                         "lr": trial.suggest_float(
                             "optimizer.lr",
-                            tun_cfg.training_space.optimizer.lr.low,
-                            tun_cfg.training_space.optimizer.lr.high,
+                            tun_cfg.training_space.optimizer.params.lr.low,
+                            tun_cfg.training_space.optimizer.params.lr.high,
                             log=True
                         )
-                        }
+                    }
                 },
 
                 "loss": {
