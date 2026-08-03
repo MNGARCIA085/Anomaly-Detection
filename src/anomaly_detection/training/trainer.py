@@ -17,98 +17,135 @@ class NNTrainer:
     def __init__(self, cfg: TrainingConfig):
         self.cfg = cfg
         self.callbacks = cfg.callbacks or []
-
         self.history = None
 
+
+    #--------build dataloader-----------#
+    def build_dataloader(self, X, shuffle):
+        return DataLoader(
+            AnomalyDataset(X),
+            batch_size=self.cfg.batch_size,
+            shuffle=shuffle,
+            num_workers=self.cfg.num_workers,
+        )
+
+    # ------------Loss-----------------#
+    def build_loss(self):
+        return nn.MSELoss()
+
+
+    # ---------Optimizer------------#
+    def build_optimizer(self, model):
+        return torch.optim.Adam(
+            model.parameters(),
+            lr=self.cfg.lr,
+        )
+
+    #------------Callbacks---------------#
     def _call_callbacks(self, hook, state):
         for cb in self.callbacks:
             getattr(cb, hook, lambda x: None)(state)
 
-    def fit(self, model, X_train, X_val=None): # train
-        device = self.cfg.device
-        model.to(device)
+    #---------Train epoch----------------#
+    def train_epoch(
+        self,
+        model,
+        loader,
+        optimizer,
+        criterion,
+    ):
+        model.train()
+
+        total_loss = 0.0
+
+        for batch in loader:
+            batch = batch.to(self.cfg.device)
+
+            optimizer.zero_grad()
+
+            recon = model(batch)
+            loss = criterion(recon, batch)
+
+            loss.backward()
+            optimizer.step()
+
+            total_loss += loss.item() * batch.size(0)
+
+        return total_loss / len(loader.dataset)
 
 
-        history = TrainingHistory()
+    #-----------Val epoch-------------------#
+    def validate(
+        self,
+        model,
+        loader,
+        criterion,
+    ):
+        model.eval()
+
+        total_loss = 0.0
+
+        with torch.no_grad():
+            for batch in loader:
+                batch = batch.to(self.cfg.device)
+
+                recon = model(batch)
+                loss = criterion(recon, batch)
+
+                total_loss += loss.item() * batch.size(0)
+
+        return total_loss / len(loader.dataset)
 
 
-        optimizer = torch.optim.Adam(model.parameters(), lr=self.cfg.lr)
-        criterion = nn.MSELoss()
+    #-----------------------Fit-----------------------#
+    def fit(self, model, X_train, X_val=None):
+        model.to(self.cfg.device)
 
-        # ---- DataLoaders ----
-        train_loader = DataLoader(
-            AnomalyDataset(X_train),
-            batch_size=self.cfg.batch_size,
-            shuffle=self.cfg.shuffle,
-            num_workers=self.cfg.num_workers
+        optimizer = self.build_optimizer(model)
+        criterion = self.build_loss()
+
+        train_loader = self.build_dataloader(X_train, shuffle=self.cfg.shuffle)
+        val_loader = (
+            self.build_dataloader(X_val, shuffle=False)
+            if X_val is not None
+            else None
         )
 
-        val_loader = None
-        if X_val is not None:
-            val_loader = DataLoader(
-                AnomalyDataset(X_val),
-                batch_size=self.cfg.batch_size,
-                shuffle=False,
-                num_workers=self.cfg.num_workers
-            )
-
+        history = TrainingHistory()
         state = TrainState(model=model)
+
         self._call_callbacks("on_train_start", state)
 
         for epoch in range(self.cfg.epochs):
             state.epoch = epoch
-            epoch_loss = 0.0
 
             self._call_callbacks("on_epoch_start", state)
 
-            model.train()
-            for batch in train_loader:
-                batch = batch.to(device)
+            train_loss = self.train_epoch(
+                model,
+                train_loader,
+                optimizer,
+                criterion,
+            )
 
-                optimizer.zero_grad()
-                recon = model(batch)
-                loss = criterion(recon, batch)
-                loss.backward()
-                optimizer.step()
+            state.train_loss = train_loss
 
-                epoch_loss += loss.item() * batch.size(0)
+            history.append("train_loss", train_loss)
 
-            epoch_loss /= len(train_loader.dataset)
-            state.train_loss = epoch_loss
-
-            # ---- Validation ----
             if val_loader is not None:
-                model.eval()
-                val_loss = 0.0
+                val_loss = self.validate(
+                    model,
+                    val_loader,
+                    criterion,
+                )
 
-                with torch.no_grad():
-                    for batch in val_loader:
-                        batch = batch.to(device)
-                        recon = model(batch)
-                        loss = criterion(recon, batch)
-                        val_loss += loss.item() * batch.size(0)
-
-                val_loss /= len(val_loader.dataset)
                 state.val_loss = val_loss
-
-                model.train()
+                history.append("val_loss", val_loss)
 
             self._call_callbacks("on_epoch_end", state)
 
             if state.stop_training:
                 break
-
-            # history
-            history.append(
-                "train_loss",
-                epoch_loss
-            )
-
-            if val_loader is not None:
-                history.append(
-                    "val_loss",
-                    val_loss
-                )
 
         self._call_callbacks("on_train_end", state)
 

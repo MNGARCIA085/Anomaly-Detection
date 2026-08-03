@@ -120,6 +120,7 @@ class Experiment:
             )
 
 
+            # is it the same for the transfomer!!!!
             evaluation = (
                 self.evaluator.evaluate(
                     scores=scores,
