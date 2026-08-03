@@ -27,7 +27,69 @@ from ...base_entry import BaseModelEntry
 
 
 
+#-----------code to move later----------#
+import torch
+import torch.nn as nn
 
+OPTIMIZER_REGISTRY = {
+    "adam": torch.optim.Adam,
+    "adamw": torch.optim.AdamW,
+    "sgd": torch.optim.SGD,
+}
+
+
+def create_optimizer(cfg, parameters):
+
+    optimizer_cls = OPTIMIZER_REGISTRY[cfg.name]
+
+    return optimizer_cls(
+        parameters,
+        **cfg.params
+    )
+
+
+LOSS_REGISTRY = {
+    "mse": nn.MSELoss,
+    "l1": nn.L1Loss,
+    "huber": nn.HuberLoss,
+}
+
+
+def create_loss(cfg):
+
+    loss_cls = LOSS_REGISTRY[cfg.name]
+
+    return loss_cls()
+
+
+
+
+# better code; so they also accept dicts
+def create_optimizer(cfg, parameters):
+
+    optimizer_cls = OPTIMIZER_REGISTRY[cfg["name"]]
+
+    return optimizer_cls(
+        parameters,
+        **cfg.get("params", {})
+    )
+
+
+def create_loss(cfg):
+
+    loss_cls = LOSS_REGISTRY[cfg["name"]]
+
+    return loss_cls(
+        **cfg.get("params", {})
+    )
+
+
+
+
+
+
+
+#--------------------------------ENTRY----------------------#
 
 @register("ae")
 class AEEntry(BaseModelEntry):
@@ -37,6 +99,8 @@ class AEEntry(BaseModelEntry):
     def sample(self, trial, tun_cfg):
 
         return {
+
+            "name": "ae",
 
             "prep": {
                 "scaler": trial.suggest_categorical(
@@ -70,13 +134,21 @@ class AEEntry(BaseModelEntry):
 
 
             "training": {
+                "optimizer": {
+                    "name": "adam",
+                    "params": {
+                        "lr": trial.suggest_float(
+                            "optimizer.lr",
+                            tun_cfg.training_space.optimizer.lr.low,
+                            tun_cfg.training_space.optimizer.lr.high,
+                            log=True
+                        )
+                        }
+                },
 
-                "lr": trial.suggest_float(
-                    "lr",
-                    tun_cfg.training_space.lr.low,
-                    tun_cfg.training_space.lr.high,
-                    log=True
-                ),
+                "loss": {
+                    "name": "mse"
+                },
 
                 "epochs": trial.suggest_int(
                     "epochs",
@@ -89,8 +161,8 @@ class AEEntry(BaseModelEntry):
                     tun_cfg.training_space.batch_size.choices
                 ),
 
+                "type": "default"
 
-                "type": "default" # hardcoded for now
             }
 
         }
@@ -139,15 +211,28 @@ class AEEntry(BaseModelEntry):
         model = AE(model_cfg)
 
 
+        # trainer
+        optimizer = create_optimizer(
+            cfg_training["optimizer"],
+            model.parameters()
+        )
+
+        loss = create_loss(
+            cfg_training["loss"],
+        )
+
+
         trainer_cfg = TrainingConfig(
-                lr=cfg_training["lr"],
-                epochs=cfg_training["epochs"],
-                batch_size=cfg_training["batch_size"],
-                callbacks=[
-                    EarlyStopping(patience=3),
-                    PrintLossCallback(),
-                ]
-            )
+            epochs=cfg_training["epochs"],
+            batch_size=cfg_training["batch_size"],
+            optimizer=optimizer,
+            loss=loss,
+            callbacks=[
+                EarlyStopping(patience=3),
+                PrintLossCallback(),
+            ]
+        )
+
 
         
         trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]

@@ -33,8 +33,9 @@ class Experiment:
             run_name=self.model_type
         ):
 
+
             # tags
-            self.logger.log_tags(cfg.name)
+            self.logger.log_tags(cfg.get('name'))
 
 
             # log params from my config; maybe prefixes later

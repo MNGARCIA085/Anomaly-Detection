@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
-from typing import List,Any
+from typing import List,Any,Dict
+import torch.nn as nn
+
+
 
 @dataclass
 class TrainState:
@@ -10,8 +13,34 @@ class TrainState:
     stop_training: bool = False
 
 
+#----------
+@dataclass
+class OptimizerConfig:
+    name: str
+    params: dict = field(default_factory=dict)
 
 
+
+@dataclass
+class TrainingConfig:
+    optimizer: OptimizerConfig
+    loss: nn.Module | None
+
+    batch_size: int
+    epochs: int
+
+    device: str = "cpu"
+    shuffle: bool = True
+    num_workers: int = 0
+
+    callbacks: List[Any] = field(default_factory=list)
+
+
+
+
+
+"""
+OK
 @dataclass
 class TrainingConfig:
     lr: float
@@ -23,6 +52,8 @@ class TrainingConfig:
     num_workers: int = 0
 
     callbacks: List[Any] = field(default_factory=list)
+"""
+
 
 
 """

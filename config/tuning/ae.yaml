@@ -18,12 +18,13 @@ model_space:
 
 
 training_space:
-  lr:
-    name: lr
-    type: float
-    low: 1e-4
-    high: 1e-2
-    log: true
+  optimizer:
+    lr:
+      name: optimizer.lr
+      type: float
+      low: 1e-4
+      high: 1e-2
+      log: true
 
   epochs:
     name: epochs

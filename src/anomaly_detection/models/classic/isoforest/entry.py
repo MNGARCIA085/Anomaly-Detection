@@ -26,6 +26,8 @@ class IsoEntry(BaseModelEntry):
 
         return {
 
+            "name": "isoforest",
+
             "prep": {
                 "scaler": trial.suggest_categorical(
                     "scaler",

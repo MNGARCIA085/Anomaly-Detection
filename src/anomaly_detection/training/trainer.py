@@ -10,14 +10,15 @@ from .schemas import TrainState, TrainingConfig, TrainingHistory
 
 
 
-
-# later -> optim... as DI -> it seems to work well
 class NNTrainer:
+
 
     def __init__(self, cfg: TrainingConfig):
         self.cfg = cfg
         self.callbacks = cfg.callbacks or []
         self.history = None
+        self.optimizer = cfg.optimizer
+        self.criterion = cfg.loss
 
 
     #--------build dataloader-----------#
@@ -29,17 +30,6 @@ class NNTrainer:
             num_workers=self.cfg.num_workers,
         )
 
-    # ------------Loss-----------------#
-    def build_loss(self):
-        return nn.MSELoss()
-
-
-    # ---------Optimizer------------#
-    def build_optimizer(self, model):
-        return torch.optim.Adam(
-            model.parameters(),
-            lr=self.cfg.lr,
-        )
 
     #------------Callbacks---------------#
     def _call_callbacks(self, hook, state):
@@ -101,8 +91,6 @@ class NNTrainer:
     def fit(self, model, X_train, X_val=None):
         model.to(self.cfg.device)
 
-        optimizer = self.build_optimizer(model)
-        criterion = self.build_loss()
 
         train_loader = self.build_dataloader(X_train, shuffle=self.cfg.shuffle)
         val_loader = (
@@ -124,8 +112,8 @@ class NNTrainer:
             train_loss = self.train_epoch(
                 model,
                 train_loader,
-                optimizer,
-                criterion,
+                self.optimizer,
+                self.criterion,
             )
 
             state.train_loss = train_loss
@@ -136,7 +124,7 @@ class NNTrainer:
                 val_loss = self.validate(
                     model,
                     val_loader,
-                    criterion,
+                    self.criterion,
                 )
 
                 state.val_loss = val_loss
@@ -152,3 +140,28 @@ class NNTrainer:
         self.history = history
 
         return model
+
+
+
+
+"""
+for several models maybe use one ineriatance level
+
+def training_step(self, model, batch, criterion):
+    recon = model(batch)
+    return criterion(recon, batch)
+
+
+def training_step(self, model, batch, criterion):
+    recon, mu, logvar = model(batch)
+
+    recon_loss = criterion(recon, batch)
+    kl = ...
+
+    return recon_loss + beta * kl
+
+def validation_step(self, model, batch, criterion):
+    recon = model(batch)
+    return criterion(recon, batch)
+
+"""
