@@ -18,114 +18,16 @@ from anomaly_detection.training.callbacks import EarlyStopping,PrintLossCallback
 from anomaly_detection.training.registry import TRAINER_REGISTRY
 
 
-
-
 from ...base_entry import BaseModelEntry
 
 
 
+from anomaly_detection.training.optimizers import create_optimizer
+
+from anomaly_detection.training.losses import create_loss
 
 
 
-#-----------code to move later----------#
-import torch
-import torch.nn as nn
-
-OPTIMIZER_REGISTRY = {
-    "adam": torch.optim.Adam,
-    "adamw": torch.optim.AdamW,
-    "sgd": torch.optim.SGD,
-}
-
-
-def create_optimizer(cfg, parameters):
-
-    optimizer_cls = OPTIMIZER_REGISTRY[cfg.name]
-
-    return optimizer_cls(
-        parameters,
-        **cfg.params
-    )
-
-
-LOSS_REGISTRY = {
-    "mse": nn.MSELoss,
-    "l1": nn.L1Loss,
-    "huber": nn.HuberLoss,
-}
-
-
-def create_loss(cfg):
-
-    loss_cls = LOSS_REGISTRY[cfg.name]
-
-    return loss_cls()
-
-
-
-
-# better code; so they also accept dicts
-def create_optimizer(cfg, parameters):
-
-    optimizer_cls = OPTIMIZER_REGISTRY[cfg["name"]]
-
-    return optimizer_cls(
-        parameters,
-        **cfg.get("params", {})
-    )
-
-
-def create_loss(cfg):
-
-    loss_cls = LOSS_REGISTRY[cfg["name"]]
-
-    return loss_cls(
-        **cfg.get("params", {})
-    )
-
-
-
-
-
-#--------later; dif optim have diff params
-"""
-optimizer_name = trial.suggest_categorical(
-    "optimizer.name",
-    ["adam", "sgd"]
-)
-
-
-
-if optimizer_name == "adam":
-    params = {
-        "lr": trial.suggest_float(
-            "adam.lr",
-            1e-4,
-            1e-2,
-            log=True
-        )
-    }
-
-elif optimizer_name == "sgd":
-    params = {
-        "lr": trial.suggest_float(
-            "sgd.lr",
-            1e-3,
-            1e-1,
-            log=True
-        ),
-        "momentum": trial.suggest_float(
-            "sgd.momentum",
-            0.0,
-            0.9
-        )
-    }
-"""
-
-
-
-
-#--------------------------------ENTRY----------------------#
 
 @register("ae")
 class AEEntry(BaseModelEntry):

@@ -145,6 +145,14 @@ class NNTrainer:
 
 
 """
+in YAML
+
+The key is: optimizer.params is an opaque dictionary owned by the optimizer factory. 
+Your generic infrastructure should not know that Adam has betas or SGD has momentum
+"""
+
+
+"""
 for several models maybe use one ineriatance level
 
 def training_step(self, model, batch, criterion):
