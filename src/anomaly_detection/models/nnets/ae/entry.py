@@ -22,10 +22,11 @@ from ...base_entry import BaseModelEntry
 
 
 
-from anomaly_detection.training.optimizers import create_optimizer
-
+#from anomaly_detection.training.optimizers import create_optimizer
 from anomaly_detection.training.losses import create_loss
 
+
+from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 
 
 
@@ -72,20 +73,11 @@ class AEEntry(BaseModelEntry):
 
 
             "training": {
-                "optimizer": {
-                    "name": trial.suggest_categorical(
-                        "optimizer.name",
-                        ["adam", "sgd"]
-                    ),
-                    "params": {
-                        "lr": trial.suggest_float(
-                            "optimizer.lr",
-                            tun_cfg.training_space.optimizer.params.lr.low,
-                            tun_cfg.training_space.optimizer.params.lr.high,
-                            log=True
-                        )
-                    }
-                },
+                
+                "optimizer": sample_optimizer(
+                    trial,
+                    tun_cfg.training_space.optimizer
+                ),
 
                 "loss": {
                     "name": "mse"
@@ -142,6 +134,10 @@ class AEEntry(BaseModelEntry):
         input_dim
     ):
 
+        print(type(cfg_training))
+        print(cfg_training)
+        print(cfg_training["optimizer"])
+
         # later maybe move it out
         model_cfg = AEConfig(
             input_dim=input_dim,
@@ -157,6 +153,9 @@ class AEEntry(BaseModelEntry):
             cfg_training["optimizer"],
             model.parameters()
         )
+
+
+        print('dsfdsfdssfdsdsf')
 
         loss = create_loss(
             cfg_training["loss"],
