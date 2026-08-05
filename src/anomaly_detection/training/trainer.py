@@ -36,6 +36,18 @@ class NNTrainer:
         for cb in self.callbacks:
             getattr(cb, hook, lambda x: None)(state)
 
+
+    #---------Training step--------------#
+    #... later some models inherits tis trainer and can overwrite this
+    def training_step(
+        self,
+        model,
+        batch,
+        criterion,
+    ):
+        recon = model(batch)
+        return criterion(recon, batch)
+
     #---------Train epoch----------------#
     def train_epoch(
         self,
@@ -53,8 +65,11 @@ class NNTrainer:
 
             optimizer.zero_grad()
 
-            recon = model(batch)
-            loss = criterion(recon, batch)
+            loss = self.training_step(
+                model,
+                batch,
+                criterion,
+            )
 
             loss.backward()
             optimizer.step()
@@ -64,7 +79,8 @@ class NNTrainer:
         return total_loss / len(loader.dataset)
 
 
-    #-----------Val epoch-------------------#
+
+    #-----------Validation epoch----------------#
     def validate(
         self,
         model,
@@ -79,8 +95,11 @@ class NNTrainer:
             for batch in loader:
                 batch = batch.to(self.cfg.device)
 
-                recon = model(batch)
-                loss = criterion(recon, batch)
+                loss = self.training_step(
+                    model,
+                    batch,
+                    criterion,
+                )
 
                 total_loss += loss.item() * batch.size(0)
 
@@ -140,6 +159,36 @@ class NNTrainer:
         self.history = history
 
         return model
+
+
+
+
+
+"""
+
+vaetrainer(NNTrainer):
+
+    # overwrite and add what i need
+    def training_step....
+
+
+VAE
+
+def training_step(self, model, batch, criterion):
+    recon, mu, logvar = model(batch)
+    return criterion(recon, batch, mu, logvar)
+
+
+dEEP svdd
+def training_step(self, model, batch, criterion):
+    z = model(batch)
+    return criterion(z)
+"""
+
+
+
+
+
 
 
 
