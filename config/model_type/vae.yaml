@@ -1,0 +1,7 @@
+defaults:
+  - /models: vae
+  - /training: vae
+  - /tuning: vae
+  - /prep: vae
+
+name: vae

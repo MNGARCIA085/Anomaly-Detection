@@ -43,7 +43,7 @@ class NNTrainer:
         self,
         model,
         batch,
-        criterion,
+        criterion = None, # some models like VAE dont use it
     ):
         recon = model(batch)
         return criterion(recon, batch)

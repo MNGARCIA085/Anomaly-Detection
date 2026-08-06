@@ -1,5 +1,9 @@
+
+#https://chatgpt.com/c/6a74e018-c794-83e9-a42a-99b566358b62
+
+
 from anomaly_detection.models.registry import register
-from .schemas import AEConfig
+from .schemas import VAEConfig
 from anomaly_detection.training.schemas import TrainingConfig
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -9,7 +13,7 @@ from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 
 
 
-from .model import AE, AEWrapper
+from .model import VAE, VAEWrapper
 
 
 from anomaly_detection.training.callbacks import EarlyStopping,PrintLossCallback
@@ -21,23 +25,29 @@ from anomaly_detection.training.registry import TRAINER_REGISTRY
 from ...base_entry import BaseModelEntry
 
 
-from anomaly_detection.training.losses import create_loss
+# from anomaly_detection.training.losses import create_loss
 
 
 from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 
 
 
-@register("ae")
-class AEEntry(BaseModelEntry):
-    
 
-    # sample only for tuning; maybe later more generic
+
+
+
+
+# no loss object, since the VAE computes reconstruction + KL internally.
+
+
+@register("vae")
+class VAEEntry(BaseModelEntry):
+
     def sample(self, trial, tun_cfg):
 
         return {
 
-            "name": "ae",
+            "name": "vae",
 
             "prep": {
                 "scaler": trial.suggest_categorical(
@@ -57,29 +67,35 @@ class AEEntry(BaseModelEntry):
                 ),
             },
 
-
             "models": {
                 "encoder_dims": [
                     trial.suggest_int("enc1", 16, 64),
                     trial.suggest_int("enc2", 4, 32),
                 ],
 
+                "latent_dim": trial.suggest_int(
+                    "latent_dim",
+                    2,
+                    16
+                ),
+
                 "decoder_dims": [
                     trial.suggest_int("dec1", 16, 64)
-                ]
+                ],
+
+                "beta": trial.suggest_float(
+                    "beta",
+                    0.1,
+                    2.0
+                ),
             },
 
-
             "training": {
-                
+
                 "optimizer": sample_optimizer(
                     trial,
                     tun_cfg.training_space.optimizer
                 ),
-
-                "loss": {
-                    "name": "mse"
-                },
 
                 "epochs": trial.suggest_int(
                     "epochs",
@@ -92,14 +108,13 @@ class AEEntry(BaseModelEntry):
                     tun_cfg.training_space.batch_size.choices
                 ),
 
-                "type": "default"
+                "type": "vae"
 
             }
 
         }
 
-
-    def build_preprocessor(self, prep_cfg): # later -> prep_cfg:AEPrepConfig or like that
+    def build_preprocessor(self, prep_cfg):
 
         steps = []
 
@@ -109,21 +124,7 @@ class AEEntry(BaseModelEntry):
         elif prep_cfg["scaler"] == "minmax":
             steps.append(MinMaxScaler())
 
-        """
-        if prep_cfg["use_pca"]:
-
-            steps.append(
-                PCA(
-                    n_components=prep_cfg["pca_dim"]
-                )
-            )
-        """
-
-        return PreprocessingPipeline(
-            steps
-        )
-
-
+        return PreprocessingPipeline(steps)
 
     def build(
         self,
@@ -132,99 +133,42 @@ class AEEntry(BaseModelEntry):
         input_dim
     ):
 
-        print(type(cfg_training))
-        print(cfg_training)
-        print(cfg_training["optimizer"])
 
-        # later maybe move it out
-        model_cfg = AEConfig(
+        model_cfg = VAEConfig(
             input_dim=input_dim,
             encoder_dims=cfg_model["encoder_dims"],
+            latent_dim=cfg_model["latent_dim"],
             decoder_dims=cfg_model["decoder_dims"],
+            beta=cfg_model["beta"],
         )
 
-        model = AE(model_cfg)
+        model = VAE(model_cfg)
 
-
-        # trainer
         optimizer = create_optimizer(
             cfg_training["optimizer"],
             model.parameters()
         )
 
-
-        print('dsfdsfdssfdsdsf')
-
-        loss = create_loss(
-            cfg_training["loss"],
-        )
-
-
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
-            loss=loss,
+            loss=None,
             callbacks=[
                 EarlyStopping(patience=3),
                 PrintLossCallback(),
             ]
         )
 
-
-        
         trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]
         trainer = trainer_cls(trainer_cfg)
 
 
-        return AEWrapper(
+        return VAEWrapper(
             model,
             trainer
         )
 
-
-    # load model (to simplify inference pipeline)
     def load(self, path):
 
-        return AEWrapper.load(path)
-
-
-
-
-
-
-
-
-
-
-
-"""
-    Model entry responsible for assembling all Autoencoder-specific components.
-
-    Acts as the integration point between the experiment framework and the AE
-    implementation by encapsulating:
-
-    - hyperparameter search space definition (`sample`)
-    - preprocessing construction (`build_preprocessor`)
-    - model and training assembly (`build`)
-
-    This class allows the experiment/tuning pipeline to remain model-agnostic:
-    callers interact with a common entry interface without knowing how the AE
-    is configured internally.
-
-    Responsibilities:
-        - Define tunable preprocessing, model, and training parameters
-        - Build the preprocessing pipeline for AE workflows
-        - Construct and return a fully configured AE wrapper
-
-    Does NOT:
-        - execute training
-        - run evaluation
-        - perform logging
-        - orchestrate experiments
-
-    Expected interface:
-        sample(trial) -> dict
-        build_preprocessor(cfg) -> PreprocessingPipeline
-        build(cfg, input_dim) -> ModelWrapper
-    """
+        return VAEWrapper.load(path)
