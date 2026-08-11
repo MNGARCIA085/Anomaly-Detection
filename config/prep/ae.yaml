@@ -1,12 +1,7 @@
-scale: true
-scaler: standard
+scaler:
+  name: standard
+  params:
+    with_mean: true
+    with_std: true
 
 
-use_pca: false
-pca_dim: 10
-
-feature_selection:
-  enabled: false
-
-normalize:
-  enabled: true

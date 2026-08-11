@@ -6,7 +6,12 @@ class PreprocessingPipeline:
     def __init__(self, steps):
         self.steps = steps
 
+
     def fit(self, X):
+
+        #new
+        self._input_dim = X.shape[1]
+
 
         for step in self.steps:
             if hasattr(step, "fit"):
@@ -16,12 +21,14 @@ class PreprocessingPipeline:
 
         return self
 
+
     def transform(self, X):
 
         for step in self.steps:
             X = step.transform(X)
 
         return X
+
 
     def fit_transform(self, X):
         return self.fit(X).transform(X)
@@ -34,3 +41,15 @@ class PreprocessingPipeline:
             self,
             path
         )
+
+
+
+    #?????????????
+    @property
+    def input_dim(self):
+        if self._input_dim is None:
+            raise RuntimeError(
+                "Pipeline must be fitted before accessing input_dim."
+            )
+        return self._input_dim
+

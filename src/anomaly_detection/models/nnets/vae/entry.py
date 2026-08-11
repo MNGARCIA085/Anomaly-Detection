@@ -6,8 +6,7 @@ from anomaly_detection.models.registry import register
 from .schemas import VAEConfig
 from anomaly_detection.training.schemas import TrainingConfig
 
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
+
 
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 
@@ -40,6 +39,10 @@ from anomaly_detection.training.optimizers import sample_optimizer, create_optim
 # no loss object, since the VAE computes reconstruction + KL internally.
 
 
+
+from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
+
+
 @register("vae")
 class VAEEntry(BaseModelEntry):
 
@@ -50,22 +53,12 @@ class VAEEntry(BaseModelEntry):
             "name": "vae",
 
             "prep": {
-                "scaler": trial.suggest_categorical(
-                    "scaler",
-                    ["standard", "minmax"]
-                ),
-
-                "use_pca": trial.suggest_categorical(
-                    "use_pca",
-                    [True, False]
-                ),
-
-                "pca_dim": trial.suggest_int(
-                    "pca_dim",
-                    2,
-                    10
+                "scaler": sample_scaler(
+                    trial,
+                    tun_cfg.prep.scaler,
                 ),
             },
+
 
             "models": {
                 "encoder_dims": [
@@ -118,11 +111,17 @@ class VAEEntry(BaseModelEntry):
 
         steps = []
 
-        if prep_cfg["scaler"] == "standard":
-            steps.append(StandardScaler())
+        # scaler
+        scaler_cfg = prep_cfg["scaler"]
 
-        elif prep_cfg["scaler"] == "minmax":
-            steps.append(MinMaxScaler())
+        scaler = create_scaler(
+            scaler_cfg["name"],
+            **scaler_cfg.get("params", {}),
+        )
+
+        steps.append(scaler)
+
+
 
         return PreprocessingPipeline(steps)
 

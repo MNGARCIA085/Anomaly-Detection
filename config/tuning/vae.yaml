@@ -1,5 +1,10 @@
-model_space:
+prep:
+  scaler:
+    names: [standard, minmax]
 
+
+
+model_space:
   encoder_dims:
     - name: enc1
       type: int
@@ -30,8 +35,9 @@ model_space:
     high: 2.0
 
 
-training_space:
 
+
+training_space:
   optimizer:
     names: [adam, sgd]
 

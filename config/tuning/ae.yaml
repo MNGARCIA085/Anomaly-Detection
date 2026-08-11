@@ -1,3 +1,13 @@
+
+
+
+prep:
+  scaler:
+    names: [standard, minmax]
+
+
+
+
 model_space:
   encoder_dims:
     - name: enc1

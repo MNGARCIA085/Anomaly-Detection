@@ -1,0 +1,31 @@
+Use a generic abstraction for things that are genuinely cross-cutting and have a stable interface. Keep model-specific preprocessing inside the model Entry.
+
+
+https://chatgpt.com/c/6a7b7173-591c-83e9-a965-1f2e65886bb4
+
+prep/
+├── pipeline.py
+├── registry.py
+└── components/
+    ├── scalers.py
+    ├── transforms.py
+    └── dimensionality.py
+
+
+
+training_space.optimizer
+        ↓
+sample_optimizer()
+        ↓
+OPTIMIZER_REGISTRY
+        ↓
+optimizer-specific sampling
+
+
+prep.scaler
+        ↓
+sample_scaler()
+        ↓
+SCALER_REGISTRY
+        ↓
+scaler-specific sampling (if needed)

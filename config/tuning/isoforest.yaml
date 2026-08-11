@@ -1,3 +1,18 @@
+prep:
+  scaler:
+    names: [standard, minmax]
+
+  dimensionality:
+    enabled: true
+    names:
+      - pca
+      - truncated_svd
+    n_components:
+      low: 1
+      high: 8
+
+
+
 model_space:
   n_estimators:
     name: n_estimators

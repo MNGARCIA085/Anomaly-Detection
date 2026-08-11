@@ -1,19 +1,10 @@
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 from anomaly_detection.models.registry import register
-
-
-
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
-
-
-
 from .model import IsoWrapper
-
-
 from ...base_entry import BaseModelEntry
-
+from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
+from anomaly_detection.preprocessing.components.dimensionality import create_dimensionality_reducer, sample_dimensionality_reducer
 
 
 
@@ -29,14 +20,18 @@ class IsoEntry(BaseModelEntry):
             "name": "isoforest",
 
             "prep": {
-                "scaler": trial.suggest_categorical(
-                    "scaler",
-                    ["standard", "minmax"]
-                )
+                "scaler": sample_scaler(
+                    trial,
+                    tun_cfg.prep.scaler,
+                ),
+                "dimensionality": sample_dimensionality_reducer(
+                    trial,
+                    tun_cfg.prep.dimensionality,
+                ),
             },
 
-            "models": {
 
+            "models": {
                 "n_estimators": trial.suggest_int(
                     "n_estimators",
                     tun_cfg.model_space.n_estimators.low,
@@ -56,15 +51,33 @@ class IsoEntry(BaseModelEntry):
 
         steps = []
 
-        if prep_cfg["scaler"] == "standard":
-            steps.append(StandardScaler())
+        # scaler
+        scaler_cfg = prep_cfg["scaler"]
 
-        elif prep_cfg["scaler"] == "minmax":
-            steps.append(MinMaxScaler())
+        scaler = create_scaler(
+            scaler_cfg["name"],
+            **scaler_cfg.get("params", {}),
+        )
+
+
+        steps.append(scaler)
+
+        print('\n', prep_cfg)
+
+
+        # Dimensionality reducer
+        reducer = create_dimensionality_reducer(
+            prep_cfg["dimensionality"]
+        )
+
+        if reducer is not None:
+            steps.append(reducer)
+
 
         return PreprocessingPipeline(
             steps
         )
+
 
 
     def build(

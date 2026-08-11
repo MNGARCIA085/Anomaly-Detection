@@ -2,8 +2,6 @@ from anomaly_detection.models.registry import register
 from .schemas import AEConfig
 from anomaly_detection.training.schemas import TrainingConfig
 
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
 
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 
@@ -27,6 +25,8 @@ from anomaly_detection.training.losses import create_loss
 from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 
 
+from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
+
 
 @register("ae")
 class AEEntry(BaseModelEntry):
@@ -39,21 +39,11 @@ class AEEntry(BaseModelEntry):
 
             "name": "ae",
 
+
             "prep": {
-                "scaler": trial.suggest_categorical(
-                    "scaler",
-                    ["standard", "minmax"]
-                ),
-
-                "use_pca": trial.suggest_categorical(
-                    "use_pca",
-                    [True, False]
-                ),
-
-                "pca_dim": trial.suggest_int(
-                    "pca_dim",
-                    2,
-                    10
+                "scaler": sample_scaler(
+                    trial,
+                    tun_cfg.prep.scaler,
                 ),
             },
 
@@ -103,21 +93,17 @@ class AEEntry(BaseModelEntry):
 
         steps = []
 
-        if prep_cfg["scaler"] == "standard":
-            steps.append(StandardScaler())
 
-        elif prep_cfg["scaler"] == "minmax":
-            steps.append(MinMaxScaler())
+        # scaler
+        scaler_cfg = prep_cfg["scaler"]
 
-        """
-        if prep_cfg["use_pca"]:
+        scaler = create_scaler(
+            scaler_cfg["name"],
+            **scaler_cfg.get("params", {}),
+        )
 
-            steps.append(
-                PCA(
-                    n_components=prep_cfg["pca_dim"]
-                )
-            )
-        """
+        steps.append(scaler)
+
 
         return PreprocessingPipeline(
             steps
@@ -131,10 +117,6 @@ class AEEntry(BaseModelEntry):
         cfg_training,
         input_dim
     ):
-
-        print(type(cfg_training))
-        print(cfg_training)
-        print(cfg_training["optimizer"])
 
         # later maybe move it out
         model_cfg = AEConfig(
@@ -152,8 +134,6 @@ class AEEntry(BaseModelEntry):
             model.parameters()
         )
 
-
-        print('dsfdsfdssfdsdsf')
 
         loss = create_loss(
             cfg_training["loss"],

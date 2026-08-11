@@ -90,10 +90,17 @@ def main(run_id):
     # Quick inference test
     # -----------------------
 
+
+    print('input dim', prep.input_dim)
+
+
+
     # fake data
     X = np.random.randn(
         5,
-        wrapper.input_dim
+        #wrapper.input_dim # final input: ex:8
+        #11
+        prep.input_dim
     )
 
     X = prep.transform(X)
@@ -107,5 +114,6 @@ def main(run_id):
 
 
 if __name__=="__main__":
-    main("0e311cc9fc8f426a80b366a76de47f7a")
-    main("277f8f9cc1134e799458cf30d7ed2d55") # iso
+    main("c3fdbab89bdb4740b78d0f76d0a92623") # ae
+    main("217a20b1284d452fa2adf793a364b4e2") # iso
+    main("74fe47e70b834f468c762d0296b47361") # iso

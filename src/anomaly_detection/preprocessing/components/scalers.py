@@ -1,0 +1,35 @@
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+
+
+SCALER_REGISTRY = {
+    "standard": StandardScaler,
+    "minmax": MinMaxScaler,
+    "robust": RobustScaler,
+}
+
+
+def create_scaler(name, **params):
+    try:
+        scaler_cls = SCALER_REGISTRY[name]
+    except KeyError:
+        raise ValueError(f"Unknown scaler: {name}")
+
+    return scaler_cls(**params)
+
+
+# create_scaler("standard") produces StandardScaler()
+
+
+
+
+def sample_scaler(trial, cfg):
+    """ Sample scaler for tuning"""
+    scaler_name = trial.suggest_categorical(
+        "prep.scaler.name",
+        cfg.names,
+    )
+
+    return {
+        "name": scaler_name,
+        "params": {},
+    }

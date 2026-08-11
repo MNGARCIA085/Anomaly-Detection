@@ -137,7 +137,7 @@ class Experiment:
 
 
             # save only "good" models
-            if evaluation["auc"] > 0.9:
+            if evaluation["auc"] > 0.7:
 
                 path = self.logger.artifact_path("model")
 

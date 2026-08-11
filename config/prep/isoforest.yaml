@@ -1,5 +1,18 @@
-scale: true
-scaler: robust
+scaler:
+  name: standard
+  params:
+    with_mean: true
+    with_std: true
+
+
+dimensionality:
+  enabled: true
+  name: pca
+  params:
+    n_components: 7
+    whiten: false
+
+
 
 feature_selection:
   enabled: false
