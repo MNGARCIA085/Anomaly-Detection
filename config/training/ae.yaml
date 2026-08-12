@@ -11,3 +11,9 @@ optimizer:
 loss:
   name: mse
 
+
+callbacks:
+  - name: print_loss
+  - name: early_stopping
+    params:
+      patience: 5

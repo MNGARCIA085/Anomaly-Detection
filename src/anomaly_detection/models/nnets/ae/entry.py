@@ -39,6 +39,12 @@ from anomaly_detection.preprocessing.components.imputation import create_imputer
 from anomaly_detection.preprocessing.components.imputation import sample_imputation
 
 
+
+from anomaly_detection.training.callbacks import sample_callbacks
+from anomaly_detection.training.callbacks import create_callbacks
+
+
+
 @register("ae")
 class AEEntry(BaseModelEntry):
     
@@ -89,6 +95,11 @@ class AEEntry(BaseModelEntry):
                 "loss": {
                     "name": "mse"
                 },
+
+                "callbacks": sample_callbacks(
+                    trial,
+                    tun_cfg.training_space.callbacks,
+                ),
 
                 "epochs": trial.suggest_int(
                     "epochs",
@@ -178,15 +189,12 @@ class AEEntry(BaseModelEntry):
             cfg_training["loss"],
         )
 
-        # build callbacks (Dynamic if provided in config, else sensible defaults)
-        callbacks = cfg_training.get("callbacks", [
-            EarlyStopping(patience=3),
-            PrintLossCallback(),
-        ])
 
-        print("\n", callbacks, "\n")
+        # create callbacks
+        callbacks = create_callbacks(cfg_training["callbacks"])
+        
 
-
+        # trainer
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],

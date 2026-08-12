@@ -77,8 +77,6 @@ def main(cfg):
             y_val
         )
     )
-    
-
 
 
 
