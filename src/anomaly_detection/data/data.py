@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class DataModule:
 
     def __init__(self, train_path, val_path, y_val_path):

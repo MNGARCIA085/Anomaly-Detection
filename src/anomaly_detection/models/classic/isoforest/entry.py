@@ -7,6 +7,10 @@ from anomaly_detection.preprocessing.components.scalers import create_scaler, sa
 from anomaly_detection.preprocessing.components.dimensionality import create_dimensionality_reducer, sample_dimensionality_reducer
 
 
+from anomaly_detection.preprocessing.components.feature_selection import create_feature_selector
+from anomaly_detection.preprocessing.components.feature_selection import sample_feature_selection
+
+
 
 @register("isoforest")
 class IsoEntry(BaseModelEntry):
@@ -20,6 +24,10 @@ class IsoEntry(BaseModelEntry):
             "name": "isoforest",
 
             "prep": {
+                "feature_selection": sample_feature_selection(
+                    trial,
+                    tun_cfg.prep.feature_selection,
+                ),
                 "scaler": sample_scaler(
                     trial,
                     tun_cfg.prep.scaler,
@@ -51,6 +59,18 @@ class IsoEntry(BaseModelEntry):
 
         steps = []
 
+        # Feature selector; it goes first because im using Variance Thresold
+        # in other situations it might go after scaling
+        fs_cfg = prep_cfg["feature_selection"]
+
+        if fs_cfg["enabled"]:
+            selector = create_feature_selector(
+                fs_cfg["name"],
+                **fs_cfg.get("params", {}),
+            )
+            steps.append(selector)
+
+
         # scaler
         scaler_cfg = prep_cfg["scaler"]
 
@@ -61,8 +81,6 @@ class IsoEntry(BaseModelEntry):
 
 
         steps.append(scaler)
-
-        print('\n', prep_cfg)
 
 
         # Dimensionality reducer

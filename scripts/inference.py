@@ -117,3 +117,27 @@ if __name__=="__main__":
     main("c3fdbab89bdb4740b78d0f76d0a92623") # ae
     main("217a20b1284d452fa2adf793a364b4e2") # iso
     main("74fe47e70b834f468c762d0296b47361") # iso
+
+
+
+
+
+"""
+X_train_p = preprocessor.fit_transform(X_train)
+
+input_dim = X_train_p.shape[1]
+
+wrapper = entry.build(
+    ...,
+    input_dim=input_dim,
+)
+
+This becomes particularly important when you have:
+
+feature selection
+PCA
+other dimensionality-changing transforms
+
+because prep.input_dim should consistently mean 
+"what enters the pipeline", while model.input_dim means "what enters the model."
+"""

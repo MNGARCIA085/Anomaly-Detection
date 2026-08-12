@@ -2,12 +2,36 @@
 
 
 prep:
+
+  imputation:
+    names:
+      - simple
+    strategy:
+      choices:
+        - mean
+        - median
+        - most_frequent
+
+
+
+  transform:
+    names:
+      - power
+    params:
+      method:
+        choices:
+          - yeo-johnson
+          - box-cox
+      standardize:
+        choices:
+          - true
+          - false
+
   scaler:
     names: [standard, minmax]
 
 
-
-
+  
 model_space:
   encoder_dims:
     - name: enc1

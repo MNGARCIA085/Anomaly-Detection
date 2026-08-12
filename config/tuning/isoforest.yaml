@@ -1,6 +1,18 @@
+
+
 prep:
   scaler:
     names: [standard, minmax]
+
+  feature_selection:
+      enabled: true
+      names:
+        - variance_threshold
+      threshold:
+        low: 0.0
+        high: 0.1
+
+
 
   dimensionality:
     enabled: true

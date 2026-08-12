@@ -28,9 +28,9 @@ Y_VAL_PATH = BASE_DIR / "data" / "servers" / "y_val_part2.npy"
 def main(cfg):
 
     # --- 1. DATA ---
+    # separate from exp. bc of loading in tuning    
     data = DataModule(TRAIN_PATH, VAL_PATH, Y_VAL_PATH)
     X_train, X_val, y_val = data.load()
-
     
 
     model_type = cfg.model_type.name

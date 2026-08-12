@@ -151,3 +151,11 @@ class Experiment:
         return evaluation
 
 
+"""
+try:
+    preprocessor.fit_transform(X_train)
+except ValueError as e:
+    raise optuna.TrialPruned(str(e))
+
+idea to prune bad confis
+"""

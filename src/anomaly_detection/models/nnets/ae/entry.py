@@ -28,6 +28,17 @@ from anomaly_detection.training.optimizers import sample_optimizer, create_optim
 from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
 
 
+
+
+from anomaly_detection.preprocessing.components.transforms import create_transform
+from anomaly_detection.preprocessing.components.transforms import sample_transform
+
+
+
+from anomaly_detection.preprocessing.components.imputation import create_imputer
+from anomaly_detection.preprocessing.components.imputation import sample_imputation
+
+
 @register("ae")
 class AEEntry(BaseModelEntry):
     
@@ -41,6 +52,14 @@ class AEEntry(BaseModelEntry):
 
 
             "prep": {
+                "imputation": sample_imputation(
+                        trial,
+                        tun_cfg.prep.imputation,
+                    ),
+                "transform": sample_transform(
+                    trial,
+                    tun_cfg.prep.transform,
+                ),
                 "scaler": sample_scaler(
                     trial,
                     tun_cfg.prep.scaler,
@@ -92,6 +111,26 @@ class AEEntry(BaseModelEntry):
     def build_preprocessor(self, prep_cfg): # later -> prep_cfg:AEPrepConfig or like that
 
         steps = []
+
+        # imputation
+        imputer_cfg = prep_cfg["imputation"]
+
+        if imputer_cfg["enabled"]:
+            imputer = create_imputer(
+                imputer_cfg["name"],
+                **imputer_cfg.get("params", {}),
+            )
+
+            steps.append(imputer)
+
+        # transform
+        transform_cfg = prep_cfg["transform"] # get, None
+
+        if transform_cfg["enabled"]:
+            transform = create_transform(
+                transform_cfg["name"]
+            )
+            steps.append(transform)
 
 
         # scaler

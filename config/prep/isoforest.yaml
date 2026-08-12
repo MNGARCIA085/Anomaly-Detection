@@ -1,9 +1,18 @@
+transform:
+  enabled: false
+  name: log1p
+
 scaler:
   name: standard
   params:
     with_mean: true
     with_std: true
 
+feature_selection:
+  enabled: true
+  name: variance_threshold
+  params:
+    threshold: 0.01
 
 dimensionality:
   enabled: true
@@ -13,9 +22,6 @@ dimensionality:
     whiten: false
 
 
-
-feature_selection:
-  enabled: false
 
 contamination_filter:
   enabled: false

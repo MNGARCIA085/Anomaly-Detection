@@ -2,7 +2,7 @@
 defaults:
   - _self_
   - model_type: ae
-  - preprocessing: preprocessing
+  - data: data
   - models: ae
   - training: ae
   - tuning: ae
