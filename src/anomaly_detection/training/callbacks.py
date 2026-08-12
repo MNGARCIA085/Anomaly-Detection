@@ -71,6 +71,49 @@ def create_callbacks(cfg):
 
 
 
+
+
+
+def sample_callbacks(trial, cfg):
+
+    callbacks = []
+
+    if cfg.print_loss:
+        if trial.suggest_categorical(
+            "training.callbacks.print_loss",
+            [True, True], # True, False
+        ):
+            callbacks.append({
+                "name": "print_loss",
+                "params": {},
+            })
+
+    if cfg.early_stopping.enabled:
+        enabled = trial.suggest_categorical(
+            "training.callbacks.early_stopping.enabled",
+            [True, True], # [True, False]
+        )
+
+        if enabled:
+            patience = trial.suggest_int(
+                "training.callbacks.early_stopping.patience",
+                cfg.early_stopping.patience.low,
+                cfg.early_stopping.patience.high,
+            )
+
+            callbacks.append({
+                "name": "early_stopping",
+                "params": {
+                    "patience": patience,
+                },
+            })
+
+    return callbacks
+
+
+
+
+"""
 def sample_callbacks(trial, cfg):
     callbacks = []
 
@@ -78,12 +121,12 @@ def sample_callbacks(trial, cfg):
     if cfg.print_loss:
 
         # if i want to sample it
-        """
+        
         print_loss = trial.suggest_categorical(
             "training.callbacks.print_loss",
             [True, False],
         )
-        """
+        
 
         print_loss = True
         if print_loss:
@@ -113,7 +156,7 @@ def sample_callbacks(trial, cfg):
             })
 
     return callbacks
-
+"""
 
 
 

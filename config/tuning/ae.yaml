@@ -84,11 +84,12 @@ training_space:
 
   callbacks:
     print_loss: true
-    early_stopping: true
 
-    patience:
-      low: 3
-      high: 10
+    early_stopping:
+      enabled: true
+      patience:
+        low: 3
+        high: 10
 
 
   epochs:
