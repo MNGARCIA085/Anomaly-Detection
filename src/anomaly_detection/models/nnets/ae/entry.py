@@ -167,16 +167,24 @@ class AEEntry(BaseModelEntry):
         model = AE(model_cfg)
 
 
-        # trainer
+        # optimizer
         optimizer = create_optimizer(
             cfg_training["optimizer"],
             model.parameters()
         )
 
-
+        # loss
         loss = create_loss(
             cfg_training["loss"],
         )
+
+        # build callbacks (Dynamic if provided in config, else sensible defaults)
+        callbacks = cfg_training.get("callbacks", [
+            EarlyStopping(patience=3),
+            PrintLossCallback(),
+        ])
+
+        print("\n", callbacks, "\n")
 
 
         trainer_cfg = TrainingConfig(
@@ -184,10 +192,7 @@ class AEEntry(BaseModelEntry):
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
             loss=loss,
-            callbacks=[
-                EarlyStopping(patience=3),
-                PrintLossCallback(),
-            ]
+            callbacks=callbacks
         )
 
 
