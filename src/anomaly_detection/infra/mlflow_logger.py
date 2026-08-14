@@ -73,26 +73,9 @@ class MLFlowLogger(ExperimentLogger):
 
 
 
-    def log_tags(
-        self,
-        model_type: str,
-        dataset: Optional[str] = None,
-        trainer: Optional[str] = None,
-        framework: Optional[str] = None,
-        **extra_tags,
-    ) -> None:
-        """Log metadata tags for the current MLflow run."""
-
-        tags = {
-            "model_type": model_type,
-            "dataset": dataset,
-            "trainer": trainer,
-            "framework": framework,
-            **extra_tags,
-        }
-
-        # Remove unset values
-        tags = {k: v for k, v in tags.items() if v is not None}
+    def log_tags(self, tags: dict):
+        if not tags:
+            return
 
         mlflow.set_tags(tags)
 
@@ -279,19 +262,24 @@ class MLFlowLogger(ExperimentLogger):
         self,
         cfg,
         run_type,
-        evaluation,
+        metrics,
         history=None,
-        preprocessor=None, # imp. pass already fit preprocessor
+        preprocessor=None, # pass already fit preprocessor
         wrapper=None,
     ):
-        # metadata
-        self.log_tags(cfg.get('name'))
 
-        """
+
+        # tags        
         self.log_tags({
             "run_type": run_type,
-            "model_type": self.model_type,
+            "model_type": cfg.get('name'),
         })
+
+        """
+        add later
+             "trial_number": str(trial.number),
+             "optimization_id": study_id,
+             dataset hash.....
         """
 
         # params
@@ -309,7 +297,7 @@ class MLFlowLogger(ExperimentLogger):
             )
 
         # metrics
-        self.log_metrics(evaluation)
+        self.log_metrics(metrics)
 
         # training history
         if history and history.metrics:

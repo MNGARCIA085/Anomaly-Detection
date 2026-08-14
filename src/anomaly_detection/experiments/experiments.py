@@ -46,7 +46,6 @@ class Experiment:
             )
 
 
-
             X_train_p = (
                 preprocessor.fit_transform(
                     X_train
@@ -80,15 +79,6 @@ class Experiment:
             )
 
 
-            # history
-            #history = wrapper.history
-
-            # log:
-            #if wrapper.history.metrics:
-            #    self.logger.log_training_history(wrapper.history)
-
-
-
             scores = (
                 wrapper.get_scores(
                     X_val_p
@@ -96,34 +86,31 @@ class Experiment:
             )
 
 
-            # is it the same for the transfomer!!!!
-            evaluation = (
+            metrics = (
                 self.evaluator.evaluate(
                     scores=scores,
                     y_true=y_val,
                     X=X_val_p
                 )
-            ) # actually returns metrics
+            )
 
 
             # log run
             self.logger.log_run(
                 cfg=cfg,
                 run_type=run_type,
-                evaluation=evaluation,
+                metrics=metrics,
                 history=wrapper.history,
-                preprocessor=preprocessor,
+                preprocessor=preprocessor, # already fit!
                 wrapper=(
                     wrapper
-                    if evaluation["auc"] > 0.7
+                    if metrics["auc"] > 0.7
                     else None
                 ),
             )
 
 
-
-
-        return evaluation
+        return metrics
 
 
 """
