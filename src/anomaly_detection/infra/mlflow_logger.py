@@ -14,6 +14,11 @@ import matplotlib.pyplot as plt
 from typing import Optional
 
 
+
+
+from anomaly_detection.infra.utils import flatten_dict
+
+
 class MLFlowLogger(ExperimentLogger):
 
     def __init__(
@@ -269,13 +274,83 @@ class MLFlowLogger(ExperimentLogger):
         )
 
 
+    # log run
+    def log_run(
+        self,
+        cfg,
+        run_type,
+        evaluation,
+        history=None,
+        preprocessor=None, # imp. pass already fit preprocessor
+        wrapper=None,
+    ):
+        # metadata
+        self.log_tags(cfg.get('name'))
+
+        """
+        self.log_tags({
+            "run_type": run_type,
+            "model_type": self.model_type,
+        })
+        """
+
+        # params
+        self.log_params(
+            flatten_dict(cfg.get("prep"))
+        )
+
+        self.log_params(
+            flatten_dict(cfg.get("models"))
+        )
+
+        if cfg.get("training"):
+            self.log_params(
+                flatten_dict(cfg["training"])
+            )
+
+        # metrics
+        self.log_metrics(evaluation)
+
+        # training history
+        if history and history.metrics:
+            self.log_training_history(history)
+
+        # preprocessor artifact
+        if preprocessor is not None:
+            path = self.artifact_path("preprocessor.pkl")
+
+            preprocessor.save(path)
+
+            self.log_artifact(
+                path,
+                artifact_path="preprocessing",
+            )
+
+        # model artifact
+        if wrapper is not None:
+            path = self.artifact_path("model")
+
+            wrapper.save(path)
+
+            self.log_artifact(
+                path,
+                artifact_path="model",
+            )
+
+
+
+
 """
 mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 5000
 
 
 rm -rf mlruns/
-rm -rf mlartifacts/      # if it exists
-rm -f mlflow.db          # if using SQLite
+rm -rf mlartifacts/      
+rm -f mlflow.db  
+
+
+# if it exists
+        # if using SQLite
 
 if I save outside
 rm -rf artifacts/

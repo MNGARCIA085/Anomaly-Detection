@@ -114,9 +114,9 @@ def main(run_id):
 
 
 if __name__=="__main__":
-    main("c3fdbab89bdb4740b78d0f76d0a92623") # ae
-    main("217a20b1284d452fa2adf793a364b4e2") # iso
-    main("74fe47e70b834f468c762d0296b47361") # iso
+    main("e812278537d04510921ee6c696c67ce3") # ae
+    #main("217a20b1284d452fa2adf793a364b4e2") # iso
+    #main("74fe47e70b834f468c762d0296b47361") # iso
 
 
 

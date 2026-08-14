@@ -42,6 +42,8 @@ def main(cfg):
     # =========================================================
 
 
+    from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
+
 
     def train_once(
         model_type,
@@ -54,7 +56,8 @@ def main(cfg):
 
         exp = Experiment(
             model_type=model_type,
-            evaluator=Evaluator()
+            evaluator=Evaluator(),
+            logger=MLFlowLogger(),
         )
 
 
@@ -80,9 +83,6 @@ def main(cfg):
 
 
 
-    
-
-
 
     #===========TUNING===============
 
@@ -94,7 +94,8 @@ def main(cfg):
     tuner = Tuner(
         model_type, # model_type; ae
         Evaluator(), #evaluator=Evaluator(),
-        tun_cfg
+        tun_cfg,
+        MLFlowLogger(),
     )
 
     study = tuner.run(

@@ -20,6 +20,7 @@ class Tuner:
         model_type,
         evaluator,
         tun_cfg,
+        logger,
     ):
 
         self.model_type = (
@@ -29,7 +30,8 @@ class Tuner:
         self.exp = (
             Experiment(
                 model_type,
-                evaluator
+                evaluator,
+                logger,
             )
         )
 
@@ -78,7 +80,8 @@ class Tuner:
                     cfg,
                     X_train,
                     X_val,
-                    y_val
+                    y_val,
+                    "tuning"
                 )
             )
 

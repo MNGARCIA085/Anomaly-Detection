@@ -3,10 +3,11 @@ from anomaly_detection.models.registry import MODEL_REGISTRY
 
 from anomaly_detection.evaluation.evaluator import Evaluator
 
-from anomaly_detection.infra.utils import flatten_dict
-from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
+#from anomaly_detection.infra.utils import flatten_dict
+#from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
 
 
+from anomaly_detection.infra.null_logger import NullLogger
 
 
 class Experiment:
@@ -15,18 +16,19 @@ class Experiment:
         self,
         model_type,
         evaluator,
-        logger=MLFlowLogger(), # later ill make it optional
+        logger=None,
     ):
         self.model_type = model_type
         self.evaluator = evaluator
-        self.logger = logger
+        self.logger = self.logger = logger or NullLogger()
 
     def run(
         self,
         cfg,
         X_train,
         X_val,
-        y_val=None
+        y_val=None,
+        run_type="train", # train or tune
     ):
 
         with self.logger.start_run(
@@ -34,23 +36,6 @@ class Experiment:
         ):
 
 
-            # tags
-            self.logger.log_tags(cfg.get('name'))
-
-
-            # log params from my config; maybe prefixes later
-            self.logger.log_params(
-                flatten_dict(cfg.get('prep'))
-            )
-            self.logger.log_params(
-                flatten_dict(cfg.get('models'))
-            )
-
-            if cfg.get('training', None):
-                self.logger.log_params(
-                    flatten_dict(cfg.get('training'))
-                )
-            #--------------------------
 
             entry = MODEL_REGISTRY[
                 self.model_type
@@ -79,16 +64,6 @@ class Experiment:
             )
 
 
-
-            # prep -> save after fit!!!!
-            path = self.logger.artifact_path("preprocessor.pkl")
-            preprocessor.save(path)
-            self.logger.log_artifact(
-                path,
-                artifact_path="preprocessing"
-            )
-
-
             # wrapper
             wrapper = (
                 entry.build(
@@ -106,11 +81,11 @@ class Experiment:
 
 
             # history
-            history = wrapper.history
+            #history = wrapper.history
 
             # log:
-            if wrapper.history.metrics:
-                self.logger.log_training_history(wrapper.history)
+            #if wrapper.history.metrics:
+            #    self.logger.log_training_history(wrapper.history)
 
 
 
@@ -131,22 +106,22 @@ class Experiment:
             ) # actually returns metrics
 
 
-            # log metrics
-            self.logger.log_metrics(evaluation)
-            #---------
+            # log run
+            self.logger.log_run(
+                cfg=cfg,
+                run_type=run_type,
+                evaluation=evaluation,
+                history=wrapper.history,
+                preprocessor=preprocessor,
+                wrapper=(
+                    wrapper
+                    if evaluation["auc"] > 0.7
+                    else None
+                ),
+            )
 
 
-            # save only "good" models
-            if evaluation["auc"] > 0.7:
 
-                path = self.logger.artifact_path("model")
-
-                wrapper.save(path)
-
-                self.logger.log_artifact(
-                    path,
-                    artifact_path="model"
-                )
 
         return evaluation
 
