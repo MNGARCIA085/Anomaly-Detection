@@ -17,6 +17,7 @@ class IsoEntry(BaseModelEntry):
 
 
     def sample(self, trial, tun_cfg):
+        # right now im not sampling threholders, but nmaybe later!!!!!!
 
 
         return {
@@ -51,7 +52,9 @@ class IsoEntry(BaseModelEntry):
                     tun_cfg.model_space.contamination.low,
                     tun_cfg.model_space.contamination.high
                 )
-            }
+            },
+
+            
         }
 
 

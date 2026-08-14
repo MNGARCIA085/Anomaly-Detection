@@ -25,6 +25,11 @@ class IsoWrapper(AnomalyWrapper):
         return -self.model.decision_function(X)
 
 
+    # new
+    def predict(self, X):
+        return (self.model.predict(X) == -1).astype(int)
+
+
     # property history; not really needed here, included just for an uniform interface
     @property
     def history(self):

@@ -3,5 +3,6 @@ defaults:
   - /training: ae
   - /tuning: ae
   - /prep: ae
+  - /thresholding: ae
 
 name: ae

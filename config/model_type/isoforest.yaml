@@ -3,5 +3,6 @@ defaults:
   - /training: isoforest
   - /tuning: isoforest
   - /prep: isoforest
+  - /thresholding: isoforest
 
 name: isoforest

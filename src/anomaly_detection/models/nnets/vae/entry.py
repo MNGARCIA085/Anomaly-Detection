@@ -103,7 +103,18 @@ class VAEEntry(BaseModelEntry):
 
                 "type": "vae"
 
-            }
+            },
+
+            "thresholding": {
+                "name": "quantile",
+                "params": {
+                    "quantile": trial.suggest_float(
+                        "threshold_quantile",
+                        0.95,
+                        0.999,
+                    )
+                },
+            },
 
         }
 

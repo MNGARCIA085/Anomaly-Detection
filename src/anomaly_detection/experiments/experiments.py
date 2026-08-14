@@ -10,6 +10,13 @@ from anomaly_detection.evaluation.evaluator import Evaluator
 from anomaly_detection.infra.null_logger import NullLogger
 
 
+
+from anomaly_detection.evaluation.threshold import create_threshold_strategy
+
+
+from anomaly_detection.thresholding.thresholding import Thresholding
+
+
 class Experiment:
 
     def __init__(
@@ -86,12 +93,34 @@ class Experiment:
             )
 
 
-            metrics = (
-                self.evaluator.evaluate(
-                    scores=scores,
-                    y_true=y_val,
-                    X=X_val_p
+            # predictions and threshold
+            thresholding = None
+            if cfg.get("thresholding"): # AEs, VAEs...
+                thresholding = Thresholding(
+                    cfg.get("thresholding")
                 )
+
+                train_scores = wrapper.get_scores(
+                    X_train_p
+                )
+                
+                thresholding.fit(
+                    train_scores
+                )
+
+                predictions = thresholding.predict(
+                    scores
+                )
+            else: # isoforests..
+                #predictions = None
+                predictions = wrapper.predict(X_val_p)
+
+
+            # compute metrics
+            metrics = self.evaluator.evaluate(
+                scores=scores,
+                y_true=y_val,
+                predictions=predictions,
             )
 
 
@@ -102,6 +131,7 @@ class Experiment:
                 metrics=metrics,
                 history=wrapper.history,
                 preprocessor=preprocessor, # already fit!
+                thresholding=thresholding, # already fit
                 wrapper=(
                     wrapper
                     if metrics["auc"] > 0.7

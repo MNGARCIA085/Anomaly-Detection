@@ -265,6 +265,7 @@ class MLFlowLogger(ExperimentLogger):
         metrics,
         history=None,
         preprocessor=None, # pass already fit preprocessor
+        thresholding=None, # already fitted
         wrapper=None,
     ):
 
@@ -314,6 +315,21 @@ class MLFlowLogger(ExperimentLogger):
                 artifact_path="preprocessing",
             )
 
+        # thresholding artifact
+        if thresholding is not None:
+
+            path = self.artifact_path(
+                "thresholding.pkl"
+            )
+
+            thresholding.save(path)
+
+            self.log_artifact(
+                path,
+                artifact_path="thresholding",
+            )
+
+
         # model artifact
         if wrapper is not None:
             path = self.artifact_path("model")
@@ -324,6 +340,7 @@ class MLFlowLogger(ExperimentLogger):
                 path,
                 artifact_path="model",
             )
+
 
 
 
@@ -346,4 +363,27 @@ rm -rf checkpoints/
 rm -rf saved_models/
 
 
+"""
+
+
+"""
+load threshold later
+The important part is that thresholding.pkl contains the fitted strategy:
+
+thresholding.strategy.threshold
+
+will contain, for example:
+
+0.13742
+
+So at inference you simply load it:
+
+thresholding = Thresholding.load(
+    "thresholding.pkl"
+)
+
+
+predictions = thresholding.predict(
+    scores
+)
 """

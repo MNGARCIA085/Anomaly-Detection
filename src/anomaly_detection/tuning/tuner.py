@@ -35,8 +35,6 @@ class Tuner:
             )
         )
 
-
-        # new
         self.tun_cfg = tun_cfg
 
 

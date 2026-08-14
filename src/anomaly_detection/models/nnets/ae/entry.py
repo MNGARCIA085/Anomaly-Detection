@@ -51,6 +51,7 @@ class AEEntry(BaseModelEntry):
 
     # sample only for tuning; maybe later more generic
     def sample(self, trial, tun_cfg):
+        """ Note. Model and threshold with hardcoded values for now (not from config)"""
 
         return {
 
@@ -114,7 +115,20 @@ class AEEntry(BaseModelEntry):
 
                 "type": "default"
 
-            }
+            },
+
+            
+            "thresholding": {
+                "name": "quantile",
+                "params": {
+                    "quantile": trial.suggest_float(
+                        "threshold_quantile",
+                        0.95,
+                        0.999,
+                    )
+                },
+            },
+            
 
         }
 

@@ -6,6 +6,7 @@ defaults:
   - models: ae
   - training: ae
   - tuning: ae
+  - thresholding: ae
   #- override hydra/launcher: joblib
 
 random_state: 42
