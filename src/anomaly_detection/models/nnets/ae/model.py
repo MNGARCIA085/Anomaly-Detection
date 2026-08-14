@@ -99,6 +99,19 @@ class AEWrapper(AnomalyWrapper):
 
 
 
+    # binary preds
+    def predict(self, X, threshold):
+
+        scores = self.get_scores(X)
+
+        return (
+            scores > threshold
+        ).astype(int)
+
+
+
+
+
     # property for input dim
     @property
     def input_dim(self):

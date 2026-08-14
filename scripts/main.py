@@ -45,7 +45,7 @@ def main(cfg):
     from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
 
 
-    """
+    
     def train_once(
         model_type,
         cfg,
@@ -81,7 +81,7 @@ def main(cfg):
             y_val
         )
     )
-    """
+    
 
 
 

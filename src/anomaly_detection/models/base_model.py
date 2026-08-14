@@ -17,6 +17,11 @@ class AnomalyWrapper(ABC):
         pass
 
 
+    @abstractmethod
+    def predict(self, X, threshold=None):
+        """ returns binary preds"""
+        pass
+
     # save the model
     @abstractmethod
     def save(self, path): 

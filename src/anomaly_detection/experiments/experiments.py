@@ -93,7 +93,40 @@ class Experiment:
             )
 
 
+
+
+
             # predictions and threshold
+            thresholding = None
+            
+            if cfg.get("thresholding"): # AEs, VAEs...
+                thresholding = Thresholding(
+                    cfg.get("thresholding")
+                )
+
+                train_scores = wrapper.get_scores(X_train_p)
+
+                thresholding.fit(train_scores)
+
+                threshold = (
+                    thresholding.get_threshold()
+                )
+
+                print(threshold)
+
+                predictions = wrapper.predict(
+                    X_val_p,
+                    threshold,
+                )
+
+            else: # isoforests
+                predictions = wrapper.predict(
+                    X_val_p
+                )
+
+
+
+            """
             thresholding = None
             if cfg.get("thresholding"): # AEs, VAEs...
                 thresholding = Thresholding(
@@ -114,6 +147,7 @@ class Experiment:
             else: # isoforests..
                 #predictions = None
                 predictions = wrapper.predict(X_val_p)
+            """
 
 
             # compute metrics

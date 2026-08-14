@@ -130,6 +130,19 @@ class VAEWrapper(AnomalyWrapper):
                 dim=1
             ).numpy()
 
+
+    # binary preds
+    def predict(self, X, threshold):
+
+        scores = self.get_scores(X)
+
+        return (
+            scores > threshold
+        ).astype(int)
+
+
+
+
     @property
     def input_dim(self):
         return self.model.config.input_dim

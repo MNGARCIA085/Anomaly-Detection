@@ -1,24 +1,36 @@
 
 
+"""
+Wrapper
+  get_scores(X)          → continuous scores
+  predict(X, threshold)  → binary predictions
+
+Thresholding
+  fit(scores)            → calculates/stores threshold
+  get_threshold()        → returns threshold
+"""
+
+
 #-----------Base---------#
 from abc import ABC, abstractmethod
+
+
+
 
 
 class ThresholdStrategy(ABC):
 
     @abstractmethod
-    def predict(
-        self,
-        scores,
-    ):
+    def fit(self, scores):
         pass
 
+    @abstractmethod
+    def get_threshold(self):
+        pass
 
 
 #--------strategies---------#
 import numpy as np
-
-#from .base import ThresholdStrategy
 
 
 class QuantileThreshold(ThresholdStrategy):
@@ -36,39 +48,14 @@ class QuantileThreshold(ThresholdStrategy):
 
         return self
 
-    def predict(self, scores):
+    def get_threshold(self):
 
         if self.threshold is None:
             raise RuntimeError(
                 "Threshold has not been fitted."
             )
 
-        return (
-            scores > self.threshold
-        ).astype(int)
-
-
-
-
-class NativeThreshold(ThresholdStrategy):
-
-    def __init__(self, threshold):
-        self.threshold = threshold
-
-    def fit(self, scores):
-        return self
-
-    def predict(self, scores):
-
-        if self.threshold is None:
-            raise RuntimeError(
-                "Threshold has not been set."
-            )
-
-        return (
-            scores > self.threshold
-        ).astype(int)
-
+        return self.threshold
 
 
 
@@ -79,7 +66,6 @@ class NativeThreshold(ThresholdStrategy):
 
 THRESHOLD_REGISTRY = {
     "quantile": QuantileThreshold,
-    "native": NativeThreshold,
 }
 
 
@@ -104,30 +90,33 @@ import joblib
 class Thresholding:
 
     def __init__(self, config):
-        self.config = config
 
+        self.config = config
         self.strategy = None
 
         if config:
-            self.strategy = create_threshold_strategy(
-                config["name"],
-                **config.get("params", {}),
+
+            self.strategy = (
+                create_threshold_strategy(
+                    config["name"],
+                    **config.get("params", {}),
+                )
             )
 
     def fit(self, scores):
+
         if self.strategy is not None:
             self.strategy.fit(scores)
 
         return self
 
-    def predict(self, scores):
+    def get_threshold(self):
+
         if self.strategy is None:
             return None
 
-        return self.strategy.predict(scores)
+        return self.strategy.get_threshold()
 
-
-    # save and load
     def save(self, path):
 
         joblib.dump(
