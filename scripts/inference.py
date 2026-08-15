@@ -86,6 +86,39 @@ def main(run_id):
     print("\n=== MODEL ===")
     print(wrapper.model)
 
+
+
+
+    # -----------------------
+    # Load thresholding
+    # -----------------------
+
+    from anomaly_detection.thresholding.thresholding import Thresholding
+
+    thresholding_path = (
+        local_dir
+        / "thresholding"
+        / "thresholding.pkl"
+    )
+
+    thresholding = None
+
+    if thresholding_path.exists():
+
+        thresholding = Thresholding.load(
+            thresholding_path
+        )
+
+        print("\n=== THRESHOLD ===")
+
+        print(
+            thresholding.get_threshold()
+        )
+
+
+
+
+
     # -----------------------
     # Quick inference test
     # -----------------------
@@ -111,13 +144,45 @@ def main(run_id):
     print(scores)
 
 
+    # -----------------------
+    # Predictions
+    # -----------------------
+
+    if thresholding is not None:
+
+        threshold = (
+            thresholding.get_threshold()
+        )
+
+        predictions = wrapper.predict(
+            X,
+            threshold,
+        )
+
+    else:
+
+        predictions = wrapper.predict(
+            X
+        )
+
+    print("\n=== PREDICTIONS ===")
+    print(predictions)
+
+
 
 
 if __name__=="__main__":
-    main("e812278537d04510921ee6c696c67ce3") # ae
-    #main("217a20b1284d452fa2adf793a364b4e2") # iso
-    #main("74fe47e70b834f468c762d0296b47361") # iso
+    main("1474f5db77e9465a8b439cd87e837c63") # ae
+    main("42dfd892996a411d9463f7640367c468") # iso
+    main("0153f371b3a04505a984b701b9b78060") # vae
 
+
+
+
+"""
+0 = normal
+1 = anomaly
+"""
 
 
 
@@ -140,4 +205,17 @@ other dimensionality-changing transforms
 
 because prep.input_dim should consistently mean 
 "what enters the pipeline", while model.input_dim means "what enters the model."
+"""
+
+
+"""
+raw X
+ ↓
+preprocessor
+ ↓
+wrapper.get_scores()
+ ↓
+thresholding.get_threshold() # if thres a threshold
+ ↓
+wrapper.predict(X, threshold)
 """

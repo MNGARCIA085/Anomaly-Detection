@@ -33,6 +33,9 @@ class ThresholdStrategy(ABC):
 import numpy as np
 
 
+
+
+# prob. only appropiate if i train mostly with std data
 class QuantileThreshold(ThresholdStrategy):
 
     def __init__(self, quantile=0.99):

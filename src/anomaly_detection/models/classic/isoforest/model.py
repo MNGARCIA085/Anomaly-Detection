@@ -27,7 +27,7 @@ class IsoWrapper(AnomalyWrapper):
 
     # new
     def predict(self, X):
-        return (self.model.predict(X) == -1).astype(int)
+        return (self.model.predict(X) == -1).astype(int) # to convert to 1 or 0
 
 
     # property history; not really needed here, included just for an uniform interface
