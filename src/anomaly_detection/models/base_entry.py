@@ -22,6 +22,11 @@ class BaseModelEntry(ABC):
 
 
     @abstractmethod
+    def adapt_input(self, X):
+        pass
+
+
+    @abstractmethod
     def build(self, model_cfg, training_cfg=None, input_dim=None):
         """
         Build and return the model wrapper.

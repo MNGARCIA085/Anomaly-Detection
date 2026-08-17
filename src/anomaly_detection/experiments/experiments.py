@@ -9,12 +9,12 @@ from anomaly_detection.evaluation.evaluator import Evaluator
 
 from anomaly_detection.infra.null_logger import NullLogger
 
-
-
-from anomaly_detection.evaluation.threshold import create_threshold_strategy
-
-
+from anomaly_detection.thresholding.thresholding import create_threshold_strategy
 from anomaly_detection.thresholding.thresholding import Thresholding
+
+
+from anomaly_detection.data.windowing import Windowing
+
 
 
 class Experiment:
@@ -27,7 +27,7 @@ class Experiment:
     ):
         self.model_type = model_type
         self.evaluator = evaluator
-        self.logger = self.logger = logger or NullLogger()
+        self.logger = logger or NullLogger()
 
     def run(
         self,
@@ -35,23 +35,31 @@ class Experiment:
         X_train,
         X_val,
         y_val=None,
-        run_type="train", # train or tune
+        run_type="train",  # train or tune
     ):
 
         with self.logger.start_run(
             run_name=self.model_type
         ):
 
-
+            # --------------------------------------------------
+            # 1. Build model entry
+            # --------------------------------------------------
 
             entry = MODEL_REGISTRY[
                 self.model_type
             ]()
 
-            preprocessor = (
-                entry.build_preprocessor(cfg.get('prep'))
-            )
+            # --------------------------------------------------
+            # 2. Preprocessing
+            #    Fit ONLY on train
+            # --------------------------------------------------
 
+            preprocessor = (
+                entry.build_preprocessor(
+                    cfg.get("prep")
+                )
+            )
 
             X_train_p = (
                 preprocessor.fit_transform(
@@ -65,107 +73,245 @@ class Experiment:
                 )
             )
 
-            input_dim = (
-                X_train_p.shape[1]
+            # --------------------------------------------------
+            # 3. Windowing
+            # --------------------------------------------------
+
+            windowing = Windowing(
+                10
             )
 
-
-            # wrapper
-            wrapper = (
-                entry.build(
-                    cfg.get('models'),
-                    cfg.get('training', None), # None for isoforests......
-                    input_dim
+            X_train_w = (
+                windowing.transform(
+                    X_train_p
                 )
             )
 
-
-            wrapper.fit(
-                X_train_p,
-                X_val_p
+            X_val_w, y_val_w = (
+                windowing.transform_with_labels(
+                    X_val_p,
+                    y_val
+                )
             )
 
+            # --------------------------------------------------
+            # 4. Model-specific representation
+            #
+            # AE:
+            #     (samples, window, features)
+            #         ->
+            #     (samples, window * features)
+            #
+            # Transformer:
+            #     probably keeps sequence representation
+            #
+            # IsoForest:
+            #     flattened representation
+            # --------------------------------------------------
+
+            X_train_model = (
+                entry.adapt_input(
+                    X_train_w
+                )
+            )
+
+            X_val_model = (
+                entry.adapt_input(
+                    X_val_w
+                )
+            )
+
+            # --------------------------------------------------
+            # 5. Input dimension AFTER adaptation
+            # --------------------------------------------------
+
+            input_dim = (
+                X_train_model.shape[1]
+            )
+
+            # --------------------------------------------------
+            # Debug
+            # --------------------------------------------------
+
+            print(
+                "Shapes:"
+            )
+
+            print(
+                "  X_train_p:",
+                X_train_p.shape
+            )
+
+            print(
+                "  X_val_p:",
+                X_val_p.shape
+            )
+
+            print(
+                "  X_train_w:",
+                X_train_w.shape
+            )
+
+            print(
+                "  X_val_w:",
+                X_val_w.shape
+            )
+
+            print(
+                "  X_train_model:",
+                X_train_model.shape
+            )
+
+            print(
+                "  X_val_model:",
+                X_val_model.shape
+            )
+
+            if y_val_w is not None:
+                print(
+                    "  y_val_w:",
+                    y_val_w.shape
+                )
+
+            # --------------------------------------------------
+            # 6. Build model
+            # --------------------------------------------------
+
+            wrapper = (
+                entry.build(
+                    cfg.get("models"),
+                    cfg.get(
+                        "training",
+                        None,
+                    ),
+                    input_dim,
+                )
+            )
+
+            # --------------------------------------------------
+            # 7. Train
+            # --------------------------------------------------
+
+            wrapper.fit(
+                X_train_model,
+                X_val_model,
+            )
+
+            # --------------------------------------------------
+            # 8. Validation scores
+            # --------------------------------------------------
 
             scores = (
                 wrapper.get_scores(
-                    X_val_p
+                    X_val_model
                 )
             )
 
+            # --------------------------------------------------
+            # 9. Thresholding
+            # --------------------------------------------------
 
-
-
-
-            # predictions and threshold
             thresholding = None
-            
-            if cfg.get("thresholding"): # AEs, VAEs...
-                thresholding = Thresholding(
-                    cfg.get("thresholding")
+
+            if cfg.get("thresholding"):
+
+                thresholding = (
+                    Thresholding(
+                        cfg.get(
+                            "thresholding"
+                        )
+                    )
                 )
 
-                train_scores = wrapper.get_scores(X_train_p)
+                # Threshold is learned from
+                # training scores
+                train_scores = (
+                    wrapper.get_scores(
+                        X_train_model
+                    )
+                )
 
-                thresholding.fit(train_scores)
+                thresholding.fit(
+                    train_scores
+                )
 
                 threshold = (
                     thresholding.get_threshold()
                 )
 
-                print(threshold)
-
-                predictions = wrapper.predict(
-                    X_val_p,
-                    threshold,
+                predictions = (
+                    wrapper.predict(
+                        X_val_model,
+                        threshold,
+                    )
                 )
 
-            else: # isoforests
-                predictions = wrapper.predict(
-                    X_val_p
+            else:
+
+                # Models such as Isolation Forest
+                # use their native prediction mechanism
+                predictions = (
+                    wrapper.predict(
+                        X_val_model
+                    )
                 )
 
+            # --------------------------------------------------
+            # 10. Sanity check
+            # --------------------------------------------------
 
-
-            """
-            thresholding = None
-            if cfg.get("thresholding"): # AEs, VAEs...
-                thresholding = Thresholding(
-                    cfg.get("thresholding")
-                )
-
-                train_scores = wrapper.get_scores(
-                    X_train_p
-                )
-                
-                thresholding.fit(
-                    train_scores
-                )
-
-                predictions = thresholding.predict(
-                    scores
-                )
-            else: # isoforests..
-                #predictions = None
-                predictions = wrapper.predict(X_val_p)
-            """
-
-
-            # compute metrics
-            metrics = self.evaluator.evaluate(
-                scores=scores,
-                y_true=y_val,
-                predictions=predictions,
+            print(
+                "\nEvaluation shapes:"
             )
 
+            print(
+                "  scores:",
+                len(scores)
+            )
 
-            # log run
+            print(
+                "  y_val:",
+                len(y_val_w)
+            )
+
+            print(
+                "  predictions:",
+                len(predictions)
+            )
+
+            assert len(scores) == len(y_val_w), (
+                f"scores ({len(scores)}) != "
+                f"y_val ({len(y_val_w)})"
+            )
+
+            assert len(predictions) == len(y_val_w), (
+                f"predictions ({len(predictions)}) != "
+                f"y_val ({len(y_val_w)})"
+            )
+
+            # --------------------------------------------------
+            # 11. Evaluate
+            # --------------------------------------------------
+
+            metrics = (
+                self.evaluator.evaluate(
+                    scores=scores,
+                    y_true=y_val_w,
+                    predictions=predictions,
+                )
+            )
+
+            # --------------------------------------------------
+            # 12. Log run
+            # --------------------------------------------------
+
             self.logger.log_run(
                 cfg=cfg,
                 run_type=run_type,
                 metrics=metrics,
                 history=wrapper.history,
-                preprocessor=preprocessor, # already fit!
-                thresholding=thresholding, # already fit
+                preprocessor=preprocessor,
+                thresholding=thresholding,
                 wrapper=(
                     wrapper
                     if metrics["auc"] > 0.7
@@ -173,9 +319,7 @@ class Experiment:
                 ),
             )
 
-
         return metrics
-
 
 """
 try:
@@ -184,4 +328,16 @@ except ValueError as e:
     raise optuna.TrialPruned(str(e))
 
 idea to prune bad confis
+"""
+
+
+"""
+AEEntry.prepare_input()
+    -> (N, T, F) -> (N, T*F)
+
+IsoForestEntry.prepare_input()
+    -> (N, T, F) -> (N, T*F)
+
+TransformerEntry.prepare_input()
+    -> (N, T, F) -> unchanged
 """

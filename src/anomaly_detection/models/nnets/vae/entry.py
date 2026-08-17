@@ -132,9 +132,13 @@ class VAEEntry(BaseModelEntry):
 
         steps.append(scaler)
 
-
-
         return PreprocessingPipeline(steps)
+
+
+
+    def adapt_input(self, X):
+        # should be (N, T*F)
+        return X.reshape(X.shape[0], -1)
 
     def build(
         self,

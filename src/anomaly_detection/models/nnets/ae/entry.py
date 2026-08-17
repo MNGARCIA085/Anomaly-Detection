@@ -174,6 +174,12 @@ class AEEntry(BaseModelEntry):
         )
 
 
+    # new
+    def adapt_input(self, X):
+        # should be (N, T*F)
+        return X.reshape(X.shape[0], -1)
+
+
 
     def build(
         self,
