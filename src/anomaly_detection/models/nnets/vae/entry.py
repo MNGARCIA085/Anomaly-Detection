@@ -144,8 +144,10 @@ class VAEEntry(BaseModelEntry):
         self,
         cfg_model,
         cfg_training,
-        input_dim
+        input_shape
     ):
+
+        input_dim = input_shape[1]
 
 
         model_cfg = VAEConfig(

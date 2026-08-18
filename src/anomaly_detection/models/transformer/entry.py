@@ -12,6 +12,9 @@ from anomaly_detection.preprocessing.components.scalers import create_scaler, sa
 
 
 
+from anomaly_detection.training.losses import create_loss
+
+
 """
 There is one thing to adjust compared with your VAE entry: 
 self.seq_len needs to come from your actual pipeline/config. 
@@ -93,6 +96,10 @@ class TransformerEntry(BaseModelEntry):
                     tun_cfg.training_space.optimizer
                 ),
 
+                "loss": {
+                    "name": "mse"
+                },
+
                 "epochs": trial.suggest_int(
                     "epochs",
                     tun_cfg.training_space.epochs.low,
@@ -165,12 +172,15 @@ class TransformerEntry(BaseModelEntry):
         self,
         cfg_model,
         cfg_training,
-        input_dim
+        input_shape,
     ):
+
+        input_dim = input_shape[-1]
+        seq_len = input_shape[1]
 
         model_cfg = TransformerAEConfig(
             input_dim=input_dim,
-            seq_len=self.seq_len,
+            seq_len=seq_len,
             d_model=cfg_model["d_model"],
             nhead=cfg_model["nhead"],
             num_encoder_layers=cfg_model["num_encoder_layers"],
@@ -185,11 +195,16 @@ class TransformerEntry(BaseModelEntry):
             model.parameters()
         )
 
+        # loss
+        loss = create_loss(
+            cfg_training["loss"],
+        )
+
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
-            loss=None,
+            loss=loss,
             callbacks=[
                 EarlyStopping(patience=3),
                 PrintLossCallback(),

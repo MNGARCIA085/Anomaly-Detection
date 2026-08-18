@@ -17,6 +17,10 @@ from anomaly_detection.data.windowing import Windowing
 
 
 
+# TRANSF.
+# https://chatgpt.com/c/6a839478-0014-83e9-930c-04b35deb7350
+
+
 class Experiment:
 
     def __init__(
@@ -78,8 +82,9 @@ class Experiment:
             # --------------------------------------------------
 
             windowing = Windowing(
-                10
+                cfg.get("windowing", {}).get("size", 10)
             )
+            
 
             X_train_w = (
                 windowing.transform(
@@ -125,9 +130,15 @@ class Experiment:
             # 5. Input dimension AFTER adaptation
             # --------------------------------------------------
 
-            input_dim = (
-                X_train_model.shape[1]
-            )
+            #input_dim = (
+            #    X_train_model.shape[1]
+            #)
+            #input_dim = X_train_model.shape[-1]
+            input_shape = X_train_model.shape
+
+
+
+
 
             # --------------------------------------------------
             # Debug
@@ -184,7 +195,8 @@ class Experiment:
                         "training",
                         None,
                     ),
-                    input_dim,
+                    #input_dim,
+                    input_shape,
                 )
             )
 

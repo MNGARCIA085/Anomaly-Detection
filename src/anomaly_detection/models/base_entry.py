@@ -27,7 +27,7 @@ class BaseModelEntry(ABC):
 
 
     @abstractmethod
-    def build(self, model_cfg, training_cfg=None, input_dim=None):
+    def build(self, model_cfg, training_cfg=None, input_shape=None):
         """
         Build and return the model wrapper.
         Accepts model_cfg as a required argument, and optional

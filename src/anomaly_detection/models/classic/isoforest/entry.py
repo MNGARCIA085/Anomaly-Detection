@@ -111,7 +111,7 @@ class IsoEntry(BaseModelEntry):
         self,
         model_cfg,
         training_cfg=None,
-        input_dim=None,
+        input_shape=None,
     ):
 
 

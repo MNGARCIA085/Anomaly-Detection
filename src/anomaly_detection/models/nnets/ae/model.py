@@ -99,7 +99,7 @@ class AEWrapper(AnomalyWrapper):
 
 
 
-    # binary preds
+    # binary preds; one pred per window!!!!!!
     def predict(self, X, threshold):
 
         scores = self.get_scores(X)
