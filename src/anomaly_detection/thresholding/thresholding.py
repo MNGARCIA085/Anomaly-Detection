@@ -11,6 +11,8 @@ Thresholding
 """
 
 
+#Quantile thresholding assumes that the training score distribution is predominantly norma
+
 #-----------Base---------#
 from abc import ABC, abstractmethod
 

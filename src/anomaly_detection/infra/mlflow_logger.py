@@ -14,9 +14,13 @@ import matplotlib.pyplot as plt
 from typing import Optional
 
 
-
-
 from anomaly_detection.infra.utils import flatten_dict
+
+
+
+from .candidate_models import CandidateRegistry, CandidateManager
+
+
 
 
 class MLFlowLogger(ExperimentLogger):
@@ -41,6 +45,21 @@ class MLFlowLogger(ExperimentLogger):
         self.exp_name = exp_name
 
         self._init_mlflow()
+
+
+        # new!!
+        self.candidate_registry = CandidateRegistry(
+            self.tracking_db
+        )
+
+        self.candidate_manager = CandidateManager(
+            registry=self.candidate_registry,
+            mlflow_dir=self.artifact_dir,
+            candidate_pool_size=5,
+            min_pr_auc=0.70,
+            max_candidates_per_model=2,
+        )
+        # later -> values from YAML
 
 
     def _init_mlflow(self):
@@ -331,6 +350,7 @@ class MLFlowLogger(ExperimentLogger):
 
 
         # model artifact
+        """
         if wrapper is not None:
             path = self.artifact_path("model")
 
@@ -340,6 +360,73 @@ class MLFlowLogger(ExperimentLogger):
                 path,
                 artifact_path="model",
             )
+        """
+
+        # model artifact
+        if wrapper is not None:
+
+            run = mlflow.active_run()
+
+            run_id = run.info.run_id
+            experiment_id = int(run.info.experiment_id)
+
+            model_family = cfg.get("name")
+            val_pr_auc = metrics.get("pr_auc")
+
+            retain = (
+                val_pr_auc is not None
+                and self.candidate_manager.should_retain(
+                    experiment_id=experiment_id,
+                    model_family=model_family,
+                    val_pr_auc=val_pr_auc,
+                )
+            )
+
+            if retain:
+
+                path = self.artifact_path("model")
+
+                wrapper.save(path)
+
+                self.log_artifact(
+                    path,
+                    artifact_path="model",
+                )
+
+                self.candidate_manager.register_candidate(
+                    experiment_id=experiment_id,
+                    run_id=run_id,
+                    model_family=model_family,
+                    val_pr_auc=val_pr_auc,
+                    artifact_path="model",
+                )
+
+
+
+
+
+
+
+"""
+train
+  ↓
+validation PR-AUC
+  ↓
+should_retain()?
+  ├── NO → MLflow metrics only
+  │
+  └── YES
+       ↓
+   save model
+       ↓
+   MLflow artifact
+       ↓
+   register candidate
+       ↓
+   pool > N?
+       ├── NO
+       └── YES → delete weakest artifact
+"""
 
 
 

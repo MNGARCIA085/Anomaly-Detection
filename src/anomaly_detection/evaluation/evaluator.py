@@ -19,7 +19,6 @@ class Evaluator:
         scores, # always evaluated
         y_true=None,
         predictions=None, # optional!
-        X=None, # not eally needed ----> check!!
     ):
         result = {
             "mean_score": scores.mean(),

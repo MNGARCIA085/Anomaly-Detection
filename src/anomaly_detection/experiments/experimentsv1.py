@@ -17,7 +17,8 @@ from anomaly_detection.data.windowing import Windowing
 
 
 
-
+# TRANSF.
+# https://chatgpt.com/c/6a839478-0014-83e9-930c-04b35deb7350
 
 
 class Experiment:
@@ -107,7 +108,7 @@ class Experiment:
             #     (samples, window * features)
             #
             # Transformer:
-            #     keeps sequence representation
+            #     probably keeps sequence representation
             #
             # IsoForest:
             #     flattened representation
@@ -129,8 +130,59 @@ class Experiment:
             # 5. Input dimension AFTER adaptation
             # --------------------------------------------------
 
+            #input_dim = (
+            #    X_train_model.shape[1]
+            #)
+            #input_dim = X_train_model.shape[-1]
             input_shape = X_train_model.shape
 
+
+
+
+
+            # --------------------------------------------------
+            # Debug
+            # --------------------------------------------------
+
+            print(
+                "Shapes:"
+            )
+
+            print(
+                "  X_train_p:",
+                X_train_p.shape
+            )
+
+            print(
+                "  X_val_p:",
+                X_val_p.shape
+            )
+
+            print(
+                "  X_train_w:",
+                X_train_w.shape
+            )
+
+            print(
+                "  X_val_w:",
+                X_val_w.shape
+            )
+
+            print(
+                "  X_train_model:",
+                X_train_model.shape
+            )
+
+            print(
+                "  X_val_model:",
+                X_val_model.shape
+            )
+
+            if y_val_w is not None:
+                print(
+                    "  y_val_w:",
+                    y_val_w.shape
+                )
 
             # --------------------------------------------------
             # 6. Build model
@@ -143,6 +195,7 @@ class Experiment:
                         "training",
                         None,
                     ),
+                    #input_dim,
                     input_shape,
                 )
             )
@@ -182,7 +235,8 @@ class Experiment:
                     )
                 )
 
-                # Threshold is learned from training scores
+                # Threshold is learned from
+                # training scores
                 train_scores = (
                     wrapper.get_scores(
                         X_train_model
@@ -214,10 +268,41 @@ class Experiment:
                     )
                 )
 
+            # --------------------------------------------------
+            # 10. Sanity check
+            # --------------------------------------------------
 
+            print(
+                "\nEvaluation shapes:"
+            )
+
+            print(
+                "  scores:",
+                len(scores)
+            )
+
+            print(
+                "  y_val:",
+                len(y_val_w)
+            )
+
+            print(
+                "  predictions:",
+                len(predictions)
+            )
+
+            assert len(scores) == len(y_val_w), (
+                f"scores ({len(scores)}) != "
+                f"y_val ({len(y_val_w)})"
+            )
+
+            assert len(predictions) == len(y_val_w), (
+                f"predictions ({len(predictions)}) != "
+                f"y_val ({len(y_val_w)})"
+            )
 
             # --------------------------------------------------
-            # 10. Evaluate
+            # 11. Evaluate
             # --------------------------------------------------
 
             metrics = (
@@ -229,7 +314,7 @@ class Experiment:
             )
 
             # --------------------------------------------------
-            # 11. Log run
+            # 12. Log run
             # --------------------------------------------------
 
             self.logger.log_run(
@@ -248,5 +333,23 @@ class Experiment:
 
         return metrics
 
+"""
+try:
+    preprocessor.fit_transform(X_train)
+except ValueError as e:
+    raise optuna.TrialPruned(str(e))
+
+idea to prune bad confis
+"""
 
 
+"""
+AEEntry.prepare_input()
+    -> (N, T, F) -> (N, T*F)
+
+IsoForestEntry.prepare_input()
+    -> (N, T, F) -> (N, T*F)
+
+TransformerEntry.prepare_input()
+    -> (N, T, F) -> unchanged
+"""
