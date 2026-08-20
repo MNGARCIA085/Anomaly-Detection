@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 
-from anomaly_detection.inference.inference import benchmark_candidates
+from anomaly_detection.inference.benchmarking import benchmark_candidates
 
 
 def main():

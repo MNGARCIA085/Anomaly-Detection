@@ -1,4 +1,4 @@
-import time
+
 import numpy as np
 
 
@@ -57,33 +57,11 @@ class InferenceRunner:
 
         return self.wrapper.predict(X_model)
 
-    def benchmark(
-        self,
-        X,
-        repetitions=20,
-        warmup=5,
-    ):
-        # Warm-up
-        for _ in range(warmup):
-            self.predict(X)
-
-        start = time.perf_counter()
-
-        for _ in range(repetitions):
-            self.predict(X)
-
-        elapsed = time.perf_counter() - start
-
-        return {
-            "total_seconds": elapsed,
-            "avg_ms": (
-                elapsed / repetitions * 1000
-            ),
-        }
-
 
 
 from mlflow.tracking import MlflowClient
+
+
 
 
 def load_inference_runner(run_id):
@@ -145,56 +123,6 @@ def load_inference_runner(run_id):
 
 
 
-def benchmark_candidates(
-    registry,
-    experiment_id,
-    raw_input_dim,
-    n_samples=100,
-    repetitions=20,
-):
-    candidates = registry.get_retained(
-        experiment_id
-    )
-
-    # ---------------------------------------------------------
-    # SAME RAW DATA FOR EVERY CANDIDATE
-    # ---------------------------------------------------------
-
-    rng = np.random.default_rng(42)
-
-    X_benchmark = rng.standard_normal(
-        (n_samples, raw_input_dim)
-    )
-
-    # ---------------------------------------------------------
-    # Benchmark each candidate
-    # ---------------------------------------------------------
-
-    for candidate in candidates:
-
-        run_id = candidate["run_id"]
-
-        runner = load_inference_runner(
-            run_id
-        )
-
-        result = runner.benchmark(
-            X_benchmark,
-            repetitions=repetitions,
-        )
-
-        inference_ms = result["avg_ms"]
-
-        registry.update_selection_metrics(
-            run_id=run_id,
-            inference_ms=inference_ms,
-        )
-
-        print(
-            f"{candidate['model_family']:<15}"
-            f"{candidate['val_pr_auc']:.4f}    "
-            f"{inference_ms:.3f} ms"
-        )
 
 
 
