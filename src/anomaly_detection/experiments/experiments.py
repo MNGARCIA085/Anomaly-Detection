@@ -9,7 +9,7 @@ from anomaly_detection.evaluation.evaluator import Evaluator
 
 from anomaly_detection.infra.null_logger import NullLogger
 
-from anomaly_detection.thresholding.thresholding import create_threshold_strategy
+from anomaly_detection.thresholding.registry import create_threshold_strategy
 from anomaly_detection.thresholding.thresholding import Thresholding
 
 
