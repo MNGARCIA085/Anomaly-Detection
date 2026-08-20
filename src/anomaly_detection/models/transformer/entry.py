@@ -3,12 +3,16 @@ from .schemas import TransformerAEConfig
 from anomaly_detection.training.schemas import TrainingConfig
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from .model import TransformerAE, TransformerAEWrapper
-from anomaly_detection.training.callbacks import EarlyStopping,PrintLossCallback
 from anomaly_detection.training.registry import TRAINER_REGISTRY
 from anomaly_detection.models.base_entry import BaseModelEntry
 from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
 
+
+
+
+from anomaly_detection.training.callbacks.registry import create_callbacks
+from anomaly_detection.tuning.sample_training import sample_callbacks
 
 
 
@@ -99,6 +103,11 @@ class TransformerEntry(BaseModelEntry):
                 "loss": {
                     "name": "mse"
                 },
+
+                "callbacks": sample_callbacks(
+                    trial,
+                    tun_cfg.training_space.callbacks,
+                ),
 
                 "epochs": trial.suggest_int(
                     "epochs",
@@ -200,15 +209,15 @@ class TransformerEntry(BaseModelEntry):
             cfg_training["loss"],
         )
 
+        # callbacks
+        callbacks = create_callbacks(cfg_training["callbacks"])
+
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
             loss=loss,
-            callbacks=[
-                EarlyStopping(patience=3),
-                PrintLossCallback(),
-            ]
+            callbacks=callbacks,
         )
 
         trainer_cls = TRAINER_REGISTRY[

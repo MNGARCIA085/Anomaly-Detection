@@ -65,6 +65,16 @@ training_space:
         log: true
 
 
+  callbacks:
+    print_loss: true
+
+    early_stopping:
+      enabled: true
+      patience:
+        low: 3
+        high: 10
+
+
   epochs:
     name: epochs
     type: int

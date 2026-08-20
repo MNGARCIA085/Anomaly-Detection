@@ -5,42 +5,22 @@
 from anomaly_detection.models.registry import register
 from .schemas import VAEConfig
 from anomaly_detection.training.schemas import TrainingConfig
-
-
-
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
-
-
-
 from .model import VAE, VAEWrapper
-
-
-from anomaly_detection.training.callbacks import EarlyStopping,PrintLossCallback
-
-
 from anomaly_detection.training.registry import TRAINER_REGISTRY
-
-
 from ...base_entry import BaseModelEntry
-
-
-# from anomaly_detection.training.losses import create_loss
-
-
 from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
+from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
 
-
-
-
-
-
+from anomaly_detection.training.callbacks.registry import create_callbacks
+from anomaly_detection.tuning.sample_training import sample_callbacks
 
 
 # no loss object, since the VAE computes reconstruction + KL internally.
 
 
 
-from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
+
 
 
 @register("vae")
@@ -88,6 +68,11 @@ class VAEEntry(BaseModelEntry):
                 "optimizer": sample_optimizer(
                     trial,
                     tun_cfg.training_space.optimizer
+                ),
+
+                "callbacks": sample_callbacks(
+                    trial,
+                    tun_cfg.training_space.callbacks,
                 ),
 
                 "epochs": trial.suggest_int(
@@ -165,15 +150,15 @@ class VAEEntry(BaseModelEntry):
             model.parameters()
         )
 
+
+        callbacks = create_callbacks(cfg_training["callbacks"])
+
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
             loss=None,
-            callbacks=[
-                EarlyStopping(patience=3),
-                PrintLossCallback(),
-            ]
+            callbacks=callbacks,
         )
 
         trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]

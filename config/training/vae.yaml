@@ -7,3 +7,10 @@ optimizer:
   params:
     lr: 0.001
     betas: [0.9, 0.999]
+
+
+callbacks:
+  - name: print_loss
+  - name: early_stopping
+    params:
+      patience: 5
