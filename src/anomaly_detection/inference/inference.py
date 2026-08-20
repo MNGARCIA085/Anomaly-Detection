@@ -1,7 +1,4 @@
-
 import numpy as np
-
-
 
 from pathlib import Path
 import joblib
@@ -9,15 +6,15 @@ import joblib
 import anomaly_detection.models.register_models 
 from anomaly_detection.models.registry import MODEL_REGISTRY
 
-
-
 from anomaly_detection.data.windowing import Windowing
-
-
 
 from anomaly_detection.thresholding.thresholding import (
         Thresholding
     )
+
+from mlflow.tracking import MlflowClient
+
+
 
 
 class InferenceRunner:
@@ -59,7 +56,7 @@ class InferenceRunner:
 
 
 
-from mlflow.tracking import MlflowClient
+
 
 
 
@@ -83,6 +80,9 @@ def load_inference_runner(run_id):
         / "preprocessing"
         / "preprocessor.pkl"
     )
+
+    # windowing
+    windowing = Windowing(int(run.data.params["data.windowing.size"]))
 
     # Model
     model_type = run.data.tags["model_type"]
@@ -108,8 +108,7 @@ def load_inference_runner(run_id):
             thresholding_path
         )
 
-    # TODO: eventually load this from model metadata/config
-    windowing = Windowing(10)
+
 
     return InferenceRunner(
         prep=prep,

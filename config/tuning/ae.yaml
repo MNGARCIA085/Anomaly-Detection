@@ -1,5 +1,13 @@
 
 
+data:
+  windowing:
+    size:
+      choices: [1, 5, 10, 20]
+
+
+
+
 
 prep:
   
@@ -11,8 +19,6 @@ prep:
         - mean
         - median
         - most_frequent
-
-
 
   transform:
     names:

@@ -12,7 +12,8 @@ from anomaly_detection.preprocessing.components.feature_selection import create_
 
 
 from anomaly_detection.tuning.sample_prep import (
-        sample_feature_selection, sample_scaler, sample_dimensionality_reducer
+        sample_window_size, sample_feature_selection, sample_scaler, 
+        sample_dimensionality_reducer
     )
 
 
@@ -29,6 +30,15 @@ class IsoEntry(BaseModelEntry):
         return {
 
             "name": "isoforest",
+
+            "data": {
+                "windowing": {
+                    "size": sample_window_size(
+                        trial,
+                        tun_cfg.data.windowing.size,
+                    ),
+                },
+            },
 
             "prep": {
                 "feature_selection": sample_feature_selection(

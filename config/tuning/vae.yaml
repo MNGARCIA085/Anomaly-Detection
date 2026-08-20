@@ -1,10 +1,15 @@
 
 
+
+data:
+  windowing:
+    size:
+      choices: [1, 5, 10, 20]
+
+
 prep:
   scaler:
     names: [standard, minmax]
-
-
 
 
 model_space:

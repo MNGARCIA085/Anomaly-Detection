@@ -302,7 +302,13 @@ class MLFlowLogger(ExperimentLogger):
              dataset hash.....
         """
 
+
+
+
         # params
+        window_size = cfg.get("data", {}).get("windowing", {}).get("size")
+        mlflow.log_param("data.windowing.size", window_size)
+
         self.log_params(
             flatten_dict(cfg.get("prep"))
         )

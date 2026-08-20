@@ -1,5 +1,17 @@
 
 
+#-----window size-------#
+def sample_window_size(trial, cfg):
+    """Sample window size for tuning."""
+    window_size = trial.suggest_categorical(
+        "data.windowing.size",
+        cfg.choices,
+    )
+
+    return window_size
+
+
+
 #---------scaler---------#
 def sample_scaler(trial, cfg):
     """ Sample scaler for tuning"""

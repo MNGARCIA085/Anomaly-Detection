@@ -24,7 +24,7 @@ from anomaly_detection.tuning.sample_training import sample_callbacks, sample_op
 
 
 from anomaly_detection.tuning.sample_prep import (
-        sample_imputation, sample_transform, sample_scaler
+        sample_window_size, sample_imputation, sample_transform, sample_scaler
     )
 
 
@@ -45,6 +45,15 @@ class AEEntry(BaseModelEntry):
         return {
 
             "name": "ae",
+
+            "data": {
+                "windowing": {
+                    "size": sample_window_size(
+                        trial,
+                        tun_cfg.data.windowing.size,
+                    ),
+                },
+            },
 
 
             "prep": {

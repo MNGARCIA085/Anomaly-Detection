@@ -15,7 +15,7 @@ from anomaly_detection.training.optimizers.registry import create_optimizer
 from anomaly_detection.tuning.sample_training import sample_callbacks, sample_optimizer
 
 
-from anomaly_detection.tuning.sample_prep import sample_scaler
+from anomaly_detection.tuning.sample_prep import sample_window_size,sample_scaler
 
 
 
@@ -46,6 +46,17 @@ class TransformerEntry(BaseModelEntry):
         return {
 
             "name": "transformer",
+
+
+
+            "data": {
+                "windowing": {
+                    "size": sample_window_size(
+                        trial,
+                        tun_cfg.data.windowing.size,
+                    ),
+                },
+            },
 
             # ========================================================
             # Preprocessing

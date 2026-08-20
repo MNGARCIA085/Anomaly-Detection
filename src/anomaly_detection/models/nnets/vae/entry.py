@@ -21,7 +21,7 @@ from anomaly_detection.tuning.sample_training import sample_callbacks, sample_op
 
 
 from anomaly_detection.tuning.sample_prep import(
-        sample_scaler
+        sample_window_size, sample_scaler
     )
 
 
@@ -34,6 +34,15 @@ class VAEEntry(BaseModelEntry):
         return {
 
             "name": "vae",
+
+            "data": {
+                "windowing": {
+                    "size": sample_window_size(
+                        trial,
+                        tun_cfg.data.windowing.size,
+                    ),
+                },
+            },
 
             "prep": {
                 "scaler": sample_scaler(
