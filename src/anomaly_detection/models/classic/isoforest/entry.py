@@ -1,14 +1,20 @@
+
+
 from sklearn.ensemble import IsolationForest
 from anomaly_detection.models.registry import register
 from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from .model import IsoWrapper
 from ...base_entry import BaseModelEntry
-from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
-from anomaly_detection.preprocessing.components.dimensionality import create_dimensionality_reducer, sample_dimensionality_reducer
-
-
+from anomaly_detection.preprocessing.components.scalers import create_scaler
+from anomaly_detection.preprocessing.components.dimensionality import create_dimensionality_reducer
 from anomaly_detection.preprocessing.components.feature_selection import create_feature_selector
-from anomaly_detection.preprocessing.components.feature_selection import sample_feature_selection
+
+
+
+from anomaly_detection.tuning.sample_prep import (
+        sample_feature_selection, sample_scaler, sample_dimensionality_reducer
+    )
+
 
 
 

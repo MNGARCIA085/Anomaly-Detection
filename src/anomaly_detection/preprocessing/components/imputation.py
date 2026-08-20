@@ -17,35 +17,3 @@ def create_imputer(name, **params):
 
     return imputer_cls(**params)
 
-
-
-def sample_imputation(trial, cfg):
-    """Sample imputation for tuning."""
-
-    enabled = trial.suggest_categorical(
-        "prep.imputation.enabled",
-        [True, False],
-    )
-
-    if not enabled:
-        return {
-            "enabled": False,
-        }
-
-    name = trial.suggest_categorical(
-        "prep.imputation.name",
-        cfg.names,
-    )
-
-    strategy = trial.suggest_categorical(
-        "prep.imputation.strategy",
-        cfg.strategy.choices,
-    )
-
-    return {
-        "enabled": True,
-        "name": name,
-        "params": {
-            "strategy": strategy,
-        },
-    }

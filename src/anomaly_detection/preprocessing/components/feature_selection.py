@@ -16,31 +16,3 @@ def create_feature_selector(name, **params):
         )
 
     return selector_cls(**params)
-
-
-
-def sample_feature_selection(trial, cfg):
-
-    if not cfg.enabled:
-        return {
-            "enabled": False,
-        }
-
-    name = trial.suggest_categorical(
-        "prep.feature_selection.name",
-        cfg.names,
-    )
-
-    threshold = trial.suggest_float(
-        "prep.feature_selection.threshold",
-        cfg.threshold.low,
-        cfg.threshold.high,
-    )
-
-    return {
-        "enabled": True,
-        "name": name,
-        "params": {
-            "threshold": threshold,
-        },
-    }

@@ -18,18 +18,3 @@ def create_scaler(name, **params):
 
 
 # create_scaler("standard") produces StandardScaler()
-
-
-
-
-def sample_scaler(trial, cfg):
-    """ Sample scaler for tuning"""
-    scaler_name = trial.suggest_categorical(
-        "prep.scaler.name",
-        cfg.names,
-    )
-
-    return {
-        "name": scaler_name,
-        "params": {},
-    }

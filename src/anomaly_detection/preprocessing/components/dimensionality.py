@@ -23,39 +23,3 @@ def create_dimensionality_reducer(cfg):
         )
 
     return reducer_cls(**cfg.get("params", {}))
-
-
-
-
-
-def sample_dimensionality_reducer(trial, cfg):
-
-
-    print("\n", cfg)
-
-    if not cfg.enabled:
-        return {
-            "enabled": False,
-            "name": None,
-            "params": {},
-        }
-
-    name = trial.suggest_categorical(
-        "prep.dimensionality.name",
-        cfg.names,
-    )
-
-    params = {}
-
-    if name == "pca":
-        params["n_components"] = trial.suggest_int(
-            "prep.dimensionality.n_components",
-            cfg.n_components.low,
-            cfg.n_components.high,
-        )
-
-    return {
-        "enabled": True,
-        "name": name,
-        "params": params,
-    }

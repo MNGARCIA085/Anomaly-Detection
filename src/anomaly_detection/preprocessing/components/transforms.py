@@ -34,26 +34,7 @@ def create_transform(name, **params):
 
 
 
-def sample_transform(trial, cfg):
 
-    # sample -> sometimes enabled sometimes not
-    enabled = trial.suggest_categorical(
-        "prep.transform.enabled",
-        [True, False],
-    )
-
-    if not enabled:
-        return {"enabled": False}
-
-    name = trial.suggest_categorical(
-        "prep.transform.name",
-        cfg.names,
-    )
-
-    return {
-        "enabled": True,
-        "name": name,
-    }
 
 
 
