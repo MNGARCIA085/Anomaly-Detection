@@ -84,7 +84,7 @@ def main(cfg):
     
 
     
-    return
+    
 
 
 
@@ -114,6 +114,28 @@ def main(cfg):
     print(
         study.best_params
     )
+
+
+
+    # retrain best model
+    # ---------------------------------
+    # FINAL TRAINING
+    # ---------------------------------
+
+    best_cfg = tuner.get_best_config(study)
+
+    print("Best config:")
+    print(best_cfg)
+
+    final_model = train_once(
+        model_type,
+        best_cfg,
+        X_train,
+        X_val,
+        y_val
+    )
+
+    print(final_model)
 
 
 
