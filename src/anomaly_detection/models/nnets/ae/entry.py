@@ -9,7 +9,6 @@ from .model import AE, AEWrapper
 from anomaly_detection.training.registry import TRAINER_REGISTRY
 from ...base_entry import BaseModelEntry
 from anomaly_detection.training.losses import create_loss
-from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
 from anomaly_detection.preprocessing.components.transforms import create_transform
 from anomaly_detection.preprocessing.components.transforms import sample_transform
@@ -18,7 +17,8 @@ from anomaly_detection.preprocessing.components.imputation import sample_imputat
 
 
 from anomaly_detection.training.callbacks.registry import create_callbacks
-from anomaly_detection.tuning.sample_training import sample_callbacks
+from anomaly_detection.training.optimizers.registry import create_optimizer
+from anomaly_detection.tuning.sample_training import sample_callbacks, sample_optimizer
 
 
 

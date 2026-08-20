@@ -9,11 +9,12 @@ from anomaly_detection.preprocessing.pipeline import PreprocessingPipeline
 from .model import VAE, VAEWrapper
 from anomaly_detection.training.registry import TRAINER_REGISTRY
 from ...base_entry import BaseModelEntry
-from anomaly_detection.training.optimizers import sample_optimizer, create_optimizer
 from anomaly_detection.preprocessing.components.scalers import create_scaler, sample_scaler
 
+
 from anomaly_detection.training.callbacks.registry import create_callbacks
-from anomaly_detection.tuning.sample_training import sample_callbacks
+from anomaly_detection.training.optimizers.registry import create_optimizer
+from anomaly_detection.tuning.sample_training import sample_callbacks, sample_optimizer
 
 
 # no loss object, since the VAE computes reconstruction + KL internally.

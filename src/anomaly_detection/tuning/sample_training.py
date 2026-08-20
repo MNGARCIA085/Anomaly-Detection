@@ -1,6 +1,11 @@
 #Optuna/search-space sampling for training configuration
 
 
+from anomaly_detection.training.optimizers.registry import OPTIMIZER_REGISTRY
+
+
+
+#--------Callbacks-------------#
 def sample_callbacks(trial, cfg):
 
     callbacks = []
@@ -36,3 +41,20 @@ def sample_callbacks(trial, cfg):
             })
 
     return callbacks
+
+
+
+#-------Optimizer------------#
+def sample_optimizer(trial, cfg):
+
+    optimizer_name = trial.suggest_categorical(
+        "optimizer.name",
+        cfg.names,
+    )
+
+    return OPTIMIZER_REGISTRY[
+        optimizer_name
+    ].sample(
+        trial,
+        cfg[optimizer_name],
+    )
