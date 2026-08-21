@@ -14,11 +14,12 @@ import matplotlib.pyplot as plt
 from typing import Optional
 
 
-from anomaly_detection.infra.utils import flatten_dict
+from anomaly_detection.infra.logging.utils import flatten_dict
 
 
 
-from .candidate_models import CandidateRegistry, CandidateManager
+from anomaly_detection.infra.selection.candidate_registry import CandidateRegistry
+from anomaly_detection.infra.selection.candidate_manager import CandidateManager
 
 
 

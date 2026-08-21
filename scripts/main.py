@@ -42,7 +42,7 @@ def main(cfg):
     # =========================================================
 
 
-    from anomaly_detection.infra.mlflow_logger import  MLFlowLogger
+    from anomaly_detection.infra.logging.mlflow_logger import  MLFlowLogger
 
 
     

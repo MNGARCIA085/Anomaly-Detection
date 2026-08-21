@@ -1,4 +1,5 @@
-from anomaly_detection.infra.candidate_models import CandidateRegistry, ModelSelector
+from anomaly_detection.infra.selection.candidate_registry import CandidateRegistry
+from anomaly_detection.infra.selection.model_selector import ModelSelector
 from pathlib import Path
 
 
