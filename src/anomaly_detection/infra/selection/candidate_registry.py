@@ -149,7 +149,7 @@ class CandidateRegistry:
 
 
 
-    #---------------here just for now----------------#
+    #---------------here just for now (LATER MOVE, is presentation not persisence)----------#
     def print_candidates(self, experiment_id, include_evicted=False):
 
         if include_evicted:

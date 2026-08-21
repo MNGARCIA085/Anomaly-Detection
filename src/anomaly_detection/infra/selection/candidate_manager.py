@@ -7,13 +7,16 @@ class CandidateManager:
     def __init__(
         self,
         registry,
-        mlflow_dir,
+        #mlflow_dir,
+        logger,
         candidate_pool_size=5,
         min_pr_auc=0.70,
         max_candidates_per_model=2,
     ):
         self.registry = registry
-        self.mlflow_dir = Path(mlflow_dir)
+        
+        self.logger = logger
+        #self.mlflow_dir = Path(mlflow_dir)
 
         self.candidate_pool_size = candidate_pool_size
         self.min_pr_auc = min_pr_auc
@@ -115,6 +118,20 @@ class CandidateManager:
 
     def _evict_candidate(self, candidate):
 
+        self.logger.delete_artifact(
+            run_id=candidate["run_id"],
+            artifact_path=candidate["artifact_path"],
+        )
+
+        self.registry.evict(
+            candidate["run_id"]
+        )
+
+
+
+    """
+    def _evict_candidate(self, candidate):
+
         run_id = candidate["run_id"]
         experiment_id = candidate["experiment_id"]
         artifact_path = candidate["artifact_path"]
@@ -144,6 +161,7 @@ class CandidateManager:
         # Keep the candidate history.
         # Only change its state.
         self.registry.evict(run_id)
+    """
 
 
 

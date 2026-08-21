@@ -22,6 +22,16 @@ from anomaly_detection.infra.selection.candidate_registry import CandidateRegist
 from anomaly_detection.infra.selection.candidate_manager import CandidateManager
 
 
+import shutil
+
+
+"""
+rm -rf mlruns/
+rm -rf mlartifacts/      
+rm -f mlflow.db 
+"""
+
+
 
 
 class MLFlowLogger(ExperimentLogger):
@@ -33,7 +43,7 @@ class MLFlowLogger(ExperimentLogger):
         artifact_dir="mlruns"
     ):
 
-        self.root_dir = Path(__file__).resolve().parents[3]
+        self.root_dir = Path(__file__).resolve().parents[4]
 
         self.tracking_db = (
             self.root_dir / tracking_db
@@ -55,7 +65,8 @@ class MLFlowLogger(ExperimentLogger):
 
         self.candidate_manager = CandidateManager(
             registry=self.candidate_registry,
-            mlflow_dir=self.artifact_dir,
+            #mlflow_dir=self.artifact_dir,
+            logger = self,
             candidate_pool_size=5,
             min_pr_auc=0.70,
             max_candidates_per_model=2,
@@ -277,6 +288,36 @@ class MLFlowLogger(ExperimentLogger):
         )
 
 
+    
+    def delete_artifact(self, run_id, artifact_path):
+        # MLflow local artifact structure:
+        #
+        # mlruns/
+        #   <experiment_id>/
+        #       <run_id>/
+        #           artifacts/
+        #
+
+        client = mlflow.tracking.MlflowClient()
+
+        run = client.get_run(run_id)
+        experiment_id = run.info.experiment_id
+
+        target = (
+            self.artifact_dir
+            / str(experiment_id)
+            / run_id
+            / "artifacts"
+            / artifact_path
+        )
+
+        if target.exists():
+            if target.is_dir():
+                shutil.rmtree(target)
+            else:
+                target.unlink()
+    
+
     # log run
     def log_run(
         self,
@@ -356,18 +397,6 @@ class MLFlowLogger(ExperimentLogger):
             )
 
 
-        # model artifact
-        """
-        if wrapper is not None:
-            path = self.artifact_path("model")
-
-            wrapper.save(path)
-
-            self.log_artifact(
-                path,
-                artifact_path="model",
-            )
-        """
 
         # model artifact
         if wrapper is not None:
@@ -435,6 +464,22 @@ should_retain()?
        └── YES → delete weakest artifact
 """
 
+
+
+"""
+Ownership
+MLFlowLogger
+    │
+    ├── CandidateRegistry
+    │
+    └── CandidateManager
+             │
+             ├── registry
+             └── logger ────┐
+                            │
+                       MLFlowLogger
+
+"""
 
 
 
