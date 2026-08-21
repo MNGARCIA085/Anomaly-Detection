@@ -1,41 +1,11 @@
 import time
-
 import numpy as np
 
-
-class InferenceBenchmark:
-
-    def measure(
-        self,
-        runner,
-        X,
-        repetitions=20,
-        warmup=5,
-    ):
-        # Warm-up
-        for _ in range(warmup):
-            runner.predict(X)
-
-        start = time.perf_counter()
-
-        for _ in range(repetitions):
-            runner.predict(X)
-
-        elapsed = time.perf_counter() - start
-
-        return {
-            "total_seconds": elapsed,
-            "avg_ms": (
-                elapsed / repetitions * 1000
-            ),
-        }
+from .loader import load_from_mlflow
 
 
 
-from .inference import load_inference_runner
-
-
-
+#--------Benchmark candidates-------------#
 def benchmark_candidates(
     registry,
     experiment_id,
@@ -65,7 +35,7 @@ def benchmark_candidates(
 
         run_id = candidate.run_id
 
-        runner = load_inference_runner(
+        runner = load_from_mlflow(
             run_id
         )
 
@@ -90,3 +60,54 @@ def benchmark_candidates(
             f"{candidate.val_pr_auc:.4f}    "
             f"{inference_ms:.3f} ms"
         )
+
+
+
+
+#-----------Benchmark--------------#
+class InferenceBenchmark:
+
+    def measure(
+        self,
+        runner,
+        X,
+        repetitions=20,
+        warmup=5,
+    ):
+        """ Measures inference time"""
+
+        # Warm-up
+        for _ in range(warmup):
+            runner.predict(X)
+
+        start = time.perf_counter()
+
+        for _ in range(repetitions):
+            runner.predict(X)
+
+        elapsed = time.perf_counter() - start
+
+        return {
+            "total_seconds": elapsed,
+            "avg_ms": (
+                elapsed / repetitions * 1000
+            ),
+        }
+
+
+
+
+
+
+
+"""
+For the real benchmark, replace the generated X_benchmark with a fixed subset of your actual 
+raw validation data:
+
+X_benchmark = X_val[:100]
+
+That is preferable to random data because every candidate sees the same realistic input distribution.
+
+And raw_input_dim should come from the raw dataset, not from any candidate's preprocessor.
+"""
+
