@@ -9,9 +9,9 @@ from .loader import load_from_mlflow
 def benchmark_candidates(
     registry,
     experiment_id,
-    raw_input_dim,
-    n_samples=100,
+    X_benchmark, # e.g. X_val[:100]; same fixed raw val subset
     repetitions=20,
+    
 ):
     candidates = registry.get_candidates( # reatained ones; bfore: get_retained
         experiment_id
@@ -21,11 +21,14 @@ def benchmark_candidates(
     # SAME RAW DATA FOR EVERY CANDIDATE
     # ---------------------------------------------------------
 
+    """
+    random data -> not representative
     rng = np.random.default_rng(42)
 
     X_benchmark = rng.standard_normal(
         (n_samples, raw_input_dim)
     )
+    """
 
     # ---------------------------------------------------------
     # Benchmark each candidate

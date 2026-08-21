@@ -1,13 +1,30 @@
+from anomaly_detection.data.data import DataModule
+    
 from anomaly_detection.infra.selection.candidate_registry import CandidateRegistry
 from anomaly_detection.infra.selection.model_selector import ModelSelector
 from pathlib import Path
 
-
-
 from anomaly_detection.inference.benchmarking import benchmark_candidates
 
 
+BASE_DIR = Path(__file__).resolve().parents[1]  # __file__ -> actual file location
+TRAIN_PATH = BASE_DIR / "data" / "servers" / "X_part2.npy"
+VAL_PATH = BASE_DIR / "data" / "servers" / "X_val_part2.npy"
+Y_VAL_PATH = BASE_DIR / "data" / "servers" / "y_val_part2.npy"
+
+
+
+
 def main():
+
+
+
+    # load data
+
+    data = DataModule(TRAIN_PATH, VAL_PATH, Y_VAL_PATH)
+    X_train, X_val, y_val = data.load()
+
+
 
     root_dir = Path(__file__).resolve().parents[1]
     tracking_db = root_dir / "mlflow.db"
@@ -33,8 +50,7 @@ def main():
     benchmark_candidates(
         registry=registry,
         experiment_id=1,
-        #raw_input_dim=X_train.shape[1],
-        raw_input_dim=11
+        X_benchmark=X_val[:100], # later the 100 came from config
     )
 
 
