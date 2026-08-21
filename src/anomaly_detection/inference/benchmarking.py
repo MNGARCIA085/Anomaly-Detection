@@ -43,7 +43,7 @@ def benchmark_candidates(
     n_samples=100,
     repetitions=20,
 ):
-    candidates = registry.get_retained(
+    candidates = registry.get_candidates( # reatained ones; bfore: get_retained
         experiment_id
     )
 
@@ -63,7 +63,7 @@ def benchmark_candidates(
 
     for candidate in candidates:
 
-        run_id = candidate["run_id"]
+        run_id = candidate.run_id
 
         runner = load_inference_runner(
             run_id
@@ -86,7 +86,7 @@ def benchmark_candidates(
         )
 
         print(
-            f"{candidate['model_family']:<15}"
-            f"{candidate['val_pr_auc']:.4f}    "
+            f"{candidate.model_family:<15}"
+            f"{candidate.val_pr_auc:.4f}    "
             f"{inference_ms:.3f} ms"
         )

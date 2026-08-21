@@ -1,5 +1,5 @@
-from pathlib import Path
-import shutil
+
+
 
 
 class CandidateManager:
@@ -7,16 +7,13 @@ class CandidateManager:
     def __init__(
         self,
         registry,
-        #mlflow_dir,
         logger,
         candidate_pool_size=5,
         min_pr_auc=0.70,
         max_candidates_per_model=2,
     ):
         self.registry = registry
-        
         self.logger = logger
-        #self.mlflow_dir = Path(mlflow_dir)
 
         self.candidate_pool_size = candidate_pool_size
         self.min_pr_auc = min_pr_auc
@@ -41,7 +38,7 @@ class CandidateManager:
 
         family_candidates = [
             c for c in candidates
-            if c["model_family"] == model_family
+            if c.model_family == model_family
         ]
 
         # Model-family limit
@@ -49,10 +46,10 @@ class CandidateManager:
 
             weakest_family = min(
                 family_candidates,
-                key=lambda c: c["val_pr_auc"],
+                key=lambda c: c.val_pr_auc,
             )
 
-            if val_pr_auc <= weakest_family["val_pr_auc"]:
+            if val_pr_auc <= weakest_family.val_pr_auc:
                 return False
 
         # Pool has room
@@ -62,10 +59,10 @@ class CandidateManager:
         # Pool full: must beat weakest candidate
         weakest = min(
             candidates,
-            key=lambda c: c["val_pr_auc"],
+            key=lambda c: c.val_pr_auc,
         )
 
-        return val_pr_auc > weakest["val_pr_auc"]
+        return val_pr_auc > weakest.val_pr_auc
 
     # ---------------------------------------------------------
     # Registration
@@ -103,7 +100,7 @@ class CandidateManager:
 
             weakest = min(
                 candidates,
-                key=lambda c: c["val_pr_auc"],
+                key=lambda c: c.val_pr_auc,
             )
 
             self._evict_candidate(weakest)
@@ -119,58 +116,10 @@ class CandidateManager:
     def _evict_candidate(self, candidate):
 
         self.logger.delete_artifact(
-            run_id=candidate["run_id"],
-            artifact_path=candidate["artifact_path"],
+            run_id=candidate.run_id,
+            artifact_path=candidate.artifact_path,
         )
 
         self.registry.evict(
-            candidate["run_id"]
+            candidate.run_id
         )
-
-
-
-    """
-    def _evict_candidate(self, candidate):
-
-        run_id = candidate["run_id"]
-        experiment_id = candidate["experiment_id"]
-        artifact_path = candidate["artifact_path"]
-
-        # MLflow local artifact structure:
-        #
-        # mlruns/
-        #   <experiment_id>/
-        #       <run_id>/
-        #           artifacts/
-        #
-        artifact_dir = (
-            self.mlflow_dir
-            / str(experiment_id)
-            / run_id
-            / "artifacts"
-        )
-
-        target = artifact_dir / artifact_path
-
-        if target.exists():
-            if target.is_dir():
-                shutil.rmtree(target)
-            else:
-                target.unlink()
-
-        # Keep the candidate history.
-        # Only change its state.
-        self.registry.evict(run_id)
-    """
-
-
-
-"""
-remove MLFlow artifact belongs to MLFlow
-
-So ideally the manager says something like:
-
-self.registry.evict(run_id)
-
-and the artifact lifecycle is handled by your MLflow infrastructure.
-"""

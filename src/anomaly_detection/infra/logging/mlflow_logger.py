@@ -59,8 +59,11 @@ class MLFlowLogger(ExperimentLogger):
 
 
         # new!!
+        #self.candidate_registry = CandidateRegistry(
+        #    self.tracking_db
+        #)
         self.candidate_registry = CandidateRegistry(
-            self.tracking_db
+            f"sqlite:///{self.tracking_db}"
         )
 
         self.candidate_manager = CandidateManager(

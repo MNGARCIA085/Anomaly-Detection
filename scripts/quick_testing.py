@@ -11,9 +11,10 @@ def main():
 
     root_dir = Path(__file__).resolve().parents[1]
     tracking_db = root_dir / "mlflow.db"
+    candidate_db_url = f"sqlite:///{tracking_db}"
 
    
-    registry = CandidateRegistry(tracking_db)
+    registry = CandidateRegistry(candidate_db_url)
 
     registry.print_candidates(
         experiment_id=1,
@@ -44,9 +45,9 @@ def main():
 
 
     print(selected)
-    print(selected["run_id"])
-    print(selected["model_family"])
-    print(selected["val_pr_auc"])
+    print(selected.run_id)
+    print(selected.model_family)
+    print(selected.val_pr_auc)
 
 
 

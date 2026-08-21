@@ -1,152 +1,131 @@
-import sqlite3
-from pathlib import Path
+from sqlalchemy import create_engine, select, update
+from sqlalchemy.orm import Session
+from .models import Base, Candidate
 
 
 class CandidateRegistry:
-    """ Note. -> only resposnable for persistence"""
 
-    def __init__(self, db_path):
-        self.db_path = Path(db_path)
-        self._create_table()
+    def __init__(self, db_url):
 
-    def _connect(self):
-        return sqlite3.connect(self.db_path)
+        self.engine = create_engine(db_url)
 
-    def _create_table(self):
-        with self._connect() as conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS candidate_pool (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    experiment_id INTEGER NOT NULL,
-                    run_id TEXT NOT NULL UNIQUE,
-                    model_family TEXT NOT NULL,
-                    val_pr_auc REAL NOT NULL,
-                    artifact_path TEXT,
-                    state TEXT NOT NULL DEFAULT 'retained',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    inference_ms REAL,
-                    explainability TEXT
-                )
-            """)
+        Base.metadata.create_all(self.engine)
 
-    def add(self, experiment_id, run_id, model_family,
-            val_pr_auc, artifact_path=None):
+    def add(
+        self,
+        experiment_id,
+        run_id,
+        model_family,
+        val_pr_auc,
+        artifact_path=None,
+    ):
 
-        with self._connect() as conn:
-            conn.execute("""
-                INSERT INTO candidate_pool (
-                    experiment_id,
-                    run_id,
-                    model_family,
-                    val_pr_auc,
-                    artifact_path
-                )
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                experiment_id,
-                run_id,
-                model_family,
-                val_pr_auc,
-                artifact_path,
-            ))
+        candidate = Candidate(
+            experiment_id=experiment_id,
+            run_id=run_id,
+            model_family=model_family,
+            val_pr_auc=val_pr_auc,
+            artifact_path=artifact_path,
+        )
 
-    def remove(self, run_id):
-        with self._connect() as conn:
-            conn.execute(
-                "DELETE FROM candidate_pool WHERE run_id = ?",
-                (run_id,),
-            )
+        with Session(self.engine) as session:
+            session.add(candidate)
+            session.commit()
 
     def get_candidates(self, experiment_id):
-        with self._connect() as conn:
-            conn.row_factory = sqlite3.Row
 
-            return conn.execute("""
-                SELECT *
-                FROM candidate_pool
-                WHERE experiment_id = ?
-                  AND state = 'retained'
-                ORDER BY val_pr_auc DESC
-            """, (experiment_id,)).fetchall()
+        stmt = (
+            select(Candidate)
+            .where(
+                Candidate.experiment_id == experiment_id,
+                Candidate.state == "retained",
+            )
+            .order_by(Candidate.val_pr_auc.desc())
+        )
 
+        with Session(self.engine) as session:
+            return session.scalars(stmt).all()
 
-    def get_worst(self, experiment_id):
-        with self._connect() as conn:
-            conn.row_factory = sqlite3.Row
-
-            return conn.execute("""
-                SELECT *
-                FROM candidate_pool
-                WHERE experiment_id = ?
-                ORDER BY val_pr_auc ASC
-                LIMIT 1
-            """, (experiment_id,)).fetchone()
-
-    def count(self, experiment_id):
-        with self._connect() as conn:
-            return conn.execute("""
-                SELECT COUNT(*)
-                FROM candidate_pool
-                WHERE experiment_id = ?
-            """, (experiment_id,)).fetchone()[0]
-
-
-    def evict(self, run_id):
-        with self._connect() as conn:
-            conn.execute("""
-                UPDATE candidate_pool
-                SET state = 'evicted'
-                WHERE run_id = ?
-            """, (run_id,))
-
-
-    # to inspect
-    def get_retained(self, experiment_id):
-        with self._connect() as conn:
-            conn.row_factory = sqlite3.Row
-
-            return conn.execute("""
-                SELECT *
-                FROM candidate_pool
-                WHERE experiment_id = ?
-                  AND state = 'retained'
-                ORDER BY val_pr_auc DESC
-            """, (experiment_id,)).fetchall()
 
 
     def get_all(self, experiment_id):
-        with self._connect() as conn:
-            conn.row_factory = sqlite3.Row
 
-            return conn.execute("""
-                SELECT *
-                FROM candidate_pool
-                WHERE experiment_id = ?
-                ORDER BY val_pr_auc DESC
-            """, (experiment_id,)).fetchall()
+        stmt = (
+            select(Candidate)
+            .where(
+                Candidate.experiment_id == experiment_id,
+            )
+            .order_by(Candidate.val_pr_auc.desc())
+        )
+
+        with Session(self.engine) as session:
+            return session.scalars(stmt).all()
 
 
 
-    # update sel. metrics
+    def get_worst(self, experiment_id):
+
+        stmt = (
+            select(Candidate)
+            .where(
+                Candidate.experiment_id == experiment_id,
+            )
+            .order_by(Candidate.val_pr_auc.asc())
+            .limit(1)
+        )
+
+        with Session(self.engine) as session:
+            return session.scalars(stmt).first()
+
+    def count(self, experiment_id):
+
+        stmt = (
+            select(Candidate)
+            .where(
+                Candidate.experiment_id == experiment_id,
+            )
+        )
+
+        with Session(self.engine) as session:
+            return len(session.scalars(stmt).all())
+
+    def evict(self, run_id):
+
+        stmt = (
+            update(Candidate)
+            .where(Candidate.run_id == run_id)
+            .values(state="evicted")
+        )
+
+        with Session(self.engine) as session:
+            session.execute(stmt)
+            session.commit()
+
+
+
     def update_selection_metrics(
         self,
         run_id,
         inference_ms=None,
         explainability=None,
     ):
-        with self._connect() as conn:
-            conn.execute("""
-                UPDATE candidate_pool
-                SET
-                    inference_ms = ?,
-                    explainability = ?
-                WHERE run_id = ?
-            """, (
-                inference_ms,
-                explainability,
-                run_id,
-            ))
+        with Session(self.engine) as session:
 
+            candidate = session.scalar(
+                select(Candidate).where(
+                    Candidate.run_id == run_id
+                )
+            )
+
+            if candidate is None:
+                raise ValueError(
+                    f"Candidate not found: {run_id}"
+                )
+
+            candidate.inference_ms = inference_ms
+            candidate.explainability = explainability
+
+            session.commit()
 
 
     #---------------here just for now (LATER MOVE, is presentation not persisence)----------#
@@ -179,41 +158,10 @@ class CandidateRegistry:
 
             print(
                 f"{rank:<6}"
-                f"{candidate['model_family']:<15}"
-                f"{candidate['val_pr_auc']:<10.4f}"
-                f"{candidate['state']:<12}"
-                f"{candidate['run_id']}"
+                f"{candidate.model_family:<15}"
+                f"{candidate.val_pr_auc:<10.4f}"
+                f"{candidate.state:<12}"
+                f"{candidate.run_id}"
             )
 
         print()
-
-
-
-
-
-
-
-"""
-CandidateManager
-    ├── should_retain()
-    ├── register_candidate()
-    └── evict_candidate()
-            ├── remove from registry
-            └── remove MLflow artifact
-
-
-but a note -> remove MLFlow artifact belongs to MLFlow
-
-"""
-
-
-"""
-CandidateRegistry
-    → SQLite state
-
-CandidateManager
-    → selection/retention policy
-
-MLFlowLogger
-    → MLflow + artifact storage
-"""

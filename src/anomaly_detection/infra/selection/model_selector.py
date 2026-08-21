@@ -4,9 +4,10 @@ class ModelSelector:
         self.registry = registry
 
     def get_candidates(self, experiment_id):
-        return self.registry.get_retained(
+        return self.registry.get_candidates( # bfore get_retained; now get_cnds=get_ret
             experiment_id
         )
+
 
     def select(
         self,
@@ -31,15 +32,15 @@ class ModelSelector:
         if max_inference_ms is not None:
             candidates = [
                 c for c in candidates
-                if c["inference_ms"] is not None
-                and c["inference_ms"] <= max_inference_ms
+                if c.inference_ms is not None
+                and c.inference_ms <= max_inference_ms
             ]
 
         if min_explainability is not None:
             candidates = [
                 c for c in candidates
-                if c["explainability"] is not None
-                and c["explainability"] >= min_explainability
+                if c.explainability is not None
+                and c.explainability >= min_explainability
             ]
 
         if not candidates:
@@ -52,7 +53,7 @@ class ModelSelector:
         # --------------------------------------------------
 
         best_pr_auc = max(
-            c["val_pr_auc"]
+            c.val_pr_auc
             for c in candidates
         )
 
@@ -62,7 +63,7 @@ class ModelSelector:
 
         candidates = [
             c for c in candidates
-            if c["val_pr_auc"]
+            if c.val_pr_auc
             >= best_pr_auc - pr_auc_tolerance
         ]
 
@@ -72,7 +73,8 @@ class ModelSelector:
 
         selected = min(
             candidates,
-            key=lambda c: c["inference_ms"]
+            key=lambda c: c.inference_ms
         )
 
-        return dict(selected)
+        return selected
+
