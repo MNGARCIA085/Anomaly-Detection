@@ -109,100 +109,64 @@ esult rather than exposing trial_configs directly. For now, I would keep it this
 """
 
 
+"""
+safety
+def objective(self, trial):
 
+    cfg = self.entry.sample(
+        trial,
+        self.tun_cfg,
+    )
 
+    try:
 
-#----------
-class Tunerv0:
-
-    def __init__(
-        self,
-        model_type,
-        evaluator,
-        tun_cfg,
-        logger,
-    ):
-
-        self.model_type = (
-            model_type
+        result = self.exp.run(
+            cfg=cfg,
+            X_train=self.X_train,
+            X_val=self.X_val,
+            y_val=self.y_val,
+            run_type="tune",
         )
 
-        self.exp = (
-            Experiment(
-                model_type,
-                evaluator,
-                logger,
-            )
+        return result["auc"]
+
+    except Exception as e:
+
+        print(
+            f"Trial {trial.number} failed"
         )
 
-        self.tun_cfg = tun_cfg
+        print(f"Error: {e}")
 
+        print("Config:")
+        print(cfg)
 
-    def run(
-        self,
-        X_train,
-        X_val,
-        y_val=None,
-        n_trials=5
-    ):
-
-        entry = (
-            MODEL_REGISTRY[
-                self.model_type
-            ]
-        )()
+        raise
 
 
 
-        direction = (
-            "maximize"
-            if y_val is not None
-            else "minimize"
-        )
+Bad hyperparameters
+        ↓
+Training becomes numerically unstable
+        ↓
+Raise meaningful exception
+        ↓
+Trial marked as failed
+        ↓
+Other Optuna trials continue
 
-        def objective(
-            trial
-        ):
-
-
-            cfg = (
-                entry.sample(
-                    trial,
-                    self.tun_cfg,
-                )
-            )
+So yes: log what happened, but don't silently swallow the exception. Let Optuna 
+know the trial failed. Later, if you want, 
+you can explicitly configure the study to continue for expected numerical errors.
 
 
-            result = (
-                self.exp.run(
-                    cfg,
-                    X_train,
-                    X_val,
-                    y_val,
-                    "tuning"
-                )
-            )
 
-            if y_val is not None:
-                return (
-                    result["auc"]
-                )
+maybe detetct it before
+if not np.isfinite(scores).all():
+    raise ValueError(
+        "Non-finite anomaly scores detected"
+    )
 
-            return (
-                result[
-                    "mean_score"
-                ]
-            )
+"""
 
-        study = (
-            optuna.create_study(
-                direction=direction
-            )
-        )
 
-        study.optimize(
-            objective,
-            n_trials=n_trials
-        )
-
-        return study

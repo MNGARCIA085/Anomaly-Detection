@@ -9,9 +9,11 @@ class InferenceRunner:
         windowing,
         entry,
         wrapper,
+        temporal_prep=None,
         thresholding=None,
     ):
         self.prep = prep
+        self.temporal_prep = temporal_prep
         self.windowing = windowing
         self.entry = entry
         self.wrapper = wrapper
@@ -22,6 +24,10 @@ class InferenceRunner:
         X_p = self.prep.transform(X)
 
         X_w = self.windowing.transform(X_p)
+
+        if self.temporal_prep is not None:
+
+            X_w = self.temporal_prep.transform(X_w)
 
         X_model = self.entry.adapt_input(X_w)
 
@@ -37,3 +43,20 @@ class InferenceRunner:
             )
 
         return self.wrapper.predict(X_model)
+
+
+
+
+"""
+Raw X
+ ↓
+prep.transform()
+ ↓
+windowing.transform()
+ ↓
+temporal_prep.transform()   # optional
+ ↓
+entry.adapt_input()
+ ↓
+wrapper.predict()
+"""

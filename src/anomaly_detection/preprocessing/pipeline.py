@@ -9,8 +9,8 @@ class PreprocessingPipeline:
 
     def fit(self, X):
 
-        #new
-        self._input_dim = X.shape[1]
+        # test remove it
+        #self._input_dim = X.shape[1] feaures for 2d bu wind. length for 3D
 
 
         for step in self.steps:
@@ -43,6 +43,7 @@ class PreprocessingPipeline:
         )
 
 
+    """
     @property
     def input_dim(self):
         if self._input_dim is None:
@@ -50,4 +51,4 @@ class PreprocessingPipeline:
                 "Pipeline must be fitted before accessing input_dim."
             )
         return self._input_dim
-
+    """

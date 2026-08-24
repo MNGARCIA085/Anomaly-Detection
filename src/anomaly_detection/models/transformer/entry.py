@@ -7,9 +7,6 @@ from anomaly_detection.training.registry import TRAINER_REGISTRY
 from anomaly_detection.models.base_entry import BaseModelEntry
 from anomaly_detection.preprocessing.components.scalers import create_scaler
 
-
-
-
 from anomaly_detection.training.callbacks.registry import create_callbacks
 from anomaly_detection.training.optimizers.registry import create_optimizer
 from anomaly_detection.tuning.sample_training import sample_callbacks, sample_optimizer
@@ -18,8 +15,10 @@ from anomaly_detection.tuning.sample_training import sample_callbacks, sample_op
 from anomaly_detection.tuning.sample_prep import sample_window_size,sample_scaler
 
 
-
 from anomaly_detection.training.losses import create_loss
+
+
+from anomaly_detection.preprocessing.components.delta_transform import DeltaTransform
 
 
 """
@@ -67,6 +66,9 @@ class TransformerEntry(BaseModelEntry):
                     trial,
                     tun_cfg.prep.scaler,
                 ),
+                "temporal": {
+                    "delta": False,
+                }
             },
 
             # ========================================================
@@ -186,6 +188,23 @@ class TransformerEntry(BaseModelEntry):
         # F = number of features
 
         return X
+
+
+
+
+
+    def build_temporal_preprocessor(self, temp_prep_cfg):
+
+        steps = []
+        print("dsfdfds\n")
+
+        # if cfg.get("prep", {}).get("temporal"):
+        if temp_prep_cfg.get("delta", False): 
+            steps.append(DeltaTransform())
+
+        return PreprocessingPipeline(steps)
+
+
 
     # ================================================================
     # Model / Trainer

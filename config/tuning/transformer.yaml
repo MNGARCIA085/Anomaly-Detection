@@ -10,6 +10,9 @@ prep:
   scaler:
     names: [standard, minmax]
 
+  temporal:
+    delta: true
+
 
 model_space:
 

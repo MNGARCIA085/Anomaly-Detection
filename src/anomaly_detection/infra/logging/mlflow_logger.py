@@ -329,6 +329,7 @@ class MLFlowLogger(ExperimentLogger):
         metrics,
         history=None,
         preprocessor=None, # pass already fit preprocessor
+        temporal_preprocessor=None, # already fit
         thresholding=None, # already fitted
         wrapper=None,
     ):
@@ -346,8 +347,6 @@ class MLFlowLogger(ExperimentLogger):
              "optimization_id": study_id,
              dataset hash.....
         """
-
-
 
 
         # params
@@ -384,6 +383,21 @@ class MLFlowLogger(ExperimentLogger):
                 path,
                 artifact_path="preprocessing",
             )
+
+
+        # temporal preprocessor
+        if temporal_preprocessor is not None:
+            path = self.artifact_path("temporal_preprocessor.pkl")
+
+            temporal_preprocessor.save(path)
+
+            self.log_artifact(
+                path,
+                artifact_path="temporal_preprocessing",
+            )
+
+
+
 
         # thresholding artifact
         if thresholding is not None:

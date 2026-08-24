@@ -33,6 +33,26 @@ def _build_runner(
 
     windowing = Windowing(window_size)
 
+
+    # temporal prep
+    temporal_prep = None
+
+    temporal_prep_path = (
+        model_dir
+        / "temporal_preprocessing"
+        / "temporal_preprocessor.pkl"
+    )
+
+    if temporal_prep_path.exists():
+
+        temporal_prep = joblib.load(
+            temporal_prep_path,
+        )
+
+
+
+    print("t_prep", temporal_prep)
+
     entry = MODEL_REGISTRY[model_type]()
 
     wrapper = entry.load(
@@ -60,6 +80,7 @@ def _build_runner(
         windowing=windowing,
         entry=entry,
         wrapper=wrapper,
+        temporal_prep=temporal_prep,
         thresholding=thresholding,
     )
 
