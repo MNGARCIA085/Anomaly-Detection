@@ -11,27 +11,10 @@ from anomaly_detection.training.callbacks.registry import create_callbacks
 from anomaly_detection.training.optimizers.registry import create_optimizer
 from anomaly_detection.tuning.sample_training import sample_callbacks, sample_optimizer
 
-
 from anomaly_detection.tuning.sample_prep import sample_window_size,sample_scaler
-
-
 from anomaly_detection.training.losses import create_loss
-
-
 from anomaly_detection.preprocessing.temporal.delta_transform import DeltaTransform
 
-
-"""
-There is one thing to adjust compared with your VAE entry: 
-self.seq_len needs to come from your actual pipeline/config. 
-I would not invent it inside the entry.
-model_cfg = TransformerAEConfig(
-    input_dim=input_dim,
-    seq_len=seq_len,
-    ...
-)
-where seq_len is the window length established by your data/windowing configuration.
-"""
 
 
 

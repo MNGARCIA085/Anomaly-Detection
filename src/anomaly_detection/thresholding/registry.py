@@ -5,6 +5,17 @@ THRESHOLD_REGISTRY = {
 }
 
 
+def create_threshold_strategy(name, **params):
+    try:
+        strategy_cls = THRESHOLD_REGISTRY[name]
+    except KeyError:
+        raise ValueError(f"Unknown threshold strategy: {name}")
+
+    return strategy_cls(**params)
+
+
+
+"""
 def create_threshold_strategy(
     name,
     **params,
@@ -12,3 +23,4 @@ def create_threshold_strategy(
     strategy_cls = THRESHOLD_REGISTRY[name]
 
     return strategy_cls(**params)
+"""
