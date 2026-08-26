@@ -18,7 +18,7 @@ from anomaly_detection.tuning.sample_prep import sample_window_size,sample_scale
 from anomaly_detection.training.losses import create_loss
 
 
-from anomaly_detection.preprocessing.components.delta_transform import DeltaTransform
+from anomaly_detection.preprocessing.temporal.delta_transform import DeltaTransform
 
 
 """
