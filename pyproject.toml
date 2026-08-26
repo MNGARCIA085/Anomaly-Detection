@@ -14,6 +14,7 @@ dependencies = [
   "numpy",
   "scikit-learn",
   "optuna",
+  "pytest",
 ]
 
 [tool.setuptools]

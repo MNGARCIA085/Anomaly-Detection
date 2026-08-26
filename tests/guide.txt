@@ -1,0 +1,44 @@
+tests/
+├── conftest.py
+│
+├── unit/
+│   │
+│   ├── data/
+│   │   ├── test_data.py
+│   │   └── test_windowing.py
+│   │
+│   ├── preprocessing/
+│   │   ├── test_pipeline.py
+│   │   ├── test_components.py
+│   │   └── test_delta_transform.py
+│   │
+│   ├── evaluation/
+│   │   ├── test_evaluator.py
+│   │   └── test_inference_benchmark.py
+│   │
+│   ├── models/
+│   │   ├── test_registry.py
+│   │   ├── test_isoforest.py
+│   │   └── test_autoencoder.py
+│   │
+│   ├── thresholding/
+│   │   ├── test_strategies.py
+│   │   └── test_registry.py
+│   │
+│   ├── training/
+│   │   ├── test_dataset.py
+│   │   └── test_trainer.py
+│   │
+│   ├── tuning/
+│   │   └── test_sampling.py
+│   │
+│   └── selection/
+│       ├── test_candidate_registry.py
+│       ├── test_candidate_manager.py
+│       └── test_model_selector.py
+│
+└── integration/
+    ├── test_preprocessing_flow.py
+    ├── test_model_pipeline.py
+    ├── test_training_evaluation_flow.py
+    └── test_inference_flow.py

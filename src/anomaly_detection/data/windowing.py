@@ -50,8 +50,18 @@ class Windowing:
         X = np.asarray(X)
         y = np.asarray(y)
 
+        if X.ndim != 2:
+            raise ValueError(
+                f"Expected X with shape (n_samples, n_features), got {X.shape}"
+            )
+
         if len(X) != len(y):
             raise ValueError("X and y must have the same number of samples")
+
+        if len(X) < self.seq_len:
+            raise ValueError(
+                f"Not enough samples ({len(X)}) for seq_len={self.seq_len}"
+            )
 
         X_windows = []
         y_windows = []
