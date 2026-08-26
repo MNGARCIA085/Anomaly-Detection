@@ -34,16 +34,3 @@ class AnomalyWrapper(ABC):
     def history(self):
         pass
 
-
-
-"""
-class IsoWrapper:
-
-    def __init__(...):
-        ...
-        self._history = TrainingHistory()
-
-    @property
-    def history(self):
-        return self._history
-"""
