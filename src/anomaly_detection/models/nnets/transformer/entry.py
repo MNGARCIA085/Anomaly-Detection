@@ -18,12 +18,29 @@ from anomaly_detection.preprocessing.temporal.delta_transform import DeltaTransf
 
 
 
+# extremely important -> https://gemini.google.com/app/ee33dee502b26d85?hl=es
+
 
 
 @register("transformer")
 class TransformerEntry(BaseModelEntry):
 
     def sample(self, trial, tun_cfg):
+
+        # 1. Sample d_model first
+        d_model = trial.suggest_categorical(
+            "d_model",
+            [32, 64, 128],
+        )
+
+        # 2. Filter nhead choices so (d_model % nhead == 0) is guaranteed
+        possible_heads = [2, 4, 8]
+        valid_heads = [h for h in possible_heads if d_model % h == 0]
+
+        nhead = trial.suggest_categorical(
+            "nhead",
+            valid_heads,
+        )
 
         return {
 
@@ -60,15 +77,9 @@ class TransformerEntry(BaseModelEntry):
 
             "models": {
 
-                "d_model": trial.suggest_categorical(
-                    "d_model",
-                    [32, 64, 128],
-                ),
-
-                "nhead": trial.suggest_categorical(
-                    "nhead",
-                    [2, 4, 8],
-                ),
+                "d_model": d_model,
+                
+                "nhead": nhead,
 
                 "num_encoder_layers": trial.suggest_int(
                     "num_encoder_layers",
@@ -179,7 +190,6 @@ class TransformerEntry(BaseModelEntry):
     def build_temporal_preprocessor(self, temp_prep_cfg):
 
         steps = []
-        print("dsfdfds\n")
 
         # if cfg.get("prep", {}).get("temporal"):
         if temp_prep_cfg.get("delta", False): 

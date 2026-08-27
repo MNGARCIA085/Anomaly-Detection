@@ -51,13 +51,15 @@ def _build_runner(
 
 
 
-    print("t_prep", temporal_prep)
-
     entry = MODEL_REGISTRY[model_type]()
+
+
 
     wrapper = entry.load(
         model_dir / "model"
     )
+
+
 
     # thresholding
     thresholding = None
@@ -73,6 +75,7 @@ def _build_runner(
         thresholding = Thresholding.load(
             thresholding_path
         )
+
 
 
     return InferenceRunner(
