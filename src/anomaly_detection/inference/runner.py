@@ -25,7 +25,7 @@ class InferenceRunner:
 
         X_w = self.windowing.transform(X_p)
 
-        if self.temporal_prep is not None:
+        if self.temporal_prep is not None: # window-level!!!
 
             X_w = self.temporal_prep.transform(X_w)
 

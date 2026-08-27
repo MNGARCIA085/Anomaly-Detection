@@ -29,7 +29,5 @@ class NullLogger:
         pass
 
 
-
-    #...................
-    def log_run(self):
+    def log_run(self, *args, **kwargs):
         pass
