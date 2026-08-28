@@ -6,30 +6,26 @@ from pathlib import Path
 import numpy as np
 from omegaconf import DictConfig
 
-
 from anomaly_detection.experiments.experiments import Experiment
-
 from anomaly_detection.tuning.tuner import Tuner
-
 from anomaly_detection.evaluation.evaluator import Evaluator
 
-
-
-
-#------PATHS (later maybe from hydra?????)---------#
-BASE_DIR = Path(__file__).resolve().parents[1]  # __file__ -> actual file location
-TRAIN_PATH = BASE_DIR / "data" / "servers" / "X_part2.npy"
-VAL_PATH = BASE_DIR / "data" / "servers" / "X_val_part2.npy"
-Y_VAL_PATH = BASE_DIR / "data" / "servers" / "y_val_part2.npy"
+from hydra.utils import to_absolute_path
 
 
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg):
 
+
+
     # --- 1. DATA ---
     # separate from exp. bc of loading in tuning    
-    data = DataModule(TRAIN_PATH, VAL_PATH, Y_VAL_PATH)
+    data = DataModule(
+        to_absolute_path(cfg.data.train_path),
+        to_absolute_path(cfg.data.val_path),
+        to_absolute_path(cfg.data.y_val_path),
+    )
     X_train, X_val, y_val = data.load()
     
 
@@ -49,6 +45,7 @@ def main(cfg):
     def train_once(
         model_type,
         cfg,
+        all_cfg,
         X_train,
         X_val,
         y_val,
@@ -58,7 +55,10 @@ def main(cfg):
         exp = Experiment(
             model_type=model_type,
             evaluator=Evaluator(),
-            logger=MLFlowLogger(),
+            logger=MLFlowLogger(
+                tracking_db=to_absolute_path(all_cfg.paths.mlflow_db),
+                artifact_dir=to_absolute_path(all_cfg.paths.mlflow_artifacts),
+            ),
         )
 
 
@@ -76,6 +76,7 @@ def main(cfg):
         train_once(
             model_type, # ae, iso
             cfg.model_type,
+            cfg,
             X_train,
             X_val,
             y_val
@@ -128,6 +129,7 @@ def main(cfg):
     final_model = train_once(
         model_type,
         best_cfg,
+        cfg,
         X_train,
         X_val,
         y_val

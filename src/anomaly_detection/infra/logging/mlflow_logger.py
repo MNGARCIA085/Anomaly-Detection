@@ -43,6 +43,7 @@ class MLFlowLogger(ExperimentLogger):
         artifact_dir="mlruns"
     ):
 
+        """
         self.root_dir = Path(__file__).resolve().parents[4]
 
         self.tracking_db = (
@@ -52,6 +53,13 @@ class MLFlowLogger(ExperimentLogger):
         self.artifact_dir = (
             self.root_dir / artifact_dir
         )
+        """
+
+        #self.tracking_db = tracking_db
+        #self.artifact_dir = artifact_dir
+
+        self.tracking_db = Path(tracking_db)
+        self.artifact_dir = Path(artifact_dir)
 
         self.exp_name = exp_name
 
@@ -166,7 +174,7 @@ class MLFlowLogger(ExperimentLogger):
         run_id = mlflow.active_run().info.run_id
 
         path = (
-            self.root_dir
+            self.artifact_dir
             / "artifacts"
             / run_id
         )
@@ -187,7 +195,7 @@ class MLFlowLogger(ExperimentLogger):
     ):
 
         model_path = (
-            self.root_dir / path
+            self.artifact_dir / path
         )
 
         joblib.dump(

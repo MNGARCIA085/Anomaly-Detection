@@ -12,6 +12,13 @@ defaults:
 random_state: 42
 experiment_name: anomaly_detection
 
+
+
+paths:
+  mlflow_db: mlflow.db
+  mlflow_artifacts: mlruns
+
+
 tracking:
   enabled: true
   #uri: "sqlite:///mlflow.db"

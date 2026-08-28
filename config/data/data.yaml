@@ -1,7 +1,7 @@
-image_dir : "images-small"
-train_path: "train-small.csv"
-valid_path : "valid-small.csv"
-test_path : "test.csv"
+train_path: data/servers/X_part2.npy
+val_path: data/servers/X_val_part2.npy
+y_val_path: data/servers/y_val_part2.npy
+
 
 
 windowing:
