@@ -9,9 +9,15 @@ import numpy as np
 import numbers
 
 import pandas as pd
+
+
+import matplotlib
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 
-from typing import Optional
+
+#from typing import Optional
 
 
 from anomaly_detection.infra.logging.utils import flatten_dict

@@ -10,6 +10,7 @@ y_val.shape   == (M,)
 
 
 class Windowing:
+    
     def __init__(self, seq_len: int, stride: int = 1):
         if seq_len < 1:
             raise ValueError("seq_len must be >= 1")
@@ -18,6 +19,7 @@ class Windowing:
 
         self.seq_len = seq_len
         self.stride = stride
+
 
     def transform(self, X):
         X = np.asarray(X)
