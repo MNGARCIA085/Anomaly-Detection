@@ -1,0 +1,88 @@
+
+
+                    Hydra
+                      │
+             ┌────────┴────────┐
+             │                 │
+          train.py           tune.py
+             │                 │
+       Hydra multirun       Optuna
+             │                 │
+       n_jobs > 1          n_jobs = 1
+       when appropriate
+
+
+
+
+python scripts/train.py -m \
+    model=ae,transformer_ae \
+    hydra.launcher.n_jobs=2
+
+
+tunign
+python scripts/tune.py -m \
+    model=ae,transformer_ae
+
+
+.... optuna can create // runs
+
+
+
+
+python scripts/train.py -m model=ae,transformer_ae -> hydra multirun
+
+
+
+---
+Hydra config
+    ↓
+Optuna study
+    ↓
+trial → preprocessing → model → training → validation
+    ↓
+best parameters
+
+
+
+--
+Hydra config
+    ↓
+preprocessing
+    ↓
+model
+    ↓
+training
+    ↓
+evaluation
+    ↓
+MLflow / artifacts
+
+
+
+---
+Optuna parallelism → parallel hyperparameter trials.
+Hydra multirun → parallel independent experiments/configurations.
+
+If your main goal is tuning AE hyperparameters, Optuna is enough.
+
+
+
+--
+Hydra multirun → parallelizes independent experiments/configurations.
+Optuna n_jobs → parallelizes hyperparameter trials within a tuning experiment.
+
+You can even combine them:
+
+Hydra multirun
+   │
+   ├── AE tuning
+   │      └── Optuna: 4 parallel trials
+   │
+   └── TransformerAE tuning
+          └── Optuna: 4 parallel trials
+
+But whether you should combine both levels of parallelism is another question, especially since you're CPU-only
+
+
+
+add some conceptuals from: https://chatgpt.com/c/6a95cb7e-597c-83e9-842c-49e4c6b8a8a8
