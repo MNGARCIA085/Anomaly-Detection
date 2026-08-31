@@ -86,3 +86,11 @@ But whether you should combine both levels of parallelism is another question, e
 
 
 add some conceptuals from: https://chatgpt.com/c/6a95cb7e-597c-83e9-842c-49e4c6b8a8a8
+
+
+--
+# Sequential
+python scripts/train.py -m model=ae,transformer_ae
+
+# Parallel
+python scripts/train.py -m model=ae,transformer_ae hydra.launcher.n_jobs=2

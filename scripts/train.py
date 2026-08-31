@@ -11,7 +11,6 @@ from anomaly_detection.infra.logging.mlflow_logger import  MLFlowLogger
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg):
 
-
     # ---------Data -----------#
     # separate from exp. bc of loading in tuning    
     data = DataModule(
@@ -61,3 +60,12 @@ if __name__ == "__main__":
 
 
 # hydra multirun: python -m scripts.train -m model_type=ae,vae
+
+
+"""
+# Sequential
+python scripts/train.py -m model=ae,transformer_ae
+
+# Parallel
+python scripts/train.py -m model=ae,transformer_ae hydra.launcher.n_jobs=2
+"""

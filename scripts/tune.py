@@ -87,10 +87,17 @@ def main(cfg):
 
 
 
-
-
 if __name__ == "__main__":
     main()
 
+
+
+"""
+# Sequential
+python scripts/tune.py -m model_type=ae,transformer
+
+# Parallel
+python scripts/tune.py -m model_type=ae,transformer hydra.launcher.n_jobs=2
+"""
 
 

@@ -7,7 +7,7 @@ defaults:
   - training: ae
   - tuning: ae
   - thresholding: ae
-  #- override hydra/launcher: joblib
+  - override hydra/launcher: joblib
 
 random_state: 42
 experiment_name: anomaly_detection
@@ -27,6 +27,6 @@ tracking:
 
 
 
-#hydra:
-#  launcher:
-#    n_jobs: 2
+hydra:
+  launcher:
+    n_jobs: 1 # max. number of concurrent jobs

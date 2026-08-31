@@ -74,7 +74,8 @@ class Tuner:
 
         study.optimize(
             objective,
-            n_trials=n_trials
+            n_trials=n_trials,
+            n_jobs=4,
         )
 
         return study

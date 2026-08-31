@@ -19,6 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 train = [
     "hydra-core",
+    "hydra-joblib-launcher",
     "mlflow",
     "pandas",
     "optuna",
