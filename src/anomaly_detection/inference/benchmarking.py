@@ -1,7 +1,7 @@
 import time
 import numpy as np
 
-from .loader import load_from_mlflow
+from .mlflow_loader import load_from_mlflow
 
 
 

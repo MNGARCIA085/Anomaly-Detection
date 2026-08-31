@@ -10,10 +10,9 @@ from anomaly_detection.data.windowing import Windowing
 from anomaly_detection.thresholding.thresholding import (
         Thresholding
     )
-from mlflow.tracking import MlflowClient
+
 
 from .runner import InferenceRunner
-
 
 
 
@@ -87,27 +86,6 @@ def _build_runner(
         thresholding=thresholding,
     )
 
-
-
-
-
-def load_from_mlflow(run_id):
-
-    client = MlflowClient()
-
-    run = client.get_run(run_id)
-
-    local_dir = Path(
-        client.download_artifacts(run_id, "")
-    )
-
-    return _build_runner(
-        model_dir=local_dir,
-        model_type=run.data.tags["model_type"],
-        window_size=int(
-            run.data.params["data.windowing.size"]
-        ),
-    )
 
 
 
