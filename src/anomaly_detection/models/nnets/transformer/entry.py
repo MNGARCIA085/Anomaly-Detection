@@ -203,13 +203,37 @@ class TransformerEntry(BaseModelEntry):
     # Model / Trainer
     # ================================================================
 
+
+
     def build(
         self,
         cfg_model,
         cfg_training,
         input_shape,
     ):
+        """ Builds the wrapper: model+trainer"""
+        
+        model = self._build_model(
+            cfg_model,
+            input_shape,
+        )
 
+        trainer = self._build_trainer(
+            cfg_training,
+            model,
+        )
+
+        return TransformerAEWrapper(
+            model,
+            trainer,
+        )
+
+
+    def _build_model(
+        self,
+        cfg_model,
+        input_shape,
+    ):
         input_dim = input_shape[-1]
         seq_len = input_shape[1]
 
@@ -223,20 +247,26 @@ class TransformerEntry(BaseModelEntry):
             dropout=cfg_model["dropout"],
         )
 
-        model = TransformerAE(model_cfg)
+        return TransformerAE(model_cfg)
 
-        optimizer = create_optimizer(
+
+    def _build_trainer(
+        self,
+        cfg_training,
+        model,
+    ):
+        optimizer = self._build_optimizer(
             cfg_training["optimizer"],
-            model.parameters()
+            model,
         )
 
-        # loss
-        loss = create_loss(
+        loss = self._build_loss(
             cfg_training["loss"],
         )
 
-        # callbacks
-        callbacks = create_callbacks(cfg_training["callbacks"])
+        callbacks = create_callbacks(
+            cfg_training["callbacks"]
+        )
 
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
@@ -250,17 +280,46 @@ class TransformerEntry(BaseModelEntry):
             cfg_training["type"]
         ]
 
-        trainer = trainer_cls(trainer_cfg)
+        return trainer_cls(trainer_cfg)
 
-        return TransformerAEWrapper(
-            model,
-            trainer
+
+    def _build_optimizer(
+        self,
+        cfg_optimizer,
+        model,
+    ):
+        return create_optimizer(
+            cfg_optimizer,
+            model.parameters(),
         )
+
+
+    def _build_loss(
+        self,
+        cfg_loss,
+    ):
+        return create_loss(cfg_loss)
+
+
 
     # ================================================================
     # Load
     # ================================================================
 
     def load(self, path):
-
         return TransformerAEWrapper.load(path)
+
+
+
+
+"""
+ModelEntry
+│
+├── build()
+│   ├── _build_model()
+│   └── _build_trainer()
+│       ├── _build_optimizer()
+│       └── _build_loss()
+│
+└── build_training_context()   # only when needed
+"""

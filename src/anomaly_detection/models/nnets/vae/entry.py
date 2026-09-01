@@ -137,15 +137,48 @@ class VAEEntry(BaseModelEntry):
         # should be (N, T*F)
         return X.reshape(X.shape[0], -1)
 
+
+
     def build(
         self,
         cfg_model,
         cfg_training,
-        input_shape
+        input_shape,
+        #training_context,
     ):
+        model = self._build_model(
+            cfg_model,
+            input_shape,
+        )
 
+        trainer = self._build_trainer(
+            cfg_training,
+            model,
+            #training_context,
+        )
+
+        return VAEWrapper(
+            model,
+            trainer,
+        )
+
+
+    """
+    def build_training_context(
+        self,
+        cfg_training,
+        y_train,
+    ):
+        return TrainingContext()
+    """
+
+
+    def _build_model(
+        self,
+        cfg_model,
+        input_shape,
+    ):
         input_dim = input_shape[1]
-
 
         model_cfg = VAEConfig(
             input_dim=input_dim,
@@ -155,15 +188,23 @@ class VAEEntry(BaseModelEntry):
             beta=cfg_model["beta"],
         )
 
-        model = VAE(model_cfg)
+        return VAE(model_cfg)
 
-        optimizer = create_optimizer(
+
+    def _build_trainer(
+        self,
+        cfg_training,
+        model,
+        #training_context,
+    ):
+        optimizer = self._build_optimizer(
             cfg_training["optimizer"],
-            model.parameters()
+            model,
         )
 
-
-        callbacks = create_callbacks(cfg_training["callbacks"])
+        callbacks = create_callbacks(
+            cfg_training["callbacks"]
+        )
 
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
@@ -173,15 +214,25 @@ class VAEEntry(BaseModelEntry):
             callbacks=callbacks,
         )
 
-        trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]
-        trainer = trainer_cls(trainer_cfg)
+        trainer_cls = TRAINER_REGISTRY[
+            cfg_training["type"]
+        ]
+
+        return trainer_cls(trainer_cfg)
 
 
-        return VAEWrapper(
-            model,
-            trainer
+    def _build_optimizer(
+        self,
+        cfg_optimizer,
+        model,
+    ):
+        return create_optimizer(
+            cfg_optimizer,
+            model.parameters(),
         )
 
-    def load(self, path):
 
+
+
+    def load(self, path):
         return VAEWrapper.load(path)

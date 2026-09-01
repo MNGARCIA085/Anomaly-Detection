@@ -185,53 +185,89 @@ class AEEntry(BaseModelEntry):
         cfg_training,
         input_shape,
     ):
+        model = self._build_model(
+            cfg_model=cfg_model,
+            input_shape=input_shape,
+        )
 
+        trainer = self._build_trainer(
+            cfg_training=cfg_training,
+            model=model,
+        )
+
+        return AEWrapper(
+            model,
+            trainer,
+        )
+
+
+
+    def _build_model(
+        self,
+        cfg_model,
+        input_shape,
+    ):
         input_dim = input_shape[1]
 
-        # later maybe move it out
         model_cfg = AEConfig(
             input_dim=input_dim,
             encoder_dims=cfg_model["encoder_dims"],
             decoder_dims=cfg_model["decoder_dims"],
         )
 
-        model = AE(model_cfg)
+        return AE(model_cfg)
 
 
-        # optimizer
-        optimizer = create_optimizer(
-            cfg_training["optimizer"],
-            model.parameters()
+    def _build_trainer(
+        self,
+        cfg_training,
+        model,
+    ):
+        optimizer = self._build_optimizer(
+            cfg_optimizer=cfg_training["optimizer"],
+            model=model,
         )
 
-        # loss
-        loss = create_loss(
-            cfg_training["loss"],
+        loss = self._build_loss(
+            cfg_loss=cfg_training["loss"],
         )
 
+        callbacks = create_callbacks(
+            cfg_training["callbacks"]
+        )
 
-        # create callbacks
-        callbacks = create_callbacks(cfg_training["callbacks"])
-        
-
-        # trainer
         trainer_cfg = TrainingConfig(
             epochs=cfg_training["epochs"],
             batch_size=cfg_training["batch_size"],
             optimizer=optimizer,
             loss=loss,
-            callbacks=callbacks
+            callbacks=callbacks,
+        )
+
+        trainer_cls = TRAINER_REGISTRY[
+            cfg_training["type"]
+        ]
+
+        return trainer_cls(trainer_cfg)
+
+
+    def _build_optimizer(
+        self,
+        cfg_optimizer,
+        model,
+    ):
+        return create_optimizer(
+            cfg_optimizer,
+            model.parameters(),
         )
 
 
-        
-        trainer_cls = TRAINER_REGISTRY[cfg_training["type"]]
-        trainer = trainer_cls(trainer_cfg)
-
-
-        return AEWrapper(
-            model,
-            trainer
+    def _build_loss(
+        self,
+        cfg_loss,
+    ):
+        return create_loss(
+            cfg_loss,
         )
 
 
@@ -244,6 +280,15 @@ class AEEntry(BaseModelEntry):
 
 
 
+
+"""
+build()
+ ├── _build_model()
+ └── _build_trainer()
+       ├── _build_optimizer()
+       ├── _build_loss()
+       └── callbacks
+"""
 
 
 
