@@ -22,6 +22,20 @@ class PrintLossCallback(Callback):
         print(f"Epoch {state.epoch} - Train Loss: {state.train_loss:.4f} - Val Loss: {state.val_loss:.4f}")
 
 
+"""
+class PrintLossCallback(Callback):
+
+    def on_epoch_end(self, state):
+        msg = f"Epoch {state.epoch} - Train Loss: {state.train_loss:.4f}"
+
+        if state.val_loss is not None:
+            msg += f" - Val Loss: {state.val_loss:.4f}"
+
+        print(msg)
+"""
+
+
+
 
 class EarlyStopping(Callback):
     def __init__(self, patience=5):
