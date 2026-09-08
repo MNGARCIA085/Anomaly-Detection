@@ -9,24 +9,24 @@ version = "0.1.0"
 requires-python = ">=3.7"
 
 dependencies = [
-    "numpy",
-    "pydantic",
-    "scikit-learn",
-    "torch",
-    "joblib",
+    "numpy==2.2.6",
+    "pydantic==2.13.1",
+    "scikit-learn==1.7.2",
+    "torch==2.11.0+cpu",
+    "joblib==1.5.3",
 ]
 
 [project.optional-dependencies]
 train = [
-    "hydra-core",
-    "hydra-joblib-launcher",
-    "mlflow",
-    "pandas",
-    "optuna",
+    "hydra-core==1.3.2",
+    "hydra-joblib-launcher==1.2.0",
+    "mlflow==3.11.1",
+    "pandas==2.3.3",
+    "optuna==4.8.0",
 ]
 
 dev = [
-    "pytest",
+    "pytest==9.1.1",
 ]
 
 
