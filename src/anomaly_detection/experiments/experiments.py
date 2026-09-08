@@ -255,6 +255,10 @@ class Experiment:
             # 11. Log run
             # --------------------------------------------------
 
+            from omegaconf import DictConfig, OmegaConf
+            cfg = OmegaConf.to_container(cfg, resolve=True) if isinstance(cfg, DictConfig) else cfg
+
+
             self.logger.log_run(
                 cfg=cfg,
                 run_type=run_type,

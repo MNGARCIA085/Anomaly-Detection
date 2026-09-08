@@ -1,6 +1,7 @@
 {
   "model": {
     "type": "ae",
-    "version": "v1"
+    "version": "v1",
+    "window_size": 10
   }
 }      
