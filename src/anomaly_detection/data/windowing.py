@@ -95,3 +95,11 @@ class Windowing:
             self,
             path
         )
+
+
+    """
+    better
+    @classmethod
+    def load(cls, path):
+        return joblib.load(path)
+    """
