@@ -90,6 +90,92 @@ class Tuner:
 
 
 
+
+
+# NEW ARCHITCTURE
+
+
+
+# entry paaseds to experiment; see ev. works later
+# tuner also receives it
+
+
+
+"""
+class Tuner:
+
+    def __init__(self, entry, evaluator, tun_cfg, logger):
+        self.entry = entry
+        self.exp = Experiment(
+            entry,
+            evaluator,
+            logger,
+        )
+
+
+
+class Tuner:
+
+    def __init__(self, entry, evaluator, tun_cfg, logger):
+        self.entry = entry
+        self.exp = Experiment(
+            entry,
+            evaluator,
+            logger,
+        )
+
+
+class Experiment:
+
+    def __init__(self, entry, evaluator, logger):
+        self.entry = entry
+        ...
+
+
+                  MODEL_REGISTRY
+                        │
+                        ▼
+                 ModelEntry()
+                        │
+              ┌─────────┴─────────┐
+              ▼                   ▼
+            Tuner             Experiment
+              │                   │
+              ▼                   ▼
+           sample()          build_model()
+                             build_prep()
+                             build_optimizer()
+                             ...
+
+
+"""
+
+
+"""
+Better
+C. Split the entry into separate sampler/builder abstractions
+
+registry
+ ├── Sampler → Tuner
+ └── Builder → Experiment
+
+
+ using python Protocol
+
+
+ModelEntry
+   │
+   ├── Sampling capability
+   │      └── Tuner needs this
+   │
+   └── Building capability
+          └── Experiment needs this
+
+"""
+
+
+
+
 """
 One thing I would change later, though: trial_configs being an in-memory dictionary i
 s fine for your current quick experiment, but if you want your architecture to be robust, I'd eventually make the best config part of the Tuner r

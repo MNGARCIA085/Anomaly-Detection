@@ -18,7 +18,4 @@ def load_from_mlflow(run_id):
     return _build_runner(
         model_dir=local_dir,
         model_type=run.data.tags["model_type"],
-        window_size=int(
-            run.data.params["data.windowing.size"]
-        ),
     )

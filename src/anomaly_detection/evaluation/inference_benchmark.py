@@ -1,12 +1,6 @@
 import time
 
 
-"""
-LATER -> REAL MESAURE; ALL PIPELINE
-NOT JUST PREDICT
-
-"""
-
 class InferenceBenchmark:
 
     def measure(

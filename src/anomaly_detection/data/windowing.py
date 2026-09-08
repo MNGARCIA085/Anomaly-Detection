@@ -1,5 +1,5 @@
 import numpy as np
-
+import joblib
 
 """
 X_train.shape == (N, T, F)
@@ -85,4 +85,13 @@ class Windowing:
         return (
             np.stack(X_windows),
             np.asarray(y_windows),
+        )
+
+
+    # to save
+    def save(self, path):
+
+        joblib.dump(
+            self,
+            path
         )

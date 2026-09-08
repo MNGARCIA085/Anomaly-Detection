@@ -46,6 +46,7 @@ def main():
     )
 
 
+
     #------------------
     benchmark_candidates(
         registry=registry,

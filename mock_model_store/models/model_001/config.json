@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "vae",
+    "version": "v1"
+  }
+}      

@@ -9,24 +9,6 @@ from anomaly_detection.data.windowing import Windowing
 
 
 
-
-import numpy as np
-
-def check(name, X):
-    print(
-        name,
-        "shape:", X.shape,
-        "nan:", np.isnan(X).any(),
-        "inf:", np.isinf(X).any(),
-        "min:", np.nanmin(X),
-        "max:", np.nanmax(X),
-    )
-
-
-
-
-
-
 class Experiment:
 
     def __init__(
@@ -111,9 +93,6 @@ class Experiment:
             #     Temporal preprocessing (optional), for ex for transformers
             # ================================================================
 
-
-            check("X_train_w", X_train_w)
-
             temporal_cfg = (
                 cfg.get("prep", {})
                    .get("temporal")
@@ -140,8 +119,6 @@ class Experiment:
                         X_val_w
                     )
                 )
-
-                check("X_train_temporal", X_train_w)
 
 
             # --------------------------------------------------
@@ -284,7 +261,8 @@ class Experiment:
                 metrics=metrics,
                 history=wrapper.history,
                 preprocessor=preprocessor,
-                temporal_preprocessor=temporal_preprocessor,
+                windowing=windowing,
+                temporal_preprocessor=temporal_preprocessor, # better: win-level prep
                 thresholding=thresholding,
                 wrapper=(
                     wrapper

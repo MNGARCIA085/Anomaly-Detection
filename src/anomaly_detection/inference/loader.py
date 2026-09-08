@@ -5,7 +5,6 @@ import joblib
 import anomaly_detection.models.register_models 
 from anomaly_detection.models.registry import MODEL_REGISTRY
 
-from anomaly_detection.data.windowing import Windowing
 
 from anomaly_detection.thresholding.thresholding import (
         Thresholding
@@ -21,7 +20,6 @@ from .runner import InferenceRunner
 def _build_runner(
     model_dir,
     model_type,
-    window_size,
 ):
 
     prep = joblib.load(
@@ -30,10 +28,16 @@ def _build_runner(
         / "preprocessor.pkl"
     )
 
-    windowing = Windowing(window_size)
+    
+    # windowing
+    windowing = joblib.load(
+        model_dir
+        / "windowing"
+        / "windowing.pkl"
+    )
 
 
-    # temporal prep
+    # window-level temporal prep
     temporal_prep = None
 
     temporal_prep_path = (
@@ -94,6 +98,5 @@ def load_from_config(config, model_dir):
     return _build_runner(
         model_dir=Path(model_dir),
         model_type=config["model"]["type"],
-        window_size=config["data"]["windowing"]["size"],
     )
 

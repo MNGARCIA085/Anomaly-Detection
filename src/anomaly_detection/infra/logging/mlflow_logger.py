@@ -343,6 +343,7 @@ class MLFlowLogger(ExperimentLogger):
         metrics,
         history=None,
         preprocessor=None, # pass already fit preprocessor
+        windowing=None, # already fit
         temporal_preprocessor=None, # already fit
         thresholding=None, # already fitted
         wrapper=None,
@@ -397,6 +398,19 @@ class MLFlowLogger(ExperimentLogger):
                 path,
                 artifact_path="preprocessing",
             )
+
+
+        # windowing
+        if windowing is not None:
+            path = self.artifact_path("windowing.pkl")
+
+            windowing.save(path)
+
+            self.log_artifact(
+                path,
+                artifact_path="windowing",
+            )
+
 
 
         # temporal preprocessor
