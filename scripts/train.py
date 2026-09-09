@@ -36,8 +36,18 @@ def main(cfg):
     )
 
 
+    print(type(cfg.model_type))
+
+    from omegaconf import DictConfig, OmegaConf
+    
+
+    cfg_dict = OmegaConf.to_container(cfg.model_type, resolve=True)
+    print(type(cfg_dict))
+
+
     metrics = exp.run(
-        cfg.model_type,
+        #cfg.model_type,
+        cfg_dict,
         X_train,
         X_val,
         y_val
