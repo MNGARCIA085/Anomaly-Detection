@@ -27,6 +27,10 @@ def main(cfg):
     # select best model (first in my tbale, i should add a rank column)    
     root_dir = Path(__file__).resolve().parents[1] # change!!!!!!!
     tracking_db = root_dir / "mlflow.db"
+
+
+    print(tracking_db)
+
     candidate_db_url = f"sqlite:///{tracking_db}"
 
    

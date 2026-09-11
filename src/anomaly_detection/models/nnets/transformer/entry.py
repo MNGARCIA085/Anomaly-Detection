@@ -185,8 +185,6 @@ class TransformerEntry(BaseModelEntry):
 
 
 
-
-
     def build_temporal_preprocessor(self, temp_prep_cfg):
 
         steps = []

@@ -165,3 +165,29 @@ class CandidateRegistry:
             )
 
         print()
+
+
+
+    def candidate_records(
+        self,
+        experiment_id,
+        include_evicted=False,
+    ):
+        if include_evicted:
+            candidates = self.get_all(experiment_id)
+        else:
+            candidates = self.get_candidates(experiment_id)
+
+        return [
+            {
+                "run_id": candidate.run_id,
+                "model_family": candidate.model_family,
+                "val_pr_auc": candidate.val_pr_auc,
+                "inference_ms": candidate.inference_ms,
+                "explainability": candidate.explainability,
+                "state": candidate.state,
+                "artifact_path": candidate.artifact_path,
+                "created_at": candidate.created_at,
+            }
+            for candidate in candidates
+        ]

@@ -67,6 +67,12 @@ def main():
     print(selected.val_pr_auc)
 
 
+    #--------
+    aux = registry.candidate_records(experiment_id=1)
+    print(aux)
+
+
+
 
 
 
