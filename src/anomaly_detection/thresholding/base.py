@@ -2,8 +2,18 @@ from abc import ABC, abstractmethod
 
 class ThresholdStrategy(ABC):
 
+    #@abstractmethod
+    #def fit(self, scores):
+    #    pass
+
+
     @abstractmethod
-    def fit(self, scores):
+    def fit(
+        self,
+        train_scores=None,
+        val_scores=None,
+        y_val=None,
+    ):
         pass
 
     @abstractmethod

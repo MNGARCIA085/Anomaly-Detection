@@ -183,7 +183,7 @@ class Experiment:
             # 8. Validation scores
             # --------------------------------------------------
 
-            scores = (
+            val_scores = ( # val scores
                 wrapper.get_scores(
                     X_val_model
                 )
@@ -212,13 +212,23 @@ class Experiment:
                     )
                 )
 
+                # validate len(val_scores) == len(y_val_w)
+
                 thresholding.fit(
-                    train_scores
+                    train_scores,
+                    #
+                    val_scores,
+                    y_val_w,
+
                 )
 
                 threshold = (
                     thresholding.get_threshold()
                 )
+
+
+                print(threshold)
+                print(thresholding.config) # {'name': 'constrained_f1', 'params': {'min_recall': 0.8}}
 
                 predictions = (
                     wrapper.predict(
@@ -245,7 +255,7 @@ class Experiment:
 
             metrics = (
                 self.evaluator.evaluate(
-                    scores=scores,
+                    scores=val_scores,
                     y_true=y_val_w,
                     predictions=predictions,
                 )

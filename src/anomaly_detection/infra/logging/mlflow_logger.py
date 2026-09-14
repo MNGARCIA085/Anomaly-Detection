@@ -381,6 +381,14 @@ class MLFlowLogger(ExperimentLogger):
                 flatten_dict(cfg["training"])
             )
 
+
+        if cfg.get('thresholding'):
+            self.log_params(
+                flatten_dict(cfg['thresholding'])    
+            )
+
+
+
         # metrics
         self.log_metrics(metrics)
 

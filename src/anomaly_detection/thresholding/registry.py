@@ -1,7 +1,8 @@
-from .strategies import QuantileThreshold
+from .strategies import QuantileThreshold, ConstrainedF1Threshold
 
 THRESHOLD_REGISTRY = {
     "quantile": QuantileThreshold,
+     "constrained_f1": ConstrainedF1Threshold,
 }
 
 
@@ -14,13 +15,3 @@ def create_threshold_strategy(name, **params):
     return strategy_cls(**params)
 
 
-
-"""
-def create_threshold_strategy(
-    name,
-    **params,
-):
-    strategy_cls = THRESHOLD_REGISTRY[name]
-
-    return strategy_cls(**params)
-"""

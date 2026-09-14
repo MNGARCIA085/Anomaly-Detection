@@ -17,10 +17,10 @@ class Thresholding:
                 )
             )
 
-    def fit(self, scores):
+    def fit(self, train_scores, val_scores, y_val):
 
         if self.strategy is not None:
-            self.strategy.fit(scores)
+            self.strategy.fit(train_scores, val_scores, y_val)
 
         return self
 

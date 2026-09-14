@@ -110,3 +110,7 @@ training_space:
     choices: [32, 64]
 
 
+threshdoling:
+  name: constrained_f1
+  params:
+    min_recall: 0.80
