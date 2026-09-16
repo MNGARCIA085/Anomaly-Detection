@@ -138,13 +138,9 @@ class TransformerEntry(BaseModelEntry):
             # ========================================================
 
             "thresholding": {
-                "name": "quantile",
+                "name": "constrained_f1",
                 "params": {
-                    "quantile": trial.suggest_float(
-                        "threshold_quantile",
-                        0.95,
-                        0.999,
-                    )
+                    "min_recall": 0.80,
                 },
             },
         }

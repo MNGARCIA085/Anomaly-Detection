@@ -1,11 +1,12 @@
 import hydra
 from hydra.utils import to_absolute_path
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from anomaly_detection.data.data import DataModule
 from anomaly_detection.experiments.experiments import Experiment
 from anomaly_detection.evaluation.evaluator import Evaluator
 from anomaly_detection.infra.logging.mlflow_logger import  MLFlowLogger
+
 
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
@@ -36,13 +37,7 @@ def main(cfg):
     )
 
 
-    print(type(cfg.model_type))
-
-    from omegaconf import DictConfig, OmegaConf
-    
-
     cfg_dict = OmegaConf.to_container(cfg.model_type, resolve=True)
-    print(type(cfg_dict))
 
 
     metrics = exp.run(
