@@ -135,6 +135,9 @@ class TransformerAE(nn.Module):
         return x
 
 
+
+# model analysis:https://gemini.google.com/app/e3280263a7d9fbec?hl=es
+
 # ============================================================
 # Wrapper
 # ============================================================
