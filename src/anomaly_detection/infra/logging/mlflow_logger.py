@@ -38,6 +38,16 @@ rm -f mlflow.db
 """
 
 
+"""
+isolate models
+
+model_path = self.artifact_path(
+    path
+)
+
+"""
+
+
 
 
 class MLFlowLogger(ExperimentLogger):
