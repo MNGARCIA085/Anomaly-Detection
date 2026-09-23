@@ -23,11 +23,10 @@ train = [
     "mlflow==3.11.1",
     "pandas==2.3.3",
     "optuna==4.8.0",
-]
-
-dev = [
     "pytest==9.1.1",
 ]
+
+
 
 
 [tool.setuptools]

@@ -1,6 +1,6 @@
 import numpy as np
 
-from anomaly_detection.evaluation.inference_benchmark import (
+from anomaly_detection.inference.benchmarking import (
     InferenceBenchmark,
 )
 
@@ -17,19 +17,37 @@ class DummyModel:
 
 
 def test_measure_warms_up_and_repeats_prediction():
-    """Benchmark should perform one warm-up prediction plus the requested repetitions."""
+    """Benchmark should perform requested warm-up predictions plus the requested repetitions."""
+    model = DummyModel()
+    X = np.zeros((5, 2))
+    warmup = 3
+    repetitions = 3
+
+    result = InferenceBenchmark().measure(
+        runner=model,
+        X=X,
+        repetitions=repetitions,
+        warmup=warmup,
+    )
+
+    # Total calls must equal warm-up calls + repetitions
+    assert model.predict_calls == warmup + repetitions
+    assert result["total_seconds"] >= 0
+    assert result["avg_ms"] >= 0
+
+
+def test_measure_uses_default_warmup_and_repetitions():
+    """Benchmark should use default parameter values if none are provided."""
     model = DummyModel()
     X = np.zeros((5, 2))
 
-    result = InferenceBenchmark().measure(
-        model=model,
+    InferenceBenchmark().measure(
+        runner=model,
         X=X,
-        repetitions=3,
     )
 
-    assert model.predict_calls == 4
-    assert result["total_seconds"] >= 0
-    assert result["avg_ms"] >= 0
+    # Default warmup=5 + default repetitions=20
+    assert model.predict_calls == 25
 
 
 def test_measure_returns_consistent_timing_metrics():
@@ -39,7 +57,7 @@ def test_measure_returns_consistent_timing_metrics():
     repetitions = 5
 
     result = InferenceBenchmark().measure(
-        model=model,
+        runner=model,
         X=X,
         repetitions=repetitions,
     )
@@ -49,16 +67,3 @@ def test_measure_returns_consistent_timing_metrics():
     )
 
     assert result["avg_ms"] == expected_avg_ms
-
-
-
-"""
-The timing itself is inherently nondeterministic, 
-so we should test the contract, not exact performance.
-
-The first test protects the warm-up + repetition contract. 
-The second protects the calculation of avg_ms.
-
-I would not test things like avg_ms < 10, because that would make 
-the test dependent on the machine running it.
-"""

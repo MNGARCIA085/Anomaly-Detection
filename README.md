@@ -53,17 +53,18 @@ Install the package and its dependencies:
 pip install -e .
 ```
 
-For development dependencies:
-
-```bash
-pip install -e ".[dev]"
+**Note** CPU Torch
 ```
+pip install -e . --extra-index-url https://download.pytorch.org/whl/cpu
+```  
 
 For training and experimentation:
 
 ```bash
 pip install -e ".[train]"
 ```
+
+
 
 The exact optional dependency groups are defined in `pyproject.toml`.
 
@@ -76,28 +77,41 @@ The project provides command-line entry points for the main ML workflows.
 Run a training experiment:
 
 ```bash
-python -m scripts.training
+python -m scripts.train
 ```
 
 Hydra configuration can be overridden from the command line. For example:
 
 ```bash
-python -m scripts.training model_type=ae
+python -m scripts.train model_type=ae
 ```
+
+Multirun
+
+```bash
+python -m scripts.train -m model_type=ae,transformer
+```
+
+Parallel execution
+
+```bash
+python scripts/train.py -m \
+    model=ae,transformer \
+    hydra.launcher.n_jobs=2
+```
+
 
 ### Hyperparameter Tuning
 
 Run an Optuna-based tuning experiment:
 
 ```bash
-python -m scripts.tuning
+python -m scripts.tune
+python -m scripts.tune model_type=ae
+python -m scripts.tune -m model_type=ae,isoforest
 ```
 
-Configuration parameters can be overridden from the command line, for example:
 
-```bash
-python -m scripts.tuning model_type=ae
-```
 
 ### Inference
 
@@ -112,15 +126,7 @@ python -m scripts.inference
 Evaluate model predictions and anomaly scores:
 
 ```bash
-python -m scripts.evaluation
-```
-
-### Pipeline
-
-Run the complete configured pipeline:
-
-```bash
-python -m scripts.pipeline
+python -m scripts.final_evaluation
 ```
 
 The available configuration options and experiment parameters are defined under `config/`.
@@ -158,20 +164,34 @@ docker build --target inference -t anomaly-detection:inference-cpu .
 The training container mounts the project data directory as read-only:
 
 ```bash
+docker build \
+    --target train \
+    --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu \
+    -t anomaly-detection:train-cpu .
+
 docker run -it --rm \
     -v "$(pwd)/data:/app/data:ro" \
     anomaly-detection:train-cpu
 ```
+
+
 
 ### Run inference
 
 Inference can use a persisted model from the local model store:
 
 ```bash
-docker run -it --rm \
+docker build \
+    --target inference \
+    --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu \
+    -t anomaly-detection:inference-cpu .
+    
+    
+docker run --rm -it \
     -v "$(pwd)/data:/app/data:ro" \
     -v "$(pwd)/mock_model_store:/app/mock_model_store:ro" \
     anomaly-detection:inference-cpu
+
 ```
 
 The mounted directories allow the container to access the dataset and persisted model artifacts without copying them into the image.
@@ -239,18 +259,10 @@ See the project documentation for the detailed rationale behind these decisions.
 
 ## Dataset
 
+The initial dataset used is provided as part of the DeepLearning.AI & Stanford Online Machine Learning Specialization, in the anomaly detection course material.
 
-Improve this section.....
+DeepLearning.AI & Stanford Online. Machine Learning Specialization.
+https://www.deeplearning.ai/specializations/machine-learning
 
+The dataset is used here for experimentation and methodology development; it is not presented as a real-world production dataset.
 
-
-The dataset files are stored under:
-
-```text
-data/servers/
-```
-
-## References
-
-- DeepLearning.AI & Stanford Online. *Machine Learning Specialization*.
-  [https://www.deeplearning.ai/specializations/machine-learning](https://www.deeplearning.ai/specializations/machine-learning)

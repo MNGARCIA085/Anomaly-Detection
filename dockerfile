@@ -12,14 +12,14 @@ ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
 COPY pyproject.toml .
 COPY src ./src
 
-# Install PyTorch explicitly from the selected index
+# 1. Pre-install PyTorch from the specific CPU/GPU index
 RUN pip install --no-cache-dir \
     torch==2.11.0 \
     --index-url ${TORCH_INDEX_URL}
 
-# Install the package without resolving dependencies again.
-# This keeps the explicitly installed PyTorch version.
-RUN pip install --no-cache-dir --no-deps .
+# 2. Install the rest of the package dependencies using PyTorch index as an extra index 
+# so it reuses the installed PyTorch wheel instead of downloading CUDA versions
+RUN pip install --no-cache-dir --extra-index-url ${TORCH_INDEX_URL} .
 
 # Scripts are needed by both images
 COPY scripts ./scripts

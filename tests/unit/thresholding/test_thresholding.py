@@ -8,8 +8,6 @@ from anomaly_detection.thresholding.registry import (
 from anomaly_detection.thresholding.thresholding import Thresholding
 
 
-
-
 def test_quantile_threshold_computes_threshold():
     """QuantileThreshold should compute the configured quantile from scores."""
     scores = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
@@ -47,14 +45,20 @@ def test_thresholding_without_config_returns_no_threshold():
     """Thresholding without configuration should behave as an optional threshold."""
     thresholding = Thresholding(config=None)
 
-    thresholding.fit(np.array([0.1, 0.2, 0.3]))
+    train_scores = np.array([0.1, 0.2, 0.3])
+    val_scores = np.array([0.4, 0.5])
+    y_val = np.array([0, 1])
+
+    thresholding.fit(train_scores, val_scores, y_val)
 
     assert thresholding.get_threshold() is None
 
 
 def test_thresholding_can_save_and_load(tmp_path):
     """A fitted Thresholding object should preserve its threshold after persistence."""
-    scores = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+    train_scores = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+    val_scores = np.array([0.6, 0.7])
+    y_val = np.array([0, 1])
 
     thresholding = Thresholding(
         config={
@@ -63,7 +67,7 @@ def test_thresholding_can_save_and_load(tmp_path):
         }
     )
 
-    thresholding.fit(scores)
+    thresholding.fit(train_scores, val_scores, y_val)
     expected_threshold = thresholding.get_threshold()
 
     path = tmp_path / "thresholding.joblib"
@@ -72,11 +76,3 @@ def test_thresholding_can_save_and_load(tmp_path):
     loaded = Thresholding.load(path)
 
     assert loaded.get_threshold() == pytest.approx(expected_threshold)
-
-
-
-
-"""
-here are three meaningful layers here: 
-strategy behavior, registry/factory, and the Thresholding wrappe
-"""

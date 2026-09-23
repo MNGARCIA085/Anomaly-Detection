@@ -3,7 +3,6 @@ import numpy as np
 from anomaly_detection.evaluation.evaluator import Evaluator
 from anomaly_detection.experiments.experiments import Experiment
 from anomaly_detection.infra.logging.null_logger import NullLogger
-from anomaly_detection.thresholding import strategies
 
 
 class TrackingThreshold:
@@ -11,8 +10,8 @@ class TrackingThreshold:
     def __init__(self):
         self.fit_scores = None
 
-    def fit(self, scores):
-        self.fit_scores = np.asarray(scores).copy()
+    def fit(self, train_scores, val_scores=None, y_val=None):
+        self.fit_scores = np.asarray(train_scores).copy()
         return self
 
     def get_threshold(self):
@@ -24,8 +23,8 @@ class TrackingThresholding:
     def __init__(self, config):
         self.strategy = TrackingThreshold()
 
-    def fit(self, scores):
-        self.strategy.fit(scores)
+    def fit(self, train_scores, val_scores=None, y_val=None):
+        self.strategy.fit(train_scores, val_scores, y_val)
         return self
 
     def get_threshold(self):
@@ -137,20 +136,3 @@ def test_experiment_fits_threshold_on_training_scores(monkeypatch):
         thresholding.strategy.fit_scores,
         X_train[:, 0],
     )
-
-
-
-
-
-"""
-The important assertion is:
-
-np.testing.assert_array_equal(
-    thresholding.strategy.fit_scores,
-    X_train[:, 0],
-)
-
-Because the validation scores are deliberately very different (10–40 versus 0.1–0.4), 
-this test would 
-fail clearly if Experiment accidentally fitted the threshold on validation scores.
-"""

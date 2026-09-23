@@ -1,32 +1,31 @@
+import hydra
+from hydra.utils import to_absolute_path
+from omegaconf import DictConfig, OmegaConf
+
 from anomaly_detection.data.data import DataModule
-    
 from anomaly_detection.infra.selection.candidate_registry import CandidateRegistry
 from anomaly_detection.infra.selection.model_selector import ModelSelector
 from pathlib import Path
-
 from anomaly_detection.inference.benchmarking import benchmark_candidates
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]  # __file__ -> actual file location
-TRAIN_PATH = BASE_DIR / "data" / "servers" / "X_part2.npy"
-VAL_PATH = BASE_DIR / "data" / "servers" / "X_val_part2.npy"
-Y_VAL_PATH = BASE_DIR / "data" / "servers" / "y_val_part2.npy"
 
 
 
-
-def main():
-
+@hydra.main(config_path="../config", config_name="config", version_base=None)
+def main(cfg):
 
 
     # load data
-
-    data = DataModule(TRAIN_PATH, VAL_PATH, Y_VAL_PATH)
+    data = DataModule(
+        to_absolute_path(cfg.data.train_path),
+        to_absolute_path(cfg.data.val_path),
+        to_absolute_path(cfg.data.y_val_path),
+    )
     X_train, X_val, y_val = data.load()
 
 
-
-    root_dir = Path(__file__).resolve().parents[1]
+    root_dir = Path(to_absolute_path(cfg.paths.root_dir))
     tracking_db = root_dir / "mlflow.db"
     candidate_db_url = f"sqlite:///{tracking_db}"
 

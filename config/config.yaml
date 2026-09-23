@@ -15,16 +15,15 @@ experiment_name: anomaly_detection
 
 
 paths:
+  root_dir: .
   mlflow_db: mlflow.db
   mlflow_artifacts: mlruns
+
 
 
 tracking:
   enabled: true
   #uri: "sqlite:///mlflow.db"
-
-
-
 
 
 hydra:
